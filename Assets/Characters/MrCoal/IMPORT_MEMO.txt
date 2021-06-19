@@ -1,0 +1,5 @@
+Blender fbx import settings:
+-- Add leaf bones - unchecked
+
+Unity fbx import settings:
+-- Scale factor - 100

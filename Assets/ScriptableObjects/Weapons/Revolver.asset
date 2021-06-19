@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 858b38b8c1fd17042b479a240ad2a19b, type: 3}
+  m_Name: Revolver
+  m_EditorClassIdentifier: 
+  ent_type: 6
+  ammoType: 5
+  FireRate: 0.3
+  reloadingTime: 0.5
+  clipSize: 60
+  prefab: {fileID: 7294208750171226124, guid: b5916822d4afb1842ac19b02aa0ed5f6, type: 3}
+  netObjectEnum: 12
+  droppedOnGroundPrefab: {fileID: 6100985812165216601, guid: cde55ea4c2e681849ad823224d0e9685,
+    type: 3}
+  bulletPrefab: {fileID: 1303921158164481607, guid: 1dfd913d3f9932d4fbe1b464eebb0b54,
+    type: 3}
+  fireAudioClip: {fileID: 8300000, guid: 00dfe3b041b34ba4696ad23178761e2f, type: 3}
+  emptyMagazineSound: {fileID: 0}
+  fireSoundRadius: 20
+  poolKey: 37

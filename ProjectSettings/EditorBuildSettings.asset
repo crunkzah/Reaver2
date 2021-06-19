@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Lobby.unity
+    guid: 97ffe5c1b33deae4caa2540533325c11
+  - enabled: 1
+    path: Assets/Scenes/UberManagerHolder.unity
+    guid: 2333b767a98221847b77d5a3747b54e6
+  - enabled: 1
+    path: Assets/Scenes/Prologue 1.unity
+    guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Level_Start.unity
+    guid: 12caf0cb35c95da48b7da1fbe43c229c
+  - enabled: 1
+    path: Assets/Scenes/Level_City.unity
+    guid: 8ea5ce5ba2473b344adf88502f8926d5
+  - enabled: 1
+    path: Assets/Scenes/Level_LabyrinthRadial.unity
+    guid: 7c6e400807f318345a9aba275b6f1bb0
+  - enabled: 1
+    path: Assets/Scenes/Level_Flat.unity
+    guid: 10e665f223e7f61479085bf02a482c9e
+  m_configObjects: {}

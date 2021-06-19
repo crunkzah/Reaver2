@@ -1,0 +1,26 @@
+HOW TO CUSTOMIZE:
+
+- In the FirstLayer material, the main adjustments come from selecting MatCap and Ramp textures. You also can rotate and scale the main MatCap.
+- In the SecondLayer material, you can customize the EdgeDetection effect, and colorize the whole mesh. Both layers have the Final Opacity parameter to make them transparent.
+- Try to just change the Ramp Texture and set the Ramp Color Tint parameter.
+- If you want to use your own gradient, add RampGeneratorV2.cs to the object, enable it, and add Renrerers (script will set the generated ramp texture to all material of each selected renderer). After that you can start creating your Gradient in the editor.
+
+
+
+DEMO SCENE EXAMPLES:
+
+- Composition_01 is just the basic example of the effect.
+- Compositions 02, 03 and 07 using Ramp textures and Compositions 04, 05 and 06 generates gradient with RampGeneratorV2.cs
+- Compositions 08, 09, and 10 are showing how to use these materials on something semi-transparent. Leaves on trees have only a single FirstLayer material.
+
+
+
+RAMP GENERATOR:
+
+- This script just generating a Ramp texture and assigning it to the Material in "_Ramp" slot
+- First boolean just enable it and generating texture one time at the beginning
+- The second boolean updating the texture every frame
+
+
+
+Support email: sinevfx@gmail.com

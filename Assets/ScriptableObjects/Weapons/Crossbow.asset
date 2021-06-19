@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 858b38b8c1fd17042b479a240ad2a19b, type: 3}
+  m_Name: Crossbow
+  m_EditorClassIdentifier: 
+  ent_type: 4
+  ammoType: 3
+  Damage: 100
+  FireRate: 0.5
+  reloadingTime: 0.7
+  clipSize: 20
+  prefab: {fileID: 3781248231535509567, guid: 06aa7f2e57fe5e1469a47bc6ae074440, type: 3}
+  netObjectEnum: 4
+  droppedOnGroundPrefab: {fileID: 2049736462032385867, guid: ff7e93dc74734f744873fee2d9758cd5,
+    type: 3}
+  bulletPrefab: {fileID: 1303921158164481607, guid: 6f2eb99925bc9514586e76bc71530d5f,
+    type: 3}
+  fireAudioClip: {fileID: 8300000, guid: b8d86dae4bc8c45459719f8e52b6b2c0, type: 3}
+  emptyMagazineSound: {fileID: 0}
+  fireSoundRadius: 20

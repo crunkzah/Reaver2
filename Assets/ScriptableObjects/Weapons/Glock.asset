@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 858b38b8c1fd17042b479a240ad2a19b, type: 3}
+  m_Name: Glock
+  m_EditorClassIdentifier: 
+  ent_type: 1
+  ammoType: 0
+  FireRate: 0.15
+  reloadingTime: 0.5
+  clipSize: 20
+  prefab: {fileID: 4617628549456096661, guid: 80bea969eaa1e31489a7a0d38717b138, type: 3}
+  netObjectEnum: 1
+  droppedOnGroundPrefab: {fileID: 1456591695478198, guid: ce46584c7422aee41a072f9fb2b56e29,
+    type: 3}
+  bulletPrefab: {fileID: 1303921158164481607, guid: 7b78bda4557e4c241af8384baabe1f26,
+    type: 3}
+  fireAudioClip: {fileID: 8300000, guid: b138e7b9aad9c58498c7ab7d9c1ae49c, type: 3}
+  emptyMagazineSound: {fileID: 0}
+  fireSoundRadius: 20
+  poolKey: 11

@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Robot01Mask1
+  m_Mask: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: Robot01
+    m_Weight: 1
+  - m_Path: RobotArmature
+    m_Weight: 1
+  - m_Path: RobotArmature/Arm1Pole.l
+    m_Weight: 1
+  - m_Path: RobotArmature/Arm1Pole.l/Arm1Pole.l_end
+    m_Weight: 1
+  - m_Path: RobotArmature/Arm1Pole.r
+    m_Weight: 1
+  - m_Path: RobotArmature/Arm1Pole.r/Arm1Pole.r_end
+    m_Weight: 1
+  - m_Path: RobotArmature/Arm2IK.l
+    m_Weight: 1
+  - m_Path: RobotArmature/Arm2IK.l/Arm2IK.l_end
+    m_Weight: 1
+  - m_Path: RobotArmature/Arm2IK.r
+    m_Weight: 1
+  - m_Path: RobotArmature/Arm2IK.r/Arm2IK.r_end
+    m_Weight: 1
+  - m_Path: RobotArmature/HeelIK.l
+    m_Weight: 1
+  - m_Path: RobotArmature/HeelIK.l/HeelIK.l_end
+    m_Weight: 1
+  - m_Path: RobotArmature/HeelIK.r
+    m_Weight: 1
+  - m_Path: RobotArmature/HeelIK.r/HeelIK.r_end
+    m_Weight: 1
+  - m_Path: RobotArmature/KneeIK.l
+    m_Weight: 1
+  - m_Path: RobotArmature/KneeIK.l/KneeIK.l_end
+    m_Weight: 1
+  - m_Path: RobotArmature/KneeIK.r
+    m_Weight: 1
+  - m_Path: RobotArmature/KneeIK.r/KneeIK.r_end
+    m_Weight: 1
+  - m_Path: RobotArmature/RootBone
+    m_Weight: 1
+  - m_Path: RobotArmature/RootBone/Chest
+    m_Weight: 1
+  - m_Path: RobotArmature/RootBone/Chest/Arm1.l
+    m_Weight: 0
+  - m_Path: RobotArmature/RootBone/Chest/Arm1.l/Arm2.l
+    m_Weight: 0
+  - m_Path: RobotArmature/RootBone/Chest/Arm1.l/Arm2.l/Hand.l
+    m_Weight: 0
+  - m_Path: RobotArmature/RootBone/Chest/Arm1.l/Arm2.l/Hand.l/Hand.l_end
+    m_Weight: 0
+  - m_Path: RobotArmature/RootBone/Chest/Arm1.r
+    m_Weight: 0
+  - m_Path: RobotArmature/RootBone/Chest/Arm1.r/Arm2.r
+    m_Weight: 0
+  - m_Path: RobotArmature/RootBone/Chest/Arm1.r/Arm2.r/Hand.r
+    m_Weight: 0
+  - m_Path: RobotArmature/RootBone/Chest/Arm1.r/Arm2.r/Hand.r/Hand.r_end
+    m_Weight: 0
+  - m_Path: RobotArmature/RootBone/Chest/Head
+    m_Weight: 0
+  - m_Path: RobotArmature/RootBone/Chest/Head/Head_end
+    m_Weight: 0
+  - m_Path: RobotArmature/RootBone/Pelvis
+    m_Weight: 1
+  - m_Path: RobotArmature/RootBone/Pelvis/Leg1.l
+    m_Weight: 1
+  - m_Path: RobotArmature/RootBone/Pelvis/Leg1.l/Leg2.l
+    m_Weight: 1
+  - m_Path: RobotArmature/RootBone/Pelvis/Leg1.l/Leg2.l/Foot.l
+    m_Weight: 1
+  - m_Path: RobotArmature/RootBone/Pelvis/Leg1.l/Leg2.l/Foot.l/Foot.l_end
+    m_Weight: 1
+  - m_Path: RobotArmature/RootBone/Pelvis/Leg1.r
+    m_Weight: 1
+  - m_Path: RobotArmature/RootBone/Pelvis/Leg1.r/Leg2.r
+    m_Weight: 1
+  - m_Path: RobotArmature/RootBone/Pelvis/Leg1.r/Leg2.r/Foot.r
+    m_Weight: 1
+  - m_Path: RobotArmature/RootBone/Pelvis/Leg1.r/Leg2.r/Foot.r/Foot.r_end
+    m_Weight: 1

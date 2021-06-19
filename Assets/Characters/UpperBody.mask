@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UpperBody
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: Dwarf
+    m_Weight: 0
+  - m_Path: DwarfArmature
+    m_Weight: 0
+  - m_Path: DwarfArmature/leg_control_l
+    m_Weight: 0
+  - m_Path: DwarfArmature/leg_control_r
+    m_Weight: 0
+  - m_Path: DwarfArmature/Torso
+    m_Weight: 0
+  - m_Path: DwarfArmature/Torso/Chest
+    m_Weight: 0
+  - m_Path: DwarfArmature/Torso/Chest/arm1_l
+    m_Weight: 0
+  - m_Path: DwarfArmature/Torso/Chest/arm1_l/arm2_l
+    m_Weight: 0
+  - m_Path: DwarfArmature/Torso/Chest/arm1_l/arm2_l/arm3_l
+    m_Weight: 0
+  - m_Path: DwarfArmature/Torso/Chest/arm1_l/arm2_l/arm3_l/arm3_l_001
+    m_Weight: 0
+  - m_Path: DwarfArmature/Torso/Chest/arm1_l/arm2_l/arm3_l/thumb_l
+    m_Weight: 0
+  - m_Path: DwarfArmature/Torso/Chest/arm1_r
+    m_Weight: 0
+  - m_Path: DwarfArmature/Torso/Chest/arm1_r/arm2_r
+    m_Weight: 0
+  - m_Path: DwarfArmature/Torso/Chest/arm1_r/arm2_r/arm3_r
+    m_Weight: 1
+  - m_Path: DwarfArmature/Torso/Chest/arm1_r/arm2_r/arm3_r/arm3_r_001
+    m_Weight: 1
+  - m_Path: DwarfArmature/Torso/Chest/arm1_r/arm2_r/arm3_r/thumb_r
+    m_Weight: 1
+  - m_Path: DwarfArmature/Torso/leg1_l
+    m_Weight: 0
+  - m_Path: DwarfArmature/Torso/leg1_l/target_control_l
+    m_Weight: 0
+  - m_Path: DwarfArmature/Torso/leg1_l/target_control_l/foot_l
+    m_Weight: 0
+  - m_Path: DwarfArmature/Torso/leg1_r
+    m_Weight: 0
+  - m_Path: DwarfArmature/Torso/leg1_r/leg2_r
+    m_Weight: 0
+  - m_Path: DwarfArmature/Torso/leg1_r/leg2_r/foot_r
+    m_Weight: 0

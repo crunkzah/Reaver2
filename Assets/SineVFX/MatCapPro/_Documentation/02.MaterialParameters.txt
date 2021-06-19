@@ -1,0 +1,55 @@
+////////// FIRST LAYER MATERIAL PARAMETERS:
+
+Final Power - Final brightness of the image, you need to lower this value if you using "Gamma Rendering" Mode
+Final Opacity - Adjust the opacity of the effect
+Final Opacity Dither Enabled - Generates a noise-like texture for smooth blending
+*** Final parameters are mostly used to adjust the result look of the effect, its emission power, and opacity
+
+MatCap Texture - MatCap Mask texture, used for coloring
+MatCap Normal - Normal texture of the mesh
+MatCap Scale - Adjust the scale of MatCap, keep it at 0.95 for better results
+MatCap Rotation- Rotates the MatCap Texture to change lighting direction
+
+Single Layer Coloring Enabled - Enables the single layer workflow, when using this, you don't need a second layer of the effect
+Ramp - Gradient Texture, can be generated with RampGeneratorV2.cs script
+Ramp Color Tint - Multiplying the texture by Color
+Ramp Tiling Exp - Adjust the tiling/scale of the Ramp Texture
+Mask Glow Exp - Control the emission mask, higher values mean that only the bright spots will glow
+Mask Glow Amount - Glow power
+Wireframe Enabled - Enables the wireframe effect
+Wireframe Power - Emission power of the effect
+Wireframe Thickness - Thickness of the lines
+Wireframe Fresnel Exp - Control the Rim Mask for the wireframe effect
+Wireframe Glow Amount - Emission power of the effect
+Opacity Texture - Texture, used for opacity mask, check the tree leaves for example
+Opacity Texture Channel - What channel is used for opacity masking, XYZW == RGBA
+
+////////// SECOND LAYER MATERIAL PARAMETERS:
+
+Final Power - Final brightness of the image, you need to lower this value if you using "Gamma Rendering" Mode
+Final Opacity - Adjust the opacity of the effect
+Final Opacity Dither Enabled - Generates a noise-like texture for smooth blending
+*** Final parameters are mostly used to adjust the result look of the effect, its emission power, and opacity
+
+Edges Only Mode Enabled - The second layer produces only the edge detection effect, in this case you can use it even as a post effect
+
+Ramp - Gradient Texture, can be generated with RampGeneratorV2.cs script
+Ramp Color Tint - Multiplying the texture by Color
+Edge Detection Thickness - Thickness of the lines
+Mask Glow Exp - Control the emission mask, higher values mean that only the bright spots will glow
+Mask Glow Amount - Glow power
+Edge Detection Exp - Adjust the look of the edges, higher values for more clear looking edges
+Edge Glow Amount - Emission power of the edge detection effect
+Edge Mask Power - Control the mask power of the edge detection effect
+Edge Fresnel Exp - Control the Rim Mask for the edge detection effect
+Wireframe Enabled - Enables the wireframe effect
+Wireframe Power - Emission power of the effect
+Wireframe Thickness - Thickness of the lines
+Wireframe Fresnel Exp - Control the Rim Mask for the wireframe effect
+Wireframe Glow Amount - Emission power of the effect
+Opacity Texture - Texture, used for opacity mask, check the tree leaves for example
+Opacity Texture Channel - What channel is used for opacity masking, XYZW == RGBA
+
+
+
+Support email: sinevfx@gmail.com

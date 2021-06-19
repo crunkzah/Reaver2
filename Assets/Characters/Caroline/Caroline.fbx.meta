@@ -1,0 +1,179 @@
+fileFormatVersion: 2
+guid: fc4776c226a48af4d9291d705c9e60d7
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: Arm1.l
+    100002: Arm1.r
+    100004: Arm2.l
+    100006: Arm2.r
+    100008: Belly
+    100010: //RootNode
+    100012: Caroline_armature
+    100014: Caroline_mesh
+    100016: Chest
+    100018: Hand1.l
+    100020: Hand1.r
+    100022: Head
+    100024: Index1.l
+    100026: Index1.r
+    100028: Index2.l
+    100030: Index2.r
+    100032: Leg1.l
+    100034: Leg1.r
+    100036: Leg2.l
+    100038: Leg2.r
+    100040: Leg3.l
+    100042: Leg3.r
+    100044: MiddleFinger1.l
+    100046: MiddleFinger1.r
+    100048: MiddleFinger2.l
+    100050: MiddleFinger2.r
+    100052: Neck
+    100054: Pinky1.l
+    100056: Pinky1.r
+    100058: Pinky2.l
+    100060: Pinky2.r
+    100062: RingFinger1.l
+    100064: RingFinger1.r
+    100066: RingFinger2.l
+    100068: RingFinger2.r
+    100070: Root
+    100072: Thumb1.l
+    100074: Thumb1.r
+    100076: Thumb2.l
+    100078: Thumb2.r
+    400000: Arm1.l
+    400002: Arm1.r
+    400004: Arm2.l
+    400006: Arm2.r
+    400008: Belly
+    400010: //RootNode
+    400012: Caroline_armature
+    400014: Caroline_mesh
+    400016: Chest
+    400018: Hand1.l
+    400020: Hand1.r
+    400022: Head
+    400024: Index1.l
+    400026: Index1.r
+    400028: Index2.l
+    400030: Index2.r
+    400032: Leg1.l
+    400034: Leg1.r
+    400036: Leg2.l
+    400038: Leg2.r
+    400040: Leg3.l
+    400042: Leg3.r
+    400044: MiddleFinger1.l
+    400046: MiddleFinger1.r
+    400048: MiddleFinger2.l
+    400050: MiddleFinger2.r
+    400052: Neck
+    400054: Pinky1.l
+    400056: Pinky1.r
+    400058: Pinky2.l
+    400060: Pinky2.r
+    400062: RingFinger1.l
+    400064: RingFinger1.r
+    400066: RingFinger2.l
+    400068: RingFinger2.r
+    400070: Root
+    400072: Thumb1.l
+    400074: Thumb1.r
+    400076: Thumb2.l
+    400078: Thumb2.r
+    2100000: Material.001
+    2100002: Material_hips
+    2100004: Eyes_mat
+    2100006: Hips_mat
+    2100008: Metal_mat
+    4300000: Caroline_mesh
+    9500000: //RootNode
+    13700000: Caroline_mesh
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 0.01
+    hasPreviousCalculatedGlobalScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

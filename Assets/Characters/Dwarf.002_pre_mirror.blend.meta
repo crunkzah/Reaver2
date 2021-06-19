@@ -1,0 +1,785 @@
+fileFormatVersion: 2
+guid: 5091df2022f3f5d448bc5ed0f6d63e29
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: arm1_l
+    100002: arm1_r
+    100004: arm2_l
+    100006: arm2_r
+    100008: arm3_l
+    100010: arm3_l_001
+    100012: arm3_r
+    100014: arm3_r_001
+    100016: Chest
+    100018: Dwarf
+    100020: //RootNode
+    100022: DwarfArmature
+    100024: foot_l
+    100026: foot_r
+    100028: leg1_l
+    100030: leg1_r
+    100032: leg2_r
+    100034: leg_control_l
+    100036: leg_control_r
+    100038: target_control_l
+    100040: thumb_l
+    100042: thumb_r
+    100044: Torso
+    100046: leg2_l
+    400000: arm1_l
+    400002: arm1_r
+    400004: arm2_l
+    400006: arm2_r
+    400008: arm3_l
+    400010: arm3_l_001
+    400012: arm3_r
+    400014: arm3_r_001
+    400016: Chest
+    400018: Dwarf
+    400020: //RootNode
+    400022: DwarfArmature
+    400024: foot_l
+    400026: foot_r
+    400028: leg1_l
+    400030: leg1_r
+    400032: leg2_r
+    400034: leg_control_l
+    400036: leg_control_r
+    400038: target_control_l
+    400040: thumb_l
+    400042: thumb_r
+    400044: Torso
+    400046: leg2_l
+    2100000: Material
+    4300000: Dwarf
+    7400000: Default Take
+    7400002: dwarf_idle_001
+    7400004: dwarf_run_001
+    7400006: dwarf_run_better
+    7400008: dwarf_idle_2
+    7400010: dwarf_hands_pistol_idle
+    7400012: dwarf_run_strafe
+    7400014: dwarf_strafe_r
+    7400016: DwarfArmatureAction
+    7400018: dwarf_run_strafe_left
+    7400020: dwarf_run_strafe_right
+    7400022: dwarf_run_strafe_left2
+    7400024: dwarf_run_strafe_right2
+    7400026: dwarf_strafe_right
+    7400028: dwarf_run_better_left_foot
+    7400030: dwarf_run_diagonal_right_001
+    7400032: dwarf_run_strafe_right4
+    7400034: dwarf_run_strafe_left4
+    7400036: dwarf_run_left45
+    7400038: dwarf_run_right45_2
+    7400040: dwarf_run_strafe_right5
+    7400042: dwarf_run_backwards
+    9500000: //RootNode
+    13700000: Dwarf
+    2186277476908879412: ImportLogs
+  externalObjects: {}
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 3
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Default Take
+      takeName: Default Take
+      firstFrame: -1
+      lastFrame: 23
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_hands_pistol_idle
+      takeName: dwarf_hands_pistol_idle
+      firstFrame: -1
+      lastFrame: 0
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_idle_2
+      takeName: dwarf_idle_2
+      firstFrame: -1
+      lastFrame: 23
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_run_001
+      takeName: dwarf_run_001
+      firstFrame: -1
+      lastFrame: 24
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_run_backwards
+      takeName: dwarf_run_backwards
+      firstFrame: -1
+      lastFrame: 23
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_run_better
+      takeName: dwarf_run_better
+      firstFrame: -1
+      lastFrame: 23
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_run_better_left_foot
+      takeName: dwarf_run_better_left_foot
+      firstFrame: -1
+      lastFrame: 23
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_run_diagonal_right_001
+      takeName: dwarf_run_diagonal_right_001
+      firstFrame: -1
+      lastFrame: 23
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_run_left45
+      takeName: dwarf_run_left45
+      firstFrame: -1
+      lastFrame: 23
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_run_right45_2
+      takeName: dwarf_run_right45_2
+      firstFrame: -1
+      lastFrame: 23
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_run_strafe_left
+      takeName: dwarf_run_strafe_left
+      firstFrame: -1
+      lastFrame: 23
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_run_strafe_left4
+      takeName: dwarf_run_strafe_left4
+      firstFrame: -1
+      lastFrame: 23
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_run_strafe_right
+      takeName: dwarf_run_strafe_right
+      firstFrame: -1
+      lastFrame: 23
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_run_strafe_right4
+      takeName: dwarf_run_strafe_right4
+      firstFrame: -1
+      lastFrame: 23
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_run_strafe_right5
+      takeName: dwarf_run_strafe_right5
+      firstFrame: -1
+      lastFrame: 23
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_strafe_r
+      takeName: dwarf_strafe_r
+      firstFrame: -1
+      lastFrame: 0
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: dwarf_strafe_right
+      takeName: dwarf_strafe_right
+      firstFrame: -1
+      lastFrame: 7
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: DwarfArmatureAction
+      takeName: DwarfArmatureAction
+      firstFrame: -1
+      lastFrame: 0
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 1
+    hasPreviousCalculatedGlobalScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton:
+    - name: Dwarf.002_pre_mirror(Clone)
+      parentName: 
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Dwarf
+      parentName: Dwarf.002_pre_mirror(Clone)
+      position: {x: -0, y: 0, z: -0.0012532473}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 0.38330042, y: 0.38330042, z: 0.3833004}
+    - name: DwarfArmature
+      parentName: Dwarf.002_pre_mirror(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071068}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Torso
+      parentName: DwarfArmature
+      position: {x: -5.23129e-10, y: -0.040561736, z: 0.56935495}
+      rotation: {x: 0.4932503, y: 0.49325034, z: -0.5066597, w: 0.5066598}
+      scale: {x: 1.0000008, y: 1.0000008, z: 1.0000007}
+    - name: Chest
+      parentName: Torso
+      position: {x: -0.3030141, y: 0.000000022613676, z: 0.00000000556247}
+      rotation: {x: 0.00000021117734, y: 0.008489624, z: -0, w: 0.999964}
+      scale: {x: 1.0000011, y: 1.0000004, z: 1.0000005}
+    - name: arm1_l
+      parentName: Chest
+      position: {x: -0.27633938, y: -0.38659135, z: -0.045873344}
+      rotation: {x: 0.0034490589, y: 0.0035088588, z: 0.700998, w: 0.71314627}
+      scale: {x: 1.0000001, y: 0.9999995, z: 0.99999994}
+    - name: arm2_l
+      parentName: arm1_l
+      position: {x: -0.43788174, y: 0.00000010430813, z: 0.000000014901161}
+      rotation: {x: -0.70710653, y: 0.0007067966, z: -0.00070667494, w: 0.7071064}
+      scale: {x: 0.9999995, y: 1.0000015, z: 1.0000002}
+    - name: arm3_l
+      parentName: arm2_l
+      position: {x: -0.2819256, y: 0.00000008568168, z: -0.00000014901161}
+      rotation: {x: -0.00006076692, y: -0.015078968, z: 0.006316892, w: 0.99986637}
+      scale: {x: 0.9999998, y: 0.99999934, z: 1}
+    - name: thumb_l
+      parentName: arm3_l
+      position: {x: -0.09482984, y: -0.100684226, z: 0.0070388317}
+      rotation: {x: 0.88734996, y: 0.46106395, z: -0.00485524, w: -0.00256183}
+      scale: {x: 0.8261064, y: 0.8261063, z: 0.8261064}
+    - name: arm3_l_001
+      parentName: arm3_l
+      position: {x: -0.16912547, y: 0.00000011175871, z: 0.000000029802322}
+      rotation: {x: -0.00002269913, y: 0.010349832, z: -0.0023424244, w: 0.99994373}
+      scale: {x: 0.861325, y: 0.8613252, z: 0.86132455}
+    - name: arm1_r
+      parentName: Chest
+      position: {x: -0.27633932, y: 0.38659137, z: -0.04587352}
+      rotation: {x: -0.0034491795, y: 0.0035087406, z: -0.700998, w: 0.71314627}
+      scale: {x: 0.99999976, y: 0.99999976, z: 1.0000006}
+    - name: arm2_r
+      parentName: arm1_r
+      position: {x: -0.43788177, y: -0.000000037252903, z: -0.00000018626451}
+      rotation: {x: -0.7071065, y: -0.00070664723, z: -0.00070667436, w: -0.7071065}
+      scale: {x: 1.0000012, y: 1.0000005, z: 1.0000007}
+    - name: arm3_r
+      parentName: arm2_r
+      position: {x: -0.28192574, y: 0.00000010430813, z: 0.000000055879354}
+      rotation: {x: -0.005044906, y: 0.07411201, z: -0.05048197, w: 0.9959586}
+      scale: {x: 1.0000005, y: 1.0000002, z: 1.0000008}
+    - name: thumb_r
+      parentName: arm3_r
+      position: {x: -0.103151776, y: 0.09192283, z: -0.0094605535}
+      rotation: {x: 0.9037241, y: -0.41982546, z: 0.07141116, w: -0.043931343}
+      scale: {x: 0.8261063, y: 0.8261068, z: 0.82610655}
+    - name: arm3_r_001
+      parentName: arm3_r
+      position: {x: -0.11492653, y: 0.000000059604645, z: -0.00000013411045}
+      rotation: {x: -0.0028840054, y: -0.12222806, z: 0.06728883, w: 0.9902142}
+      scale: {x: 0.8613249, y: 0.86132485, z: 0.86132467}
+    - name: leg1_l
+      parentName: Torso
+      position: {x: 0.02460717, y: -0.19183186, z: -0.02537645}
+      rotation: {x: -0.042350307, y: 0.0018310545, z: 0.99851936, w: 0.034092005}
+      scale: {x: 0.9999984, y: 0.9999898, z: 0.9999857}
+    - name: target_control_l
+      parentName: leg1_l
+      position: {x: -0.21542777, y: 0.000000052154064, z: 0.000000004190952}
+      rotation: {x: -0.9890008, y: -0.025814064, z: -0.14562364, w: 0.002187947}
+      scale: {x: 0.999997, y: 1.0000048, z: 1.0000054}
+    - name: foot_l
+      parentName: target_control_l
+      position: {x: -0.27237532, y: 0.000000039115548, z: -0.00000009126961}
+      rotation: {x: 0.019019075, y: 0.7572258, z: 0.018033387, w: -0.65262717}
+      scale: {x: 1.0000017, y: 1.0000004, z: 0.9999992}
+    - name: leg1_r
+      parentName: Torso
+      position: {x: 0.024607304, y: 0.19183186, z: -0.02537634}
+      rotation: {x: -0.042350266, y: -0.0018308829, z: 0.9985193, w: -0.03409206}
+      scale: {x: 1.0000011, y: 0.9999897, z: 0.9999849}
+    - name: leg2_r
+      parentName: leg1_r
+      position: {x: -0.21542777, y: 0, z: -0.00000006426126}
+      rotation: {x: -0.98900086, y: 0.025814306, z: -0.14562355, w: -0.0021879633}
+      scale: {x: 0.999996, y: 1.0000011, z: 1.0000039}
+    - name: foot_r
+      parentName: leg2_r
+      position: {x: -0.2723754, y: -0.000000014901161, z: 0}
+      rotation: {x: -0.019026617, y: 0.7572255, z: -0.01804283, w: -0.652627}
+      scale: {x: 1.0000023, y: 1.0000001, z: 0.9999991}
+    - name: leg_control_l
+      parentName: DwarfArmature
+      position: {x: -0.61655104, y: 0.34682286, z: 0.48415005}
+      rotation: {x: 0.5000577, y: 0.50000995, z: 0.49999008, w: -0.4999423}
+      scale: {x: 1.0000012, y: 1.000001, z: 1.0000017}
+    - name: leg_control_r
+      parentName: DwarfArmature
+      position: {x: 0.6121458, y: -0.19346917, z: 0.21263552}
+      rotation: {x: 0.50000995, y: 0.5000577, z: 0.4999423, w: -0.49999008}
+      scale: {x: 1.0000012, y: 1.000001, z: 1.0000017}
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: Torso
+    hasTranslationDoF: 0
+    hasExtraRoot: 1
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

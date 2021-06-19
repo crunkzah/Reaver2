@@ -1,0 +1,42 @@
+IMPORTANT NOTES:
+
+- If you using LWRP or URP make sure, you enable HDR, Depth and Opaque textures in LWRP/URP Asset settings
+- Turn on "HDR" on your Camera, Shaders requires it
+- This VFX Asset looks much better in "Linear Rendering", but if you using "Gamma Rendering" Mode, you need to slightly decrease the Final Power material parameter of each effect.
+- Image Effects are necessary in order to make a great looking game, as well as our asset. Be sure you use "Tone Mapping" and "Bloom"
+- Your camera must render Depth texture in order for some effects to appear correctly
+
+
+
+HOW THIS EFFECT WORK:
+
+- These effects consist of two materials. One creating a grayscale MatCap texture (you can colorize it if you want). The second material layer used for
+colorization and adding the Edge Detection effect.
+- You can use only one material with the "FirstLayer" prefix. In this case, you need to enable "Single Layer Coloring Enabled" inside Material settings. After that
+you can pick Gradient Texture, and also enable the Wireframe effect.
+- The method above is needed if you want to apply MatCapPro effects to a mesh with multiple submeshes (multiple material slots on a single mesh), like complex humanoid characters. You can also just split
+these submeshes in any 3d program and reimport your fbx/obj mesh.
+- We recommend using two layers for stylized meshes with normal maps, but for low-poly style you can plug just one FirstLayer material.
+
+
+
+HOW TO USE:
+
+- First of all, check for Demo Scene in the Scenes folder. Also, there is a Prefabs folder with complete effects.
+- There are prefabs of example meshes in a "Prefabs" folder. You can pick what you like and copy its FirstLayer and SecondLayer materials.
+- After that, just apply these materials to your GameObject.
+- Some Meshes using RampGeneratorV2.cs script. This script generates the gradient texture and applies it to the material. It only works in play mode, so
+in the editor window the result will be different.
+
+
+
+BASIC ADJUSTMENTS AND CUSTOMIZATION:
+
+- In the FirstLayer material, the main adjustments come from selecting MatCap and Ramp textures. You also can rotate and scale the main MatCap.
+- In the SecondLayer material, you can customize the EdgeDetection effect, and colorize the whole mesh. Both layers have the Final Opacity parameter to make them transparent.
+- Materials have a lot of settings, just play with them, and create your own unique look. Be aware, that in a play mode, some materials will be converted into instances because their values are changing by the Animator component. So if you change material settings in a play mode, the original material won't be affected. This is a great way to just test all the settings.
+- Most of the parameters are described in a "02.MaterialParameters.txt" file.
+
+
+
+Support email: sinevfx@gmail.com

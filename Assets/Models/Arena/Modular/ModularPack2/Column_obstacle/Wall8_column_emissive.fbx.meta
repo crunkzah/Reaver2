@@ -1,0 +1,143 @@
+fileFormatVersion: 2
+guid: b1230e094e70dc94b99fbc33b292614d
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Arm1.l
+    100004: Arm1.r
+    100006: Arm1_pole.l
+    100008: Arm1_pole.l_end
+    100010: Arm1_pole.r
+    100012: Arm1_pole.r_end
+    100014: Arm2.l
+    100016: Arm2.l_end
+    100018: Arm2.r
+    100020: Arm2.r_end
+    100022: Chest
+    100024: Hand_ik.l
+    100026: Hand_ik.l_end
+    100028: Hand_ik.r
+    100030: Hand_ik.r_end
+    100032: Head
+    100034: Head_end
+    100036: RobotBomber_half
+    100038: RobotBomber_half_armature
+    100040: Root
+    100042: Torso
+    400000: //RootNode
+    400002: Arm1.l
+    400004: Arm1.r
+    400006: Arm1_pole.l
+    400008: Arm1_pole.l_end
+    400010: Arm1_pole.r
+    400012: Arm1_pole.r_end
+    400014: Arm2.l
+    400016: Arm2.l_end
+    400018: Arm2.r
+    400020: Arm2.r_end
+    400022: Chest
+    400024: Hand_ik.l
+    400026: Hand_ik.l_end
+    400028: Hand_ik.r
+    400030: Hand_ik.r_end
+    400032: Head
+    400034: Head_end
+    400036: RobotBomber_half
+    400038: RobotBomber_half_armature
+    400040: Root
+    400042: Torso
+    2100000: No Name
+    2300000: //RootNode
+    2300002: RobotBomber_half
+    3300000: //RootNode
+    3300002: RobotBomber_half
+    4300000: Wall8_column_emissive
+    4300002: Wall8_detail_small3
+    4300004: RobotBomber_half
+  externalObjects: {}
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 1
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 1
+    hasPreviousCalculatedGlobalScale: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 0
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

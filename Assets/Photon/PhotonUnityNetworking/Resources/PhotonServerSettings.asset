@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f3758f8f58fdef43803eb9be1df0608, type: 3}
+  m_Name: PhotonServerSettings
+  m_EditorClassIdentifier: 
+  AppSettings:
+    AppIdRealtime: 8967b37e-cce5-432c-ba01-307337902358
+    AppIdChat: 
+    AppIdVoice: 
+    AppVersion: 
+    UseNameServer: 1
+    FixedRegion: ru
+    Server: 
+    Port: 0
+    Protocol: 0
+    EnableLobbyStatistics: 0
+    NetworkLogging: 1
+  StartInOfflineMode: 0
+  PunLogging: 0
+  EnableSupportLogger: 0
+  RunInBackground: 1
+  RpcList:
+  - ActivateNet
+  - BoostVelocity
+  - CallFuncRPC
+  - CallFunctionsMultiple
+  - CreateObject
+  - CreateObjectsMultiple
+  - DashFXEnd
+  - DashFXStart
+  - DeactivateNet
+  - DestroyAllDynamicObjects
+  - DestroyObject
+  - DisableNetObject
+  - FireRPC
+  - FPSDashFX
+  - GroundSlam
+  - Impact
+  - InteractNet
+  - OnGroundSlammed
+  - PickUpKeyRPC
+  - PlayAnimation
+  - ReceiveRTT
+  - ReloadLevel
+  - ScheduleCommandRPC
+  - SetTimeToSyncScene
+  - ShootRevolver
+  - ShootRocketLauncher
+  - ShootShotgun
+  - SpawnItem
+  - SpawnNewItemFromMasterRPC
+  - SpawnObject
+  - TakeDamage
+  - UnequipKey
+  - WieldGunTPS
+  - ShootRevolver_Alt
+  - ShootShotgun_Alt
+  - Blink
+  - ShootAR
+  - ShootARGhost
+  - EquipARGhostRPC
+  - LavaBurst
+  - Punch
+  - FPSCommand
+  - _SpawnNPC2
+  - PlayDirSlam
+  - FPSCommand2
+  - _SpawnNPC_Spawner
+  - FPSCommand3
+  - FPSC3
+  DisableAutoOpenWizard: 1

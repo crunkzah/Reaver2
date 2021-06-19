@@ -1,0 +1,192 @@
+fileFormatVersion: 2
+guid: 93c8281ec3773454e9e9dea47da7609e
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: RobotWorker
+    100004: RobotWorker_eye
+    100006: RobotWorker_Legs
+    100008: Arm1.l
+    100010: Arm1.r
+    100012: Arm1Pole.l
+    100014: Arm1Pole.l_end
+    100016: Arm1Pole.r
+    100018: Arm1Pole.r_end
+    100020: Arm2.l
+    100022: Arm2.r
+    100024: Arm2IK.l
+    100026: Arm2IK.l_end
+    100028: Arm2IK.r
+    100030: Arm2IK.r_end
+    100032: Chest
+    100034: Foot.l
+    100036: Foot.l_end
+    100038: Foot.r
+    100040: Foot.r_end
+    100042: Hand.l
+    100044: Hand.l_end
+    100046: Hand.r
+    100048: Hand.r_end
+    100050: Head
+    100052: Head_end
+    100054: HeelIK.l
+    100056: HeelIK.r
+    100058: KneeIK.l
+    100060: KneeIK.l_end
+    100062: KneeIK.r
+    100064: KneeIK.r_end
+    100066: Leg1.l
+    100068: Leg1.r
+    100070: Leg2.l
+    100072: Leg2.l_end
+    100074: Leg2.r
+    100076: Leg2.r_end
+    100078: Pelvis
+    100080: Robot01
+    100082: RobotArmature
+    100084: RootBone
+    400000: //RootNode
+    400002: RobotWorker
+    400004: RobotWorker_eye
+    400006: RobotWorker_Legs
+    400008: Arm1.l
+    400010: Arm1.r
+    400012: Arm1Pole.l
+    400014: Arm1Pole.l_end
+    400016: Arm1Pole.r
+    400018: Arm1Pole.r_end
+    400020: Arm2.l
+    400022: Arm2.r
+    400024: Arm2IK.l
+    400026: Arm2IK.l_end
+    400028: Arm2IK.r
+    400030: Arm2IK.r_end
+    400032: Chest
+    400034: Foot.l
+    400036: Foot.l_end
+    400038: Foot.r
+    400040: Foot.r_end
+    400042: Hand.l
+    400044: Hand.l_end
+    400046: Hand.r
+    400048: Hand.r_end
+    400050: Head
+    400052: Head_end
+    400054: HeelIK.l
+    400056: HeelIK.r
+    400058: KneeIK.l
+    400060: KneeIK.l_end
+    400062: KneeIK.r
+    400064: KneeIK.r_end
+    400066: Leg1.l
+    400068: Leg1.r
+    400070: Leg2.l
+    400072: Leg2.l_end
+    400074: Leg2.r
+    400076: Leg2.r_end
+    400078: Pelvis
+    400080: Robot01
+    400082: RobotArmature
+    400084: RootBone
+    2100000: Material
+    2300000: //RootNode
+    2300002: RobotWorker
+    2300004: RobotWorker_eye
+    2300006: RobotWorker_Legs
+    2300008: Robot01
+    3300000: //RootNode
+    3300002: RobotWorker
+    3300004: RobotWorker_eye
+    3300006: RobotWorker_Legs
+    3300008: Robot01
+    4300000: RobotWorker
+    4300002: RobotWorker_eye
+    4300004: RobotWorker_Legs
+    4300006: Robot01
+  externalObjects: {}
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 1
+    hasPreviousCalculatedGlobalScale: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 0
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

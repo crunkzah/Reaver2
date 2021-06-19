@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags: []
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - PostProcessing
+  - Utility
+  - Ground
+  - Projectile
+  - Player
+  - Damagable
+  - ItemsOnGround
+  - InvisibleCollider
+  - Detection
+  - Fadable
+  - EditorOnly
+  - Light
+  - DynamicObstacle
+  - NPC
+  - Ragdoll
+  - NavMeshSurface
+  - NPC_NonCollidable
+  - ProjectileLavaBurst
+  - NPC2
+  - FPSView
+  - Interactable
+  - NoShadow
+  - Ceiling
+  - GUI3D
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 858b38b8c1fd17042b479a240ad2a19b, type: 3}
+  m_Name: Shotgun
+  m_EditorClassIdentifier: 
+  ent_type: 3
+  ammoType: 1
+  FireRate: 0.55
+  reloadingTime: 0.5
+  clipSize: 20
+  prefab: {fileID: 5729018079232773848, guid: 8e680d0bfbe775f41ab1702e962495c8, type: 3}
+  netObjectEnum: 3
+  droppedOnGroundPrefab: {fileID: 404016050059344744, guid: 7e559096c041f78419377f2d53f78145,
+    type: 3}
+  bulletPrefab: {fileID: 1303921158164481607, guid: ff88b8d3d2fac2949b3cf27b3db20cd6,
+    type: 3}
+  fireAudioClip: {fileID: 8300000, guid: 203103e9a7d22d84e96e9eb270780124, type: 3}
+  emptyMagazineSound: {fileID: 0}
+  fireSoundRadius: 20
+  poolKey: 13
