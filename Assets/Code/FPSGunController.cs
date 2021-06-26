@@ -73,6 +73,7 @@ public class FPSGunController : MonoBehaviour
     
     [Header("Armed fps weapons:")]
     public Revolver revolver_fps;
+    public Animator arm_right_animator;
     public Transform gunPoint_revolver_fps;
     //public Animator revolver_animatorFPS;
     public ParticleSystem revolverFX_ps;
@@ -139,10 +140,38 @@ public class FPSGunController : MonoBehaviour
         pController = GetComponent<PlayerController>();
         pv = GetComponent<PhotonView>();
         
-        slots[0] = GunType.Revolver;
-        slots[1] = GunType.Shotgun;
-        slots[2] = GunType.RocketLauncher;
-        slots[3] = GunType.AR;
+        ReadPlayerInventory();
+        
+        // slots[0] = GunType.Revolver;
+        // slots[1] = GunType.Shotgun;
+        // slots[2] = GunType.RocketLauncher;
+        // slots[3] = GunType.AR;
+    }
+    
+    public void ReadPlayerInventory()
+    {
+        for(int i = 0; i < slots.Length; i++)
+        {
+            slots[i] = PlayerInventory.Singleton().playerGunSlots[i];
+        }
+    }
+    
+    public void WieldRevolver()
+    {
+        if(pv.IsMine)
+        {
+            currentSlot = 0;
+            WieldGunFPS();
+        }
+    }
+    
+    public void WieldShotgun()
+    {
+        if(pv.IsMine)
+        {
+            currentSlot = 1;
+            WieldGunFPS();
+        }
     }
     
     void Start()
@@ -169,6 +198,8 @@ public class FPSGunController : MonoBehaviour
         Destroy(rocketLauncher_fps.gameObject);
         Destroy(AR_fps.gameObject);
         Destroy(AR_ghost_fps.gameObject);
+        Destroy(arm_animator.gameObject);
+        Destroy(arm_right_animator.gameObject);
     }
     
     void IncrementCurrentSlot(int x)
@@ -193,6 +224,7 @@ public class FPSGunController : MonoBehaviour
     
     void SetCurrentSlot(int newSlotIndex)
     {
+        // if(currentSlot == newSlotIndex || slots[newSlotIndex] == GunType.None)
         if(currentSlot == newSlotIndex)
         {
             return;
@@ -259,6 +291,7 @@ public class FPSGunController : MonoBehaviour
     void EquipARGhostRPC(bool val)
     {
         //AR_ghost_tps.gameObject.SetActive(val);
+        
     }
     
     void UnequipARGhost()
@@ -937,17 +970,20 @@ public class FPSGunController : MonoBehaviour
             //     {
             if(SwitchToPrevSlot_KeyDown() && pController.CanControlPlayer())
             {
-                int t = currentSlot;
-                currentSlot = prevSlot;
-                prevSlot = t;
-                WieldGunFPS();
+                if(slots[prevSlot] != GunType.None)
+                {
+                    int t = currentSlot;
+                    currentSlot = prevSlot;
+                    prevSlot = t;
+                    WieldGunFPS();
+                }
             }
             //     }
             // }
         }
         else
         {
-            if(keyBoard != currentSlot)
+            if(keyBoard != currentSlot && slots[keyBoard] != GunType.None)
             {
                 if(switchWeaponTimer == 0)
                 {
@@ -1454,6 +1490,8 @@ public class FPSGunController : MonoBehaviour
                 AR_fps.gameObject.SetActive(false);
                 AR_ghost_fps.gameObject.SetActive(false);
                 
+                arm_right_animator.Play("Base.Hidden", 0, 0);
+                
                 gunTimer = switchWeaponDuration;
                 
                 break;
@@ -1461,6 +1499,9 @@ public class FPSGunController : MonoBehaviour
             case(GunType.Revolver):
             {
                 revolver_fps.gameObject.SetActive(true);
+                arm_right_animator.Play("Base.Wield", 0, 0);
+                revolver_fps.anim.Play("Base.Wield", 0, 0);
+                
                 shotgun_fps.gameObject.SetActive(false);
                 rocketLauncher_fps.gameObject.SetActive(false);
                 AR_fps.gameObject.SetActive(false);
@@ -1474,11 +1515,15 @@ public class FPSGunController : MonoBehaviour
             case(GunType.Shotgun):
             {
                 revolver_fps.gameObject.SetActive(false);
+                
+                shotgun_animatorFPS.Play("Base.Wield", 0, 0);
+                
                 shotgun_fps.gameObject.SetActive(true);
                 rocketLauncher_fps.gameObject.SetActive(false);
                 AR_fps.gameObject.SetActive(false);
                 AR_ghost_fps.gameObject.SetActive(false);
                 
+                arm_right_animator.Play("Base.Hidden", 0, 0);
                 gunTimer = switchWeaponDuration;
                 
                 
@@ -1493,6 +1538,8 @@ public class FPSGunController : MonoBehaviour
                 AR_fps.gameObject.SetActive(false);
                 AR_ghost_fps.gameObject.SetActive(false);
                 
+                arm_right_animator.Play("Base.Hidden", 0, 0);
+                
                 gunTimer = switchWeaponDuration;
                 
                 
@@ -1506,6 +1553,8 @@ public class FPSGunController : MonoBehaviour
                 AR_fps.gameObject.SetActive(true);
                 
                 currentARFireRate = ARFireRateFastest;
+                
+                arm_right_animator.Play("Base.Hidden", 0, 0);
                 
                 if(hasARGhost)
                 {
@@ -1913,8 +1962,9 @@ public class FPSGunController : MonoBehaviour
         if(pv.IsMine)
         {
             CameraShaker.MakeTrauma(0.1f);
-            revolver_fps.anim.Play("Base.Fire2", 0, 0);
+            revolver_fps.anim.Play("Base.Fire1", 0, 0);
             revolverFX_stronger_ps.Play();
+            arm_right_animator.Play("Base.Fire1", 0, 0);
         }
                 
         //RaycastHit hit;
@@ -1952,6 +2002,7 @@ public class FPSGunController : MonoBehaviour
         {
             CameraShaker.MakeTrauma(0.15f);
             revolver_fps.anim.Play("Base.Fire1", 0, 0);
+            arm_right_animator.Play("Base.Fire1", 0, 0);
         }
                 
         RaycastHit hit;

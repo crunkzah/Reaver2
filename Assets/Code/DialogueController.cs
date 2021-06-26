@@ -95,6 +95,10 @@ public class DialogueController : MonoBehaviour, INetworkObject
         }
     }
     
+    public bool showMsg = false;
+    
+    public string msgToShow = "MSG TO SHOW";
+    
     void Update()
     {
         if(hasTalkedThroughThisDialogue)
@@ -116,6 +120,11 @@ public class DialogueController : MonoBehaviour, INetworkObject
             {
                 if(DialogueManager.GetState() == DialogueState.Hidden)
                 {
+                    if(showMsg)
+                    {
+                        showMsg = false;
+                        MessagePanel.Singleton().ShowMessage(msgToShow, 4);
+                    }
                     //Show here message 'Press 'E' to chat'
                     //InGameConsole.LogOrange("Press E to chat");
                     if(Inputs.GetInteractKeyDown())

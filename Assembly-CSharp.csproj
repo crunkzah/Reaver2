@@ -54,14 +54,17 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Code\AI\Boss01Controller.cs" />
+     <Compile Include="Assets\Code\AI\CarolineKneeling.cs" />
      <Compile Include="Assets\Code\AI\CatLadyController.cs" />
      <Compile Include="Assets\Code\AI\Chaser2Controller.cs" />
+     <Compile Include="Assets\Code\AI\Civ2Controller.cs" />
      <Compile Include="Assets\Code\AI\INetworkObject.cs" />
      <Compile Include="Assets\Code\AI\KateController.cs" />
      <Compile Include="Assets\Code\AI\MrCoalController.cs" />
      <Compile Include="Assets\Code\AI\OliosController.cs" />
      <Compile Include="Assets\Code\AI\PadlaController.cs" />
      <Compile Include="Assets\Code\AI\PadlaLongController.cs" />
+     <Compile Include="Assets\Code\AI\PlayerInventory.cs" />
      <Compile Include="Assets\Code\AI\Shooter2Controller.cs" />
      <Compile Include="Assets\Code\AI\Shooter3_shotgun.cs" />
      <Compile Include="Assets\Code\AI\SinclaireController.cs" />
@@ -218,6 +221,7 @@
      <Compile Include="Assets\Code\MakeLine.cs" />
      <Compile Include="Assets\Code\MathHelper.cs" />
      <Compile Include="Assets\Code\MeleeSwingController.cs" />
+     <Compile Include="Assets\Code\MessagePanel.cs" />
      <Compile Include="Assets\Code\Mia.cs" />
      <Compile Include="Assets\Code\Monologue.cs" />
      <Compile Include="Assets\Code\MovingNPC.cs" />

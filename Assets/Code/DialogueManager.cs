@@ -16,7 +16,8 @@ public enum DialogueState : byte
 public enum DialogueAvatar : byte
 {
     Kate,
-    MrCoal
+    MrCoal,
+    Civ2
 }
 
 public class DialogueManager : MonoBehaviour
@@ -31,8 +32,8 @@ public class DialogueManager : MonoBehaviour
     public TextMeshProUGUI name_tmp;
     public TextMeshProUGUI text_tmp;
     
-    const float shown_height = 200;
-    const float shutter_speed = 300;
+    const float shown_height = 250;
+    const float shutter_speed = 450;
     
     static DialogueManager _instance;
     
@@ -476,7 +477,8 @@ public class DialogueManager : MonoBehaviour
     [Header("Dialogue avatars:")]
     public Sprite Default_avatar;
     public Sprite Kate_avatar;
-    public Sprite MrCoal_avatar;    
+    public Sprite MrCoal_avatar;
+    public Sprite Civ2_avatar; 
     
     public void SetDialogueAvatar(DialogueAvatar avatar)
     {
@@ -492,6 +494,12 @@ public class DialogueManager : MonoBehaviour
             {
                 avatar_img.sprite = MrCoal_avatar;
                 name_tmp.SetText("Mr Coal");
+                break;
+            }
+            case(DialogueAvatar.Civ2):
+            {
+                avatar_img.sprite = Civ2_avatar;
+                name_tmp.SetText("Mr Civ");
                 break;
             }
             default:

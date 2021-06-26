@@ -45,6 +45,18 @@ public class Kaboom1 : MonoBehaviour
     
     public void ExplodeDamageHostile(Vector3 pos, float radius, float force_magnitude, int dmg)
     {
+        float explosion_scale = radius * explosion_default_scale;
+        ps.transform.localScale = new Vector3(explosion_scale, explosion_scale, explosion_scale);
+        
+        Debug.DrawRay(pos, Vector3.up * radius, Color.green, 3);
+        Debug.DrawRay(pos, Vector3.right * radius, Color.red, 3);
+        Debug.DrawRay(pos, Vector3.left * radius, Color.red, 3);
+        Debug.DrawRay(pos, Vector3.down * radius, Color.green, 3);
+        Debug.DrawRay(pos, Vector3.forward * radius, Color.cyan, 3);
+        Debug.DrawRay(pos, Vector3.back * radius, Color.cyan, 3);
+        
+        InGameConsole.LogOrange("Explosion_scale is <color=green>" + explosion_scale.ToString() + "</color>" + " : Radius is <color=green>" + radius.ToString("f") + "</color>");
+        
         ps.Clear();
         ps.Play();
         //audioSource.Play();
@@ -107,14 +119,14 @@ public class Kaboom1 : MonoBehaviour
         PlayerController local_pc = PhotonManager.GetLocalPlayer();
         if(local_pc)
         {
-            float dist = Math.SqrDistance(local_pc.transform.position, pos);
-            if(dist < radius)
+            float distance = Vector3.Distance(local_pc.transform.position, pos);
+            if(distance < radius)
             {
                 Vector3 dir = local_pc.GetFPSPosition() - pos;
                 
                 dir = Math.Normalized(dir);
                 
-                float t = Mathf.InverseLerp(radius * 1.1f, 1.5f, dist);
+                float t = Mathf.InverseLerp(radius * 1.1f, 1.5f, distance);
                 float force_magnitude_ramped = force_magnitude * t;
                 
                 Vector3 force = dir * force_magnitude_ramped;
@@ -123,14 +135,26 @@ public class Kaboom1 : MonoBehaviour
                 // InGameConsole.LogOrange("Explosion force: " + force);
                 local_pc.BoostVelocity(force);
             }
+            else
+            {
+                if(distance < 60)
+                {
+                    CameraShaker.ShakeY(1f);
+                }
+            }
         }
         
         transform.localPosition = pos;       
         DoLight(pos); 
     }
     
+    const float explosion_default_scale = 1F;
+    
     void DoExplosion(Vector3 pos, float radius, float force_magnitude)
     {
+        float explosion_scale = radius * explosion_default_scale;
+        ps.transform.localScale = new Vector3(explosion_scale, explosion_scale, explosion_scale);
+        
         ps.Clear();
         ps.Play();
         // audioSource.Stop();
@@ -142,8 +166,8 @@ public class Kaboom1 : MonoBehaviour
         if(localPlayer)
         {
             Vector3 localFPSPosition = localPlayer.GetFPSPosition();
-            float sqrDist = Math.SqrDistance(localFPSPosition, pos);
-            if(sqrDist < radius * radius)
+            float distance = Vector3.Distance(localFPSPosition, pos);
+            if(distance < radius)
             {
                 localPlayer.TakeDamageOnline(1);
                 Vector3 dir = localFPSPosition - pos;

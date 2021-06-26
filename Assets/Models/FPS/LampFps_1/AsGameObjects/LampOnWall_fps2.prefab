@@ -4861,6 +4861,7 @@ MonoBehaviour:
   localDirection: 1
   rotationSpeed: 60
   objectToRotate: {fileID: 0}
+  space: 1
 --- !u!1 &8033468123326797398
 GameObject:
   m_ObjectHideFlags: 0

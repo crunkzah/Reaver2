@@ -38,12 +38,12 @@ Material:
     m_Floats:
     - _Alpha: 1
     - _EdgeDetectionExp: 1
-    - _EdgeDetectionThickness: 0.93
-    - _EdgeFresnelExp: 0.72
+    - _EdgeDetectionThickness: 0.5
+    - _EdgeFresnelExp: 0.2
     - _EdgeGlowAmount: 3.26
     - _EdgeGlowPower: 1.74
     - _EdgeMaskLightDark: 100
-    - _EdgeMaskPower: -100
+    - _EdgeMaskPower: -28
     - _EdgesOnlyModeEnabled: 0
     - _FinalAlpha: 1
     - _FinalOpacity: 1
@@ -69,4 +69,4 @@ Material:
     - __dirty: 0
     m_Colors:
     - _OpacityTextureChannel: {r: 0, g: 0, b: 0, a: 1}
-    - _RampColorTint: {r: 1, g: 0.41176468, b: 0.41176468, a: 1}
+    - _RampColorTint: {r: 0.46226418, g: 0.31181028, b: 0.31181028, a: 1}

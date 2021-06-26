@@ -1583,7 +1583,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     void OnGUI()
     {
-        //return;
+        return;
         
         if(photonView.IsMine)
         {
@@ -1594,31 +1594,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
             float w = 300;
             float h = 50;
             
-            // GUI.Label(new Rect(Screen.width/2 + w/2, Screen.height - h*1.5f, w, h), "inputVelWorld: " + inputWorld.ToString(), style);
-            // string rtt = this.rtt;
-            // GUI.Label(new Rect(Screen.width/2 + w/2, Screen.height - h*1.5f, w, h), "RTT: " + rtt, style);
-            //GUI.Label(new Rect(Screen.width/2, Screen.height - h*1.3f, w, h), "clcV: " + calculatedV.ToString(), style);
-            
-            
-            
-            
-            // if(Math.SqrMagnitude(collisionNormal) < 2 * 2)
-            // {
-            //     style.normal.textColor = Color.yellow;
-            //     GUI.Label(new Rect(Screen.width/2, Screen.height - h*0.7f, w, h), "norm: " + collisionNormal.ToString(), style);    
-            // }
-            
-            
             style.normal.textColor = Color.green;
             GUI.Label(new Rect(Screen.width/2, Screen.height - h*1.6f, w, h), "bunnyHopSpeedMult: " + bunnyHopSpeedMult.ToString(), style);
             GUI.Label(new Rect(Screen.width/2, Screen.height - h*1.3f, w, h), "currentARFireRate: " + gunController.currentARFireRate.ToString(), style);
-            //style.normal.textColor = Color.red;
-            //style.normal.textColor = Color.cyan;
-            //GUI.Label(new Rect(Screen.width/2, Screen.height - h, w, h), "fpsVelV: " + fpsVelocity.ToString(), style);
-            
-            
-            
-            
         }
     }
     

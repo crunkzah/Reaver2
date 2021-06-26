@@ -47,7 +47,63 @@ MonoBehaviour:
   - prefab: {fileID: 8735638288976725362, guid: 5b854fb11229d8444a13257ef85c6371,
       type: 3}
     key: 65
-    Quantity: 24
+    Quantity: 32
+  - prefab: {fileID: 1303921158164481607, guid: a2c4e150d243ee04fa9ac61baee05476,
+      type: 3}
+    key: 67
+    Quantity: 96
+  - prefab: {fileID: 2638779670238967251, guid: 1cf10998732276a43b5601440e442111,
+      type: 3}
+    key: 71
+    Quantity: 10
+  - prefab: {fileID: 8930375842509981472, guid: a55e328337870294ab22cf6fd75d2fb5,
+      type: 3}
+    key: 72
+    Quantity: 3
+--- !u!1 &1167621108
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1167621109}
+  - component: {fileID: 1167621110}
+  m_Layer: 0
+  m_Name: PlayerInventory
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1167621109
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1167621108}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 95.25006, y: 92.73363, z: 0.296875}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 8387225941045603394}
+  m_RootOrder: 11
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1167621110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1167621108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e1185aef27d0844b91616c151517c83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerGunSlots: 00000000
 --- !u!1 &2023119787
 GameObject:
   m_ObjectHideFlags: 0
@@ -101,6 +157,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8697842197317033625}
   - component: {fileID: 1382068782771582211}
+  - component: {fileID: 1782826945278303028}
   m_Layer: 0
   m_Name: PlayerManager
   m_TagString: Untagged
@@ -134,6 +191,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2dfe9918b8a5b942ad016c582fbae33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1782826945278303028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4135204102189805405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ec096902fa84324490055021ecc76f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outside_camera_profile: {fileID: 11400000, guid: a999bb18175cd724e93d5a219bdf0aad,
+    type: 2}
 --- !u!1 &8387225940020667294
 GameObject:
   m_ObjectHideFlags: 0
@@ -237,10 +308,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   originals:
-  - prefab: {fileID: 1303921158164481607, guid: ff88b8d3d2fac2949b3cf27b3db20cd6,
+  - prefab: {fileID: 1303921158164481607, guid: a2c4e150d243ee04fa9ac61baee05476,
       type: 3}
     key: 1
-    Quantity: 64
+    Quantity: 100
   - prefab: {fileID: 1303921158164481607, guid: 7b78bda4557e4c241af8384baabe1f26,
       type: 3}
     key: 0
@@ -270,7 +341,7 @@ MonoBehaviour:
   - prefab: {fileID: 1116064979913073207, guid: 54d04aac23f1a65439b1aabba6372f61,
       type: 3}
     key: 34
-    Quantity: 12
+    Quantity: 16
   - prefab: {fileID: 3069756612541886710, guid: 3debf62cf51ddc14995c698b1fa4614d,
       type: 3}
     key: 35
@@ -293,15 +364,15 @@ MonoBehaviour:
   - prefab: {fileID: 5355997608042300876, guid: f2cda35a9cd9c89499df3a14c14922f4,
       type: 3}
     key: 49
-    Quantity: 16
+    Quantity: 0
   - prefab: {fileID: 1351646497245696700, guid: 6ffbff4d2b71cdd45aacace00a5196cd,
       type: 3}
     key: 48
-    Quantity: 16
+    Quantity: 0
   - prefab: {fileID: 2249258505123207106, guid: 5305b2c6c9c45c646b439db0be2e9f16,
       type: 3}
     key: 50
-    Quantity: 8
+    Quantity: 0
   - prefab: {fileID: 5298854946087685688, guid: 4d781a17145915947ac068bd0cb847ba,
       type: 3}
     key: 51
@@ -313,7 +384,7 @@ MonoBehaviour:
   - prefab: {fileID: 1133851838349517105, guid: 2cacbf60224020f459f77a4dedbd6db9,
       type: 3}
     key: 53
-    Quantity: 8
+    Quantity: 1
   - prefab: {fileID: 1303921158164481607, guid: 331aa435a29b2014aa1dcee8376a4e45,
       type: 3}
     key: 54
@@ -362,6 +433,22 @@ MonoBehaviour:
       type: 3}
     key: 66
     Quantity: 12
+  - prefab: {fileID: 5451987901524434911, guid: 723a6877543aa0f4aa54f1cc4dc563c6,
+      type: 3}
+    key: 68
+    Quantity: 24
+  - prefab: {fileID: 3531645911576637789, guid: 7e590d3177cb78e42b32eb02403b142d,
+      type: 3}
+    key: 69
+    Quantity: 64
+  - prefab: {fileID: 1303921158164481607, guid: 5bb874b54d0904d4e8d85446188792ed,
+      type: 3}
+    key: 70
+    Quantity: 128
+  - prefab: {fileID: 2602264989958554761, guid: 0dd04633548908d4c950f090efcd24b3,
+      type: 3}
+    key: 73
+    Quantity: 64
 --- !u!1 &8387225940822127286
 GameObject:
   m_ObjectHideFlags: 0
@@ -420,12 +507,12 @@ MonoBehaviour:
     type: 6
     prefab: {fileID: 6294006375659519800, guid: 1204adca171740a45869ea1bb166ba4f,
       type: 3}
-    quantity: 10
+    quantity: 1
   - name: Crossbow bolt collision
     type: 7
     prefab: {fileID: 7595228741393356797, guid: c5a0d83aff253484bad5fd1f1881ec3f,
       type: 3}
-    quantity: 3
+    quantity: 1
   - name: Bomb2_explosion
     type: 8
     prefab: {fileID: 8977691375235146549, guid: afed5684565173b4bb19e608c8aa239d,
@@ -489,7 +576,7 @@ MonoBehaviour:
     type: 19
     prefab: {fileID: 2720953837036534657, guid: ab8e78a74f1a1de4f90113d79e950803,
       type: 3}
-    quantity: 6
+    quantity: 12
   - name: annihilate_1_ps
     type: 20
     prefab: {fileID: 968081376723057767, guid: 0b202bb5ac612a34c961369e9e39fbc2, type: 3}
@@ -532,6 +619,61 @@ MonoBehaviour:
     prefab: {fileID: 2011961371597626200, guid: 12aa9df14243b1b48be23a0037762bb6,
       type: 3}
     quantity: 6
+  - name: revolver_alt
+    type: 30
+    prefab: {fileID: 2536854039801412308, guid: 6f49044153a4001439fa552ea63fc10d,
+      type: 3}
+    quantity: 4
+  - name: revolver_alt_impact
+    type: 31
+    prefab: {fileID: 3371453136574908429, guid: 224fb4f79f1659444a79636ad2c62490,
+      type: 3}
+    quantity: 8
+  - name: Star_ps
+    type: 32
+    prefab: {fileID: 1731874667755605861, guid: 85bf33b1697309544ae11f85b6bf1897,
+      type: 3}
+    quantity: 4
+  - name: blink1_ps
+    type: 33
+    prefab: {fileID: 2571062966443330508, guid: 618b59f853c30804299611daffa805b6,
+      type: 3}
+    quantity: 6
+  - name: shot2_big
+    type: 34
+    prefab: {fileID: 1401453574224665718, guid: 190e4aae878a12a43a7a3e8504a7e75b,
+      type: 3}
+    quantity: 8
+  - name: punch_impact1
+    type: 35
+    prefab: {fileID: 1401453574224665718, guid: 42b0d838347bdfb4684aac3764f06a89,
+      type: 3}
+    quantity: 8
+  - name: gibs1_ps
+    type: 37
+    prefab: {fileID: 8425408471974251692, guid: 903fc86a1ec64e340b40343dbf46216c,
+      type: 3}
+    quantity: 20
+  - name: daggerShot_ps
+    type: 36
+    prefab: {fileID: 3957200220124542618, guid: 349cf2e0b76cf864bb5efa4981edccca,
+      type: 3}
+    quantity: 4
+  - name: shotStar_ps
+    type: 38
+    prefab: {fileID: 4747478279377691242, guid: f05d6e495c6f7e7439132d3ef6fa7346,
+      type: 3}
+    quantity: 16
+  - name: bullet_impact_dusty
+    type: 39
+    prefab: {fileID: 4747478279377691242, guid: 6255f64477a453c4684c096983eb97ac,
+      type: 3}
+    quantity: 8
+  - name: bullet_onReflect
+    type: 40
+    prefab: {fileID: 1479835591458868704, guid: 083f7090a91ba4d4bbc950f8ef091b5d,
+      type: 3}
+    quantity: 12
   LRs_originals: []
 --- !u!1 &8387225940868150297
 GameObject:
@@ -691,7 +833,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 5a27b5e82fe28be45b89271e1ddb2a74, type: 3}
   - name: npc_spawn_1
     type: 10
-    clip: {fileID: 8300000, guid: e135b703563321a41b4ebc1e9b257af7, type: 3}
+    clip: {fileID: 8300000, guid: 2224bc055b2d66a43992d8844b58f6b5, type: 3}
   - name: witch_death_1
     type: 12
     clip: {fileID: 8300000, guid: 2fd78ab8cd7f66e4780d671cb8a3a3b8, type: 3}
@@ -700,16 +842,49 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: b6a9c12da78518544ab85b6be4216e5b, type: 3}
   - name: projectile_launch_1
     type: 13
-    clip: {fileID: 8300000, guid: f990b696640f249459c1523a9295bb9a, type: 3}
+    clip: {fileID: 8300000, guid: e10412875171c93459e83641f6855517, type: 3}
   - name: hurt_generic
     type: 14
-    clip: {fileID: 8300000, guid: abc729f35d1c6f349ac31118c67d0600, type: 3}
+    clip: {fileID: 8300000, guid: 34c441dadf1dae747ab2b26f35072968, type: 3}
+  - name: onCharTyped1
+    type: 15
+    clip: {fileID: 8300000, guid: 297d7fa8d0f3ceb478ab4bc3659bf954, type: 3}
+  - name: revolver_alt_defer
+    type: 16
+    clip: {fileID: 8300000, guid: f46191337d2640c4695b70f5a8c96f42, type: 3}
+  - name: blink_player
+    type: 17
+    clip: {fileID: 8300000, guid: 8d1a854899f5ba44c9940a5dfab04726, type: 3}
+  - name: ricochet1
+    type: 18
+    clip: {fileID: 8300000, guid: ac480b3fe2b957e48a585d0e664ca295, type: 3}
+  - name: shot2_big
+    type: 19
+    clip: {fileID: 8300000, guid: e289a099deddd204598100aee17c139b, type: 3}
+  - name: punch_impact1
+    type: 20
+    clip: {fileID: 8300000, guid: fa828ed1409789d49bd10db395d5b1d8, type: 3}
+  - name: punch_whoosh1
+    type: 21
+    clip: {fileID: 8300000, guid: b010c566ff2124e4c99a0f74d308e257, type: 3}
+  - name: limb_gib1
+    type: 22
+    clip: {fileID: 8300000, guid: 858112c76f0a422498403f1d1ebaacda, type: 3}
+  - name: death_impact_bass
+    type: 23
+    clip: {fileID: 8300000, guid: 918d918e9ea841c41963a8f2f6704a5e, type: 3}
+  - name: death_impact_bass
+    type: 24
+    clip: {fileID: 8300000, guid: 7cb1fc99cdd294c4da1ac87f96749500, type: 3}
+  - name: bullet_reflect
+    type: 25
+    clip: {fileID: 8300000, guid: dd76cc8474f02214da189ff00311650e, type: 3}
   ambience01: {fileID: 8300000, guid: 3dc145e7c7d122a49bb9fbb5fd9a5e8e, type: 3}
-  children_of_the_omnissiah: {fileID: 8300000, guid: dc1c521bb77aa45469ec5cadbdeac734,
+  children_of_the_omnissiah: {fileID: 8300000, guid: 211971bf0a31d204c881b9fb86388469,
     type: 3}
   daycore: {fileID: 8300000, guid: 6c5e999352463a9449591e65bdde9cde, type: 3}
   cyber_grind: {fileID: 8300000, guid: 1215b6965ddcd6e46aa4c047ea8d1412, type: 3}
-  mainMenu_theme: {fileID: 0}
+  mainMenu_theme: {fileID: 8300000, guid: 07c063e61ba0b384c8199b3c9cda89e4, type: 3}
   music_src: {fileID: 0}
   source2: {fileID: 8387225940991049874}
   globalClips:
@@ -1251,16 +1426,17 @@ MonoBehaviour:
   - 0
   - 0
   currentVolume_music: 0
-  freqSmoothRate: 1
-  audio_mat: {fileID: 0}
-  audio_base_color: {r: 1, g: 0, b: 0, a: 1}
+  freqSmoothRate: 3
+  audio_mat: {fileID: 2100000, guid: 5f6e3b7204e89e44a8ac31fdae4ba0fe, type: 2}
+  audio_base_color: {r: 0.7490196, g: 0.019607844, b: 0, a: 1}
   audio_emission: 1
   audio_emission_min: 0.05
   audio_emission_max: 1.4
   audio_emission_MaxVolume: 24
   emissionSmoothRate: 3
-  snapshot_normal: {fileID: 0}
-  snapshot_muted: {fileID: 0}
+  snapshot_normal: {fileID: 24500006, guid: 90796b012c318744db1bee2b209366c9, type: 2}
+  snapshot_muted: {fileID: 245815479307486744, guid: 90796b012c318744db1bee2b209366c9,
+    type: 2}
 --- !u!82 &8387225940991049875
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1496,6 +1672,7 @@ Transform:
   - {fileID: 8697842197317033625}
   - {fileID: 1034658135}
   - {fileID: 2023119788}
+  - {fileID: 1167621109}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1578,7 +1755,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 0}
   viewIdField: 0
-  InstantiationId: 1
+  InstantiationId: 2
   isRuntimeInstantiated: 0
 --- !u!1 &8387225941684551213
 GameObject:
@@ -1697,7 +1874,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 0}
   viewIdField: 0
-  InstantiationId: 2
+  InstantiationId: 1
   isRuntimeInstantiated: 0
 --- !u!1001 &5371014289239405809
 PrefabInstance:
@@ -1818,6 +1995,24 @@ PrefabInstance:
       propertyPath: netObjectsPredefined.Array.data[7].prefab
       value: 
       objectReference: {fileID: 5320047811900922621, guid: 2e543ce683c0d974b8f905f8b3977390,
+        type: 3}
+    - target: {fileID: 4534214997863775956, guid: 119c9f0a20acd374eb399b66b08ace9d,
+        type: 3}
+      propertyPath: CatLady_npc
+      value: 
+      objectReference: {fileID: 5580803536649184565, guid: f2d76a2ff9cf630459ae6bf92ecfe8db,
+        type: 3}
+    - target: {fileID: 4534214997863775956, guid: 119c9f0a20acd374eb399b66b08ace9d,
+        type: 3}
+      propertyPath: Olios_npc
+      value: 
+      objectReference: {fileID: 5794625954668281766, guid: 64c851df0f361274b8d824b2b1b38c83,
+        type: 3}
+    - target: {fileID: 4534214997863775956, guid: 119c9f0a20acd374eb399b66b08ace9d,
+        type: 3}
+      propertyPath: PadlaLong_npc
+      value: 
+      objectReference: {fileID: 5652545937882742643, guid: c76ed5a23c2e51b4fbea7f485fb5c8f0,
         type: 3}
     - target: {fileID: 4534214997863775958, guid: 119c9f0a20acd374eb399b66b08ace9d,
         type: 3}

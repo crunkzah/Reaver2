@@ -663,5 +663,6 @@ public enum SoundType : int
     limb_gib1,
     death_impact_gib_distorted,
     bullet_impact_sound1,
-    bullet_reflect_sound
+    bullet_reflect_sound,
+    ui_blip1
 }

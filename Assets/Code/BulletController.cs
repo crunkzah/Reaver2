@@ -282,7 +282,11 @@ public class BulletController : MonoBehaviour, IPooledObject
             // if(PhotonNetwork.IsMasterClient)
             // {
                 GameObject obj = ObjectPool.s().Get(ObjectPoolKey.Kaboom1, false);
-                obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, 6, 35f, 300);
+                
+                // float _radius = Random.Range(2, 7);
+                float _radius = 6;
+                
+                obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, _radius, 35f, 300);
             // }
             
             //FollowingCamera.ShakeY(13f);
