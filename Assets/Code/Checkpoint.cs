@@ -94,6 +94,12 @@ public class Checkpoint : MonoBehaviour, INetworkObject
         }
     }
     
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, radius);
+    }
+    
     static bool DEBUG_disable_checkpoints = false;
     
     [Header("Objects to send message on activation, Master only:")]
@@ -145,6 +151,8 @@ public class Checkpoint : MonoBehaviour, INetworkObject
     
     void Activate_FancyThings()
     {
+        AudioManager.Play3D(SoundType.checkpoint_sound, transform.position, 1, 1, 2);
+        
         audio_src.pitch = 1;
         audio_src.volume = 0.33F;
         audio_src.maxDistance = 3f;

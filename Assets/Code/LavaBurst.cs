@@ -186,8 +186,8 @@ public class LavaBurst : MonoBehaviour, IPooledObject//, INetworkObject
         
         velocity = Vector3.zero;
         
-        GameObject obj = ObjectPool.s().Get(ObjectPoolKey.Kaboom1, false);
-        obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, 6, 35f, 300);
+        // GameObject obj = ObjectPool.s().Get(ObjectPoolKey.Kaboom1, false);
+        // obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, 6, 35f, 300);
     }
     
    

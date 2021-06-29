@@ -630,7 +630,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                             Vector3 punch_dir = (targetGroundPos - padlaPosition).normalized;
                             
                             Vector3 dash_pos = padlaPosition;
-                            if(NavMesh.SamplePosition(padlaPosition + punch_dir * punch1_dashDistance, out navMeshHit, 1f, NavMesh.AllAreas))
+                            if(NavMesh.SamplePosition(padlaPosition + punch_dir * punch1_dashDistance, out navMeshHit, 0.05f, NavMesh.AllAreas))
                             {
                                 dash_pos = navMeshHit.position;
                                 // InGameConsole.LogFancy("We DO <color=green>DASH ATTACK</color>");

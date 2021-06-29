@@ -872,7 +872,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                     fleeingTimer += dt;
                 
                     float sqrDistance = Math.SqrDistance(thisTransform.localPosition, fleeingPos);
-                    InGameConsole.LogFancy("SqrDistance is " + sqrDistance.ToString());
+                    //InGameConsole.LogFancy("SqrDistance is " + sqrDistance.ToString());
                     if(sqrDistance < 0.2F * 0.2F || fleeingTimer > fleeingTimeout)
                     {
                         LockSendingCommands();

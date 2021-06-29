@@ -393,11 +393,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         if(isAlive)
         {
-            if(thisTransform.position.y < -105)
-            {
-                InGameConsole.LogOrange("OUT OF BOUNDS OUT OF BOUNDS");
-                Die();
-            }
+            // if(thisTransform.position.y < -105)
+            // {
+            //     InGameConsole.LogOrange("OUT OF BOUNDS OUT OF BOUNDS");
+            //     Die();
+            // }
         }
     }
     
@@ -508,6 +508,17 @@ public class PlayerController : MonoBehaviour, IPunObservable
     float normalFov = 110;
     float duckingFov = 120;
     
+    
+    public void TeleportPlayer(Vector3 tp_pos)
+    {
+//        InGameConsole.LogOrange("TeleportPlayer");
+        InGameConsole.LogOrange(string.Format("{0} -> <color=green>{1}</color>", thisTransform.localPosition, tp_pos));
+        thisTransform.localPosition = tp_pos;
+        fpsVelocity.x = fpsVelocity.y = fpsVelocity.z = 0;
+        skipUpdatedsTimer = 0.1f;
+    }
+    
+    float skipUpdatedsTimer = 0;
     
     public void ResetFov()
     {
@@ -1107,7 +1118,19 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     void LocalNormalState_UpdateFPS()
     {
+        
         float dt  = UberManager.DeltaTime();
+        
+        if(skipUpdatedsTimer > 0)
+        {
+            skipUpdatedsTimer -= dt;
+            if(skipUpdatedsTimer <= 0)
+            {
+                skipUpdatedsTimer = 0;
+            }
+            return; 
+        }
+        
         StaminaTick(dt);
         
         if(Input.GetKeyDown(KeyCode.T))
@@ -1848,6 +1871,22 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
         
         return true;
+    }
+    
+    public void TakeDamageNonLethal(int dmg)
+    {
+        HitPoints -= dmg;
+        if(HitPoints <= 1)
+        {
+            // InGameConsole.LogOrange("HitPoints <= 0");
+            HitPoints = 1;
+            //Die();    
+        }
+        else
+        {
+            // InGameConsole.LogOrange("Trying to call OnTakeDamage");
+            OnTakeDamage(dmg);
+        }
     }
     
     [PunRPC]

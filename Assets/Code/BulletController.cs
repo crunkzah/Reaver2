@@ -286,7 +286,7 @@ public class BulletController : MonoBehaviour, IPooledObject
                 // float _radius = Random.Range(2, 7);
                 float _radius = 6;
                 
-                obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, _radius, 35f, 300);
+                obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, _radius, 20f, 200, isMine);
             // }
             
             //FollowingCamera.ShakeY(13f);
@@ -517,6 +517,7 @@ public class BulletController : MonoBehaviour, IPooledObject
         pierced_networkObjects.Clear();
                     
         currentSpeed = reflect_speed_before_pause;
+        damage = damage + damage * 15 / 100;
     }
     static Vector3 upDir = new Vector3(0, 1, 0);
 }

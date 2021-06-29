@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Photon.Pun;
 using System.Collections.Generic;
 
 public enum DaggerState : int
@@ -167,7 +168,10 @@ public class FlyingDagger : MonoBehaviour
         }
         
         GameObject obj = ObjectPool.s().Get(ObjectPoolKey.Kaboom1, false);
-        obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, 6, 0.01f, 300);
+        
+        bool isExplosionMine = PhotonNetwork.IsMasterClient;
+        
+        obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, 6, 0.01f, 300, isExplosionMine);
         
         audio_src.loop = false;
         //InGameConsole.LogFancy("Explode dagger!");

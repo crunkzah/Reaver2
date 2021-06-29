@@ -60,8 +60,8 @@ public class PlayerInventory : MonoBehaviour, IOnEventCallback
     void Start()
     {
         DontDestroyOnLoad(this);
-        playerGunSlots[0] = GunType.None;
-        playerGunSlots[1] = GunType.None;
+        playerGunSlots[0] = GunType.Revolver;
+        playerGunSlots[1] = GunType.Shotgun;
         playerGunSlots[2] = GunType.RocketLauncher;
         playerGunSlots[3] = GunType.AR;
     }

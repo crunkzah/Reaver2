@@ -1248,7 +1248,7 @@ PrefabInstance:
     - target: {fileID: 8387225940991049876, guid: d0958c5341d6fec4192a4bd3857d8dea,
         type: 3}
       propertyPath: clipsAndTypes.Array.size
-      value: 26
+      value: 27
       objectReference: {fileID: 0}
     - target: {fileID: 8387225940991049876, guid: d0958c5341d6fec4192a4bd3857d8dea,
         type: 3}
@@ -1265,6 +1265,21 @@ PrefabInstance:
       propertyPath: clipsAndTypes.Array.data[25].clip
       value: 
       objectReference: {fileID: 8300000, guid: 433a47061d18c14499c8182830ac8370, type: 3}
+    - target: {fileID: 8387225940991049876, guid: d0958c5341d6fec4192a4bd3857d8dea,
+        type: 3}
+      propertyPath: clipsAndTypes.Array.data[26].name
+      value: Checkpoint
+      objectReference: {fileID: 0}
+    - target: {fileID: 8387225940991049876, guid: d0958c5341d6fec4192a4bd3857d8dea,
+        type: 3}
+      propertyPath: clipsAndTypes.Array.data[26].type
+      value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 8387225940991049876, guid: d0958c5341d6fec4192a4bd3857d8dea,
+        type: 3}
+      propertyPath: clipsAndTypes.Array.data[26].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: ded4372db52962f469e29bbb1e87e172, type: 3}
     - target: {fileID: 8387225941045603394, guid: d0958c5341d6fec4192a4bd3857d8dea,
         type: 3}
       propertyPath: m_LocalPosition.x

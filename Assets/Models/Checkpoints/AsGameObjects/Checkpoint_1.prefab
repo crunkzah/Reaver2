@@ -9824,7 +9824,7 @@ GameObject:
   - component: {fileID: 7346537724341147632}
   - component: {fileID: 8290897771285803761}
   m_Layer: 0
-  m_Name: Point Light
+  m_Name: CheckpointLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9946,6 +9946,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27d7e6be7134adf49b947500baf165f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mode: 0
   state: 0
   gears_renders:
   - {fileID: 7209098714498354998}
@@ -9953,9 +9954,11 @@ MonoBehaviour:
   activated_ps: {fileID: 771804801}
   static_ps: {fileID: 2158882284350053554}
   label_tmp: {fileID: 1638452468}
+  sliding_structures_to_call_on_activate: []
   objects_to_activate: []
   waitingMat: {fileID: 2100000, guid: 6a7a9f043b1086b48abe791134e1cf75, type: 2}
   activatedMat: {fileID: 2100000, guid: dbd2814c5d6568d4389caab5a77a6b95, type: 2}
+  radius: 2
 --- !u!82 &681805578
 AudioSource:
   m_ObjectHideFlags: 0

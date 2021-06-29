@@ -41,6 +41,9 @@ public struct NetworkObjectAndCommand
 
 public class EnemySpawner : MonoBehaviour, Interactable
 {
+	public bool IsEnabled = true;
+	
+	public float initial_delay = 1f;
 	public float spawn_delay = 0.4F;
 	
 	
@@ -91,6 +94,14 @@ public class EnemySpawner : MonoBehaviour, Interactable
 	
 	public void Interact()
 	{
+		if(IsEnabled)
+		{
+			Invoke(nameof(InitialSpawn), initial_delay);
+		}
+	}
+	
+	public void InitialSpawn()
+	{
 		if(state == EnemySpawnerState.Disabled)
 		{
 			state = EnemySpawnerState.Spawning;
@@ -137,7 +148,7 @@ public class EnemySpawner : MonoBehaviour, Interactable
 			}
 			else
 			{
-				Invoke("SetStateSpawning", 1F);		
+				Invoke(nameof(SetStateSpawning), 1F);		
 				
 			}
 		}

@@ -14,6 +14,7 @@ public class CarolineKneeling : MonoBehaviour, INetworkObject
                 
                 DoLight(shotgun_transform.position);
                 shotgun_transform.gameObject.SetActive(false);
+                //MessagePanel.Singleton().ShowMessage("Fire")
                 
                 break;
             }

@@ -43,10 +43,14 @@ public class Kaboom1 : MonoBehaviour
     }
     
     
-    public void ExplodeDamageHostile(Vector3 pos, float radius, float force_magnitude, int dmg)
+    bool isMine = false;
+    
+    public void ExplodeDamageHostile(Vector3 pos, float radius, float force_magnitude, int dmg, bool _isMine)
     {
         float explosion_scale = radius * explosion_default_scale;
         ps.transform.localScale = new Vector3(explosion_scale, explosion_scale, explosion_scale);
+        
+        isMine = _isMine;
         
         Debug.DrawRay(pos, Vector3.up * radius, Color.green, 3);
         Debug.DrawRay(pos, Vector3.right * radius, Color.red, 3);
@@ -66,55 +70,64 @@ public class Kaboom1 : MonoBehaviour
         
         
         
-        // InGameConsole.LogFancy("ExplodeDamageHostile");
-        // {
-        //     targetsHit = Physics.OverlapSphereNonAlloc(pos, radius, hits, enemyExplosionMask);
-        //     targetsHit = Mathf.Min(targetsHit, hits.Length);
+        if(isMine)
+        {
+            InGameConsole.LogFancy("ExplodeDamageHostile is <color=green>Mine</color>");
+            targetsHit = Physics.OverlapSphereNonAlloc(pos, radius, hits, enemyExplosionMask);
+            targetsHit = Mathf.Min(targetsHit, hits.Length);
             
             
-        //     if(targetsHit > 0)
-        //     {
-        //         for(int i = 0; i < targetsHit; i++)
-        //         {
-        //             if(PhotonNetwork.IsMasterClient)
-        //             {
-        //                 NetworkObject net_comp = hits[i].GetComponent<NetworkObject>();
-        //                 if(net_comp)
-        //                 {
-        //                     int npc_net_id = net_comp.networkId;
-        //                     IDamagableLocal idl = net_comp.GetComponent<IDamagableLocal>();
-        //                     if(idl != null)
-        //                     {
-        //                         if(idl.GetCurrentHP() - dmg <= 0)
-        //                         {
-        //                             Vector3 dieForce_dir = Math.Normalized(hits[i].ClosestPoint(pos) - pos);
-        //                             NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.DieWithForce, dmg * dieForce_dir);
-        //                         }
-        //                         else
-        //                         {
-        //                             Vector3 force = Math.Normalized(hits[i].transform.position + new Vector3(0, 2, 0) - pos) * 14;
-        //                             // force.x = force.z = 0;
-        //                             //force.y += 5;
-        //                             Vector3 launchPos = hits[i].transform.position;
-        //                             NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.LaunchAirborne, launchPos, force);
+            if(targetsHit > 0)
+            {
+                InGameConsole.LogFancy(string.Format("targets hit number {0}", targetsHit));
+                
+                for(int i = 0; i < targetsHit; i++)
+                {
+                    InGameConsole.LogFancy(string.Format("Target is {0}", hits[0].gameObject.name));
+                    if(isMine)
+                    {
+                        NetworkObject net_comp = hits[i].GetComponent<NetworkObject>();
+                        if(net_comp)
+                        {
+                            int npc_net_id = net_comp.networkId;
+                            IDamagableLocal idl = net_comp.GetComponent<IDamagableLocal>();
+                            if(idl != null)
+                            {
+                                if(idl.GetCurrentHP() - dmg <= 0)
+                                {
+                                    Vector3 dieForce_dir = Math.Normalized(hits[i].ClosestPoint(pos) - pos);
+                                    NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.DieWithForce, dmg * dieForce_dir);
+                                }
+                                else
+                                {
+                                    Vector3 force = Math.Normalized(hits[i].transform.position + new Vector3(0, 2, 0) - pos) * 14;
+                                    // force.x = force.z = 0;
+                                    //force.y += 5;
+                                    Vector3 launchPos = hits[i].transform.position;
+                                    NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.LaunchAirborne, launchPos, force);
+                                    NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.TakeDamage, dmg);
                                     
-        //                              //NetworkObjectsManager.PackNetworkCommand(npc_net_id, NetworkCommand.LaunchAirborne, force);
-        //                             //  NetworkObjectsManager.PackNetworkCommand(npc_net_id, NetworkCommand.TakeDamage, dmg);
-        //                         }
-        //                     }
-        //                 }
-        //             }
+                                     //NetworkObjectsManager.PackNetworkCommand(npc_net_id, NetworkCommand.LaunchAirborne, force);
+                                    //  NetworkObjectsManager.PackNetworkCommand(npc_net_id, NetworkCommand.TakeDamage, dmg);
+                                }
+                            }
+                        }
+                    }
                     
-        //             LimbForExplosions limb_explosion = hits[i].GetComponent<LimbForExplosions>();
-        //             if(limb_explosion)
-        //             {
-        //                 limb_explosion.OnExplodeAffected();
-        //             }
+                    LimbForExplosions limb_explosion = hits[i].GetComponent<LimbForExplosions>();
+                    if(limb_explosion)
+                    {
+                        limb_explosion.OnExplodeAffected();
+                    }
                     
                   
-        //         }
-        //     }
-        // }
+                }
+            }
+        }
+        else
+        {
+            InGameConsole.LogFancy("ExplodeDamageHostile is <color=red>not Mine</color>");
+        }
         
         PlayerController local_pc = PhotonManager.GetLocalPlayer();
         if(local_pc)

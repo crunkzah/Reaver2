@@ -404,14 +404,14 @@ public class FPSGunController : MonoBehaviour
     const float ARSpreadDecreaseRate = 1f;
     const float ARSpreadMult = 0.1f;
     
-    const float punchDistance = 2.15f;
+    const float punchDistance = 2.3F;
     
     const int punchDamage = 275;
     const int punchDamage_Ult = 600;
     
     public void Punch_Ult()
     {
-        InGameConsole.LogFancy("Punch_Ult");
+        //InGameConsole.LogFancy("Punch_Ult");
         if(pv.IsMine)
         {
             Ray ray = pController.GetFPSRay();
@@ -2320,8 +2320,8 @@ public class FPSGunController : MonoBehaviour
         }
         
         rocketLauncher_FX.Play();
-        
-        bulletController.LaunchAsSphere(shotPos, direction, 0.15F, bulletMask, 46, rocketLauncherDmg, false);
+        bool isMine = pv.IsMine;
+        bulletController.LaunchAsSphere(shotPos, direction, 0.15F, bulletMask, 46, rocketLauncherDmg, isMine);
         bulletController.on_die_behave = BulletOnDieBehaviour.Explode_1;
     }
     

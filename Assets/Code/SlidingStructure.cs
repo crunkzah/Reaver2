@@ -19,18 +19,47 @@ public class SlidingStructure : MonoBehaviour
     
     public float workingSpeed = 5f;
     
+    public ParticleSystem ps;
+    public AudioSource audio_src;
+    
+    public float delay = 0.5F;
+    
+    public bool hideRenderer;
+    
+    Renderer[] rends;
+    
+    void SlideOut_Delayed()
+    {
+        audio_src.Play();
+        if(rends != null && rends.Length > 0)
+        {   
+            for(int i = 0; i < rends.Length; i++)
+            {
+                rends[i].enabled = true;
+            }
+        }   
+        ps.Play();
+        isWorking = true;
+    }
+    
     public void ToggleSlide()
     {
         if(state == SlidingStructureState.Hidden)
         {
             state = SlidingStructureState.SlidedOut;
+            
+            Invoke(nameof(SlideOut_Delayed), delay);
+            
+            //audio_src.Play();
+            //ps.Play();
+            
         }
         else
         {
             state = SlidingStructureState.Hidden;
         }
         
-        isWorking = true;
+        // isWorking = true;
     }
     
     void SlideOut()
@@ -94,6 +123,10 @@ public class SlidingStructure : MonoBehaviour
     
     void Awake()
     {
+        if(hideRenderer)
+        {
+            rends = GetComponentsInChildren<Renderer>();
+        }
         thisTransform = transform;
         slidedOutLocalPos =  thisTransform.localPosition;
         
@@ -105,6 +138,13 @@ public class SlidingStructure : MonoBehaviour
         if(state == SlidingStructureState.Hidden)
         {
             GoToHiddenState_Silently();
+            if(hideRenderer)
+            {
+                for(int i = 0; i < rends.Length; i++)
+                {
+                    rends[i].enabled = false;
+                }
+            }
         }
     }
     
