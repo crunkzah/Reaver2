@@ -107,13 +107,14 @@ public class UberManager : MonoBehaviour
         }
     }
     
+
+    LocalSettings local_settings;
+
     void Start()
     {
-        // if(mouseTex)
-        // {
-        //     Cursor.SetCursor(mouseTex, Vector2.zero, CursorMode.ForceSoftware);
-        // }
-        
+       local_settings = new LocalSettings();
+    //    local_settings.ReadLocalSettings();
+    
        Application.targetFrameRate = 144;
     }
     

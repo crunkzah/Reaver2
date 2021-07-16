@@ -29,7 +29,10 @@ MonoBehaviour:
   EnableSupportLogger: 0
   RunInBackground: 1
   RpcList:
+  - _SpawnNPC_Spawner
+  - _SpawnNPC2
   - ActivateNet
+  - Blink
   - BoostVelocity
   - CallFuncRPC
   - CallFunctionsMultiple
@@ -41,40 +44,25 @@ MonoBehaviour:
   - DestroyAllDynamicObjects
   - DestroyObject
   - DisableNetObject
+  - EquipARGhostRPC
   - FireRPC
+  - FPSC3
+  - FPSCommand
+  - FPSCommand2
   - FPSDashFX
   - GroundSlam
   - Impact
   - InteractNet
   - OnGroundSlammed
-  - PickUpKeyRPC
   - PlayAnimation
+  - PlayDirSlam
   - ReceiveRTT
   - ReloadLevel
   - ScheduleCommandRPC
   - SetTimeToSyncScene
-  - ShootRevolver
-  - ShootRocketLauncher
-  - ShootShotgun
   - SpawnItem
   - SpawnNewItemFromMasterRPC
   - SpawnObject
   - TakeDamage
-  - UnequipKey
   - WieldGunTPS
-  - ShootRevolver_Alt
-  - ShootShotgun_Alt
-  - Blink
-  - ShootAR
-  - ShootARGhost
-  - EquipARGhostRPC
-  - LavaBurst
-  - Punch
-  - FPSCommand
-  - _SpawnNPC2
-  - PlayDirSlam
-  - FPSCommand2
-  - _SpawnNPC_Spawner
-  - FPSCommand3
-  - FPSC3
   DisableAutoOpenWizard: 1

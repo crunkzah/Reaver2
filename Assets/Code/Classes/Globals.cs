@@ -420,6 +420,13 @@ public static class Math
                            current.y + toV_y / dist_mult_maxDistanceDelta,
                            current.z + toV_z / dist_mult_maxDistanceDelta);
     }
+
+    public static float LinearToQuadratic(float linear_x)
+    {
+        linear_x = Mathf.Clamp(linear_x, 0f, 1f);
+        float result = linear_x * linear_x;
+        return result;
+    }
     
 }
 

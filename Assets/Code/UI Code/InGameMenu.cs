@@ -4,6 +4,13 @@ using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
 
+public enum InGameMenuState : byte
+{
+    Hidden,
+    MainPanel,
+    Settings
+}
+
 public class InGameMenu : MonoBehaviour
 {
     static InGameMenu _instance;
@@ -16,6 +23,8 @@ public class InGameMenu : MonoBehaviour
         
         return _instance;
     }
+
+    public InGameMenuState state;
     
     bool canBeShown = true;
     bool wasCursorVisibleBeforeMenu = true;
@@ -153,6 +162,21 @@ public class InGameMenu : MonoBehaviour
     {
         if(GetEscapeKeyDown())
         {
+            // switch(state)
+            // {
+            //     case(InGameMenuState.Hidden):
+            //     {
+            //         break;
+            //     }
+            //     case(InGameMenuState.MainPanel):
+            //     {
+            //         break;
+            //     }
+            //     case(InGameMenuState.Settings):
+            //     {
+            //         break;
+            //     }
+            // }
             if(Singleton().canvas.activeSelf)
             {
                 Hide();

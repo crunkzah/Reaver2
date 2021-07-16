@@ -765,6 +765,8 @@ public class FPSGunController : MonoBehaviour
                             arm_animator.Play("Base.Punch1", 0, 0);
                         else
                             arm_animator.Play("Base.Hook", 0, 0);
+
+                        
                             
                         byte fpsCommand = (byte)FPS_Func.Punch1;
                         FPSCommand(fpsCommand);
