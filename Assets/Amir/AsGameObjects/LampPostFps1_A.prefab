@@ -58,7 +58,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7fd83bfbf9509f241b082a0ae391f141, type: 2}
+  - {fileID: 2100000, guid: 9be20b6b13a2c1c49a45fafb3c92784d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -152,7 +152,7 @@ GameObject:
   - component: {fileID: 2800687742516346389}
   - component: {fileID: 6523488005755130695}
   m_Layer: 10
-  m_Name: LampPostFps1
+  m_Name: LampPostFps1_A
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -323,7 +323,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 2
-  m_Color: {r: 1, g: 0.9487194, b: 0, a: 1}
+  m_Color: {r: 0.9607843, g: 0.7764706, b: 0.2509804, a: 1}
   m_Intensity: 1.6
   m_Range: 24
   m_SpotAngle: 30

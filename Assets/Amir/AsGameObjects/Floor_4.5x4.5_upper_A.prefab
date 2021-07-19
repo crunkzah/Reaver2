@@ -185,7 +185,7 @@ PrefabInstance:
     - target: {fileID: 2300000, guid: 61d92272dbb90494d825898894802d61, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: c92bce9987902dd40968ef9a1ef20b25, type: 2}
+      objectReference: {fileID: 2100000, guid: 7e8c16dc6833a6442a0871f4fee7fc64, type: 2}
     - target: {fileID: 2300000, guid: 61d92272dbb90494d825898894802d61, type: 3}
       propertyPath: m_ScaleInLightmap
       value: 0

@@ -286,7 +286,7 @@ public class BulletController : MonoBehaviour, IPooledObject
                 // float _radius = Random.Range(2, 7);
                 float _radius = 6;
                 
-                obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, _radius, 20f, 200, isMine);
+                obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, _radius, 33F, 300, isMine);
             // }
             
             //FollowingCamera.ShakeY(13f);

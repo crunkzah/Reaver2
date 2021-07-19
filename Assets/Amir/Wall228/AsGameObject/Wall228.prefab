@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8354643472345664884}
   - component: {fileID: 8354643472344567732}
   - component: {fileID: 8737560171011937573}
+  - component: {fileID: 584603099971267356}
   m_Layer: 10
   m_Name: Wall228
   m_TagString: Untagged
@@ -94,6 +95,16 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 6, y: 200, z: 1}
   m_Center: {x: 0, y: 20.85, z: 0}
+--- !u!41 &584603099971267356
+OcclusionPortal:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8354643472342372724}
+  m_Open: 0
+  m_Center: {x: 0, y: 30, z: 0}
+  m_Size: {x: 6, y: 100, z: 1}
 --- !u!1001 &1768562284
 PrefabInstance:
   m_ObjectHideFlags: 0

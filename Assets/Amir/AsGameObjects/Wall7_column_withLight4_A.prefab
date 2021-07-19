@@ -59,7 +59,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7fd83bfbf9509f241b082a0ae391f141, type: 2}
+  - {fileID: 2100000, guid: 2c990a57c30935648a3402f0a4c6b82d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -137,7 +137,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 2
-  m_Color: {r: 0.033018887, g: 1, b: 0.67319006, a: 1}
+  m_Color: {r: 0.031372547, g: 0.7043882, b: 1, a: 1}
   m_Intensity: 4
   m_Range: 6.83
   m_SpotAngle: 30
@@ -191,7 +191,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6323210353467792717}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -13.223512, y: 0.018558607, z: 24.563046}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -4897,7 +4897,7 @@ ParticleSystem:
 --- !u!199 &8990933679329711426
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
