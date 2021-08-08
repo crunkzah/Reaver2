@@ -91,7 +91,7 @@ public class JumpBooster : MonoBehaviour, IActivatable, INetworkObject
                     
                     PlayerController player_on_booster = PhotonManager.Singleton().local_controller;
                     
-                    if(player_on_booster && player_on_booster.photonView.IsMine)
+                    if(player_on_booster && player_on_booster.pv.IsMine)
                     {
                         // player_on_booster.GetComponent<PhotonView>().RPC("BoostVelocity", RpcTarget.AllViaServer, boostVelocity);
                         if(inLocalSpace)

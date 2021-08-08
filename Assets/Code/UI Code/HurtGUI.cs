@@ -24,6 +24,7 @@ public class HurtGUI : MonoBehaviour
     void Start()
     {
         canvas.enabled = false;
+        
         hurt_img.enabled = false;
         heal_img.enabled = false;
         

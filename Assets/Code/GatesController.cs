@@ -248,11 +248,12 @@ public class GatesController : MonoBehaviour, INetworkObject
         audioSource.pitch = 1;
         audioSource.PlayOneShot(openClip);
         
-        DoLight_open(thisTransform.position);
+        Invoke("L_Open", 0.05F);
     }
     
-    void DoLight_open(Vector3 pos)
+    void L_Open()
     {
+        Vector3 pos = thisTransform.position;
         GameObject g = ObjectPool2.s().Get(ObjectPoolKey.LightPooled, false);
         LightPooled light = g.GetComponent<LightPooled>();
         //Color color = Random.ColorHSV();
@@ -272,8 +273,8 @@ public class GatesController : MonoBehaviour, INetworkObject
         
         
         
-        audioSource.pitch = 0.5f;
-        audioSource.PlayOneShot(openClip);
+        //audioSource.pitch = 0.5f;
+        //audioSource.PlayOneShot(closedClip);
     }
     
     

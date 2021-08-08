@@ -665,5 +665,6 @@ public enum SoundType : int
     bullet_impact_sound1,
     bullet_reflect_sound,
     ui_blip1,
-    checkpoint_sound
+    checkpoint_sound,
+    shoot2
 }

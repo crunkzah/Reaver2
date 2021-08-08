@@ -40,6 +40,8 @@ ModelImporter:
     400032: Padla_Armature
     400034: Root_pelvis
     2100000: No Name
+    2300000: //RootNode
+    3300000: //RootNode
     4300000: Padla
     7400000: Padla_Armature|Idle
     7400002: Padla_Armature|Run

@@ -53,7 +53,7 @@ public class AnnihilateWithPlayer : MonoBehaviour
                                 ps.Clear();
                                 
                                 
-                                if(pc.photonView.IsMine)
+                                if(pc.pv.IsMine)
                                 {
                                     pc.TakeDamageOnline(50);                            
                                 }

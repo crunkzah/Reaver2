@@ -4642,7 +4642,7 @@ ParticleSystem:
 --- !u!199 &116242037
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -9340,7 +9340,7 @@ ParticleSystem:
 --- !u!199 &1198110657
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -9754,11 +9754,6 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 5966292281601352631, guid: 1f879fb970746914a9de3cda00937d46,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 956a6da691c524d4f97a0f19df3c45fe, type: 2}
     - target: {fileID: 7695841843625132660, guid: 1f879fb970746914a9de3cda00937d46,
         type: 3}
       propertyPath: ShapeModule.arc.spread
@@ -9804,6 +9799,16 @@ PrefabInstance:
       propertyPath: SizeModule.curve.maxCurve.m_Curve.Array.data[1].time
       value: 0.49887642
       objectReference: {fileID: 0}
+    - target: {fileID: 7695841843625132660, guid: 1f879fb970746914a9de3cda00937d46,
+        type: 3}
+      propertyPath: scalingMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5966292281601352631, guid: 1f879fb970746914a9de3cda00937d46,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 956a6da691c524d4f97a0f19df3c45fe, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1f879fb970746914a9de3cda00937d46, type: 3}
 --- !u!4 &2270385888007184049 stripped

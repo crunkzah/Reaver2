@@ -748,6 +748,7 @@ public class NetworkObjectsManager : MonoBehaviour//MonoBehaviourPunCallbacks
     public GameObject CatLady_npc;
     public GameObject Olios_npc;
     public GameObject PadlaLong_npc;
+    public GameObject Scourge_npc;
     
     
     public void SpawnNPC2(byte _npc, Vector3 pos, Vector3 forward, int playerId = -1)
@@ -827,6 +828,11 @@ public class NetworkObjectsManager : MonoBehaviour//MonoBehaviourPunCallbacks
                 npc_original = PadlaLong_npc;
                 break;
             }
+            case(NPCType.Scourge):
+            {
+                npc_original = Scourge_npc;
+                break;
+            }
             default:
             {
                 break;
@@ -845,7 +851,8 @@ public class NetworkObjectsManager : MonoBehaviour//MonoBehaviourPunCallbacks
         
         ParticlesManager.PlayPooled(ParticleType.npc_spawned_1_ps, pos, forward);
         LightOnSpawn(pos);
-        AudioManager.Play3D(SoundType.spawn_npc_1_sound, pos, 2, 0.25f);
+        float spawn_pitch = Random.Range(0.9f, 1.05f);
+        AudioManager.Play3D(SoundType.spawn_npc_1_sound, pos, spawn_pitch, 1f);
         
         if(net_comp)
         {
@@ -920,6 +927,11 @@ public class NetworkObjectsManager : MonoBehaviour//MonoBehaviourPunCallbacks
                 npc_original = PadlaLong_npc;
                 break;
             }
+            case(NPCType.Scourge):
+            {
+                npc_original = Scourge_npc;
+                break;
+            }
             default:
             {
                 break;
@@ -962,11 +974,11 @@ public class NetworkObjectsManager : MonoBehaviour//MonoBehaviourPunCallbacks
     void ExludeParticularNetworkCommands()
     {
         commands_to_exclude_from_log.Add(NetworkCommand.Move);
-        commands_to_exclude_from_log.Add(NetworkCommand.Shoot);
-        commands_to_exclude_from_log.Add(NetworkCommand.Attack);
-        commands_to_exclude_from_log.Add(NetworkCommand.Flee);
-        commands_to_exclude_from_log.Add(NetworkCommand.TakeDamage);
-        commands_to_exclude_from_log.Add(NetworkCommand.SetTarget);
+        // commands_to_exclude_from_log.Add(NetworkCommand.Shoot);
+        // commands_to_exclude_from_log.Add(NetworkCommand.Attack);
+        // commands_to_exclude_from_log.Add(NetworkCommand.Flee);
+        // commands_to_exclude_from_log.Add(NetworkCommand.TakeDamage);
+        // commands_to_exclude_from_log.Add(NetworkCommand.SetTarget);
     }
 
     [PunRPC]

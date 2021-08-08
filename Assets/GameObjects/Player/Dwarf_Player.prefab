@@ -679,7 +679,7 @@ MonoBehaviour:
   controller: {fileID: 0}
   player_renderer: {fileID: 0}
   aliveState: 0
-  photonView: {fileID: 0}
+  pv: {fileID: 0}
   hurtMaterial: {fileID: 0}
   Dash_prefab: {fileID: 0}
   onHealedClip: {fileID: 0}
@@ -718,7 +718,11 @@ MonoBehaviour:
   fpsWeaponPlaceMover: {fileID: 0}
   OnBecomeGroundedClip: {fileID: 0}
   fpsCam_anim_recoil: {fileID: 0}
+  slamLaunch_ps: {fileID: 0}
   fpsRayDistance: 1.1
+  GunLowerPoint_FPS: {fileID: 0}
+  GunMiddlePoint_FPS: {fileID: 0}
+  wind_audioSource: {fileID: 0}
   platformMask:
     serializedVersion: 2
     m_Bits: 0

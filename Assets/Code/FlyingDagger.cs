@@ -320,7 +320,7 @@ public class FlyingDagger : MonoBehaviour
                                 pierced_cols.Add(col_id);
                                 
                                 PlayerController pController = hit.collider.GetComponent<PlayerController>();
-                                if(pController.photonView.IsMine)
+                                if(pController.pv.IsMine)
                                 {
                                     pController.TakeDamage(damage);
                                 }

@@ -12,9 +12,6 @@ EditorBuildSettings:
     path: Assets/Scenes/UberManagerHolder.unity
     guid: 2333b767a98221847b77d5a3747b54e6
   - enabled: 1
-    path: Assets/Scenes/Prologue 1.unity
-    guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
     path: Assets/Scenes/Level_Start.unity
     guid: 12caf0cb35c95da48b7da1fbe43c229c
   - enabled: 1
@@ -26,4 +23,16 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Level_Flat.unity
     guid: 10e665f223e7f61479085bf02a482c9e
+  - enabled: 1
+    path: Assets/Scenes/Level_Tubes.unity
+    guid: 35a2ea2608d114546857deaaf9d6a4fe
+  - enabled: 1
+    path: Assets/Scenes/Level_Clouds.unity
+    guid: 2fab9bacbc291ac42bd84120599bee7b
+  - enabled: 1
+    path: Assets/Scenes/Level_Straight.unity
+    guid: a6ac08f580d61d645a8858b8d558b267
+  - enabled: 1
+    path: Assets/Scenes/Level_ArenaBoss.unity
+    guid: 77716b70cd452ff4f9752bf1f27b30d8
   m_configObjects: {}

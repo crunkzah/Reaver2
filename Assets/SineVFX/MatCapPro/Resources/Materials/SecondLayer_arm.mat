@@ -24,7 +24,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Ramp:
-        m_Texture: {fileID: 2800000, guid: c0929afbc04d5814989661146e442ddf, type: 3}
+        m_Texture: {fileID: 2800000, guid: 0834531b559c49cf9be8fce5b22ccfeb, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TextureSample0:
@@ -38,9 +38,9 @@ Material:
     m_Floats:
     - _Alpha: 1
     - _EdgeDetectionExp: 1
-    - _EdgeDetectionThickness: 0.93
+    - _EdgeDetectionThickness: 0.11
     - _EdgeFresnelExp: 0.2
-    - _EdgeGlowAmount: 6.56
+    - _EdgeGlowAmount: 10
     - _EdgeGlowPower: 1.74
     - _EdgeMaskLightDark: 100
     - _EdgeMaskPower: -100
@@ -59,7 +59,7 @@ Material:
     - _MaskGlowExp: 4
     - _MaskPower: 100
     - _MatCapAlpha: 1
-    - _RampTilingExp: 1.23
+    - _RampTilingExp: 1.81
     - _UseDitherForOpacity: 0
     - _WireframeEnabled: 0
     - _WireframeFresnelExp: 4
@@ -69,4 +69,4 @@ Material:
     - __dirty: 0
     m_Colors:
     - _OpacityTextureChannel: {r: 0, g: 0, b: 0, a: 1}
-    - _RampColorTint: {r: 1, g: 0.7127394, b: 0, a: 1}
+    - _RampColorTint: {r: 1, g: 1, b: 1, a: 1}

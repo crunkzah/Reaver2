@@ -178,7 +178,8 @@ public enum ObjectPoolKey : int
      Shotgun_bullet_alt,
      Olios_direct_projectile,
      LightPooled,
-     RocketLauncher_alt_projectile
+     RocketLauncher_alt_projectile,
+     Bullet_yellow
 }
 
 public enum FPS_Func : byte

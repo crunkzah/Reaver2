@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 using System.Collections.Generic;
 using Photon.Pun;
 
@@ -84,7 +85,7 @@ public class Civ2Controller : MonoBehaviour, INetworkObject
                     {
                         float distance_to_revolver = Vector3.Distance(revolver_holding.position, masterPlayer.GetHeadPosition());
                         //InGameConsole.LogFancy("distance_to_revolver is " + distance_to_revolver.ToString("f"));
-                        if(distance_to_revolver < 1f)
+                        if(distance_to_revolver < 1.5f)
                         {
                             LockSendingCommands();
                             NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetState, (byte)Civ2State.Idle);

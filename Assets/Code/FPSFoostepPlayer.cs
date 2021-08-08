@@ -18,7 +18,7 @@ public class FPSFoostepPlayer : MonoBehaviour
     }
     
     public float distanceTravelled;
-    float stepDistance = 2.65f * 2;
+    public float stepDistance = 3;
     public float timerOut = 0.5f;
     public float timer = 0;
     

@@ -4785,7 +4785,7 @@ ParticleSystem:
 --- !u!199 &1886495736668328348
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -9640,7 +9640,7 @@ ParticleSystem:
 --- !u!199 &4337902188483537564
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -9810,6 +9810,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_text: FINISH
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a79f1a250647aaa42a84ae2f443ab98e, type: 2}
@@ -10121,7 +10123,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6356987121044481983}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 243086065624918228, guid: 90796b012c318744db1bee2b209366c9,
     type: 2}
@@ -10223,3 +10225,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd484f813f80f4742a2a6b7bee13c65d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  next_level: 0

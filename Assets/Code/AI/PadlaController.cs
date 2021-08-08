@@ -66,6 +66,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             groundMask = LayerMask.GetMask("Ground", "Ceiling");
         }
         
+        path_update_cd = PhotonNetwork.OfflineMode ? PATH_UPDATE_BASE / 3 : PATH_UPDATE_BASE;
     }
     
     void InitAsMaster()
@@ -451,7 +452,8 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     
     public PadlaState state = PadlaState.Idle;
     
-    const float PATH_UPDATE_CD = 0.125F;
+    const float PATH_UPDATE_BASE = 0.125F;
+    float path_update_cd;
     float brainTimer = 0;
     
     Vector3 dashPos;
@@ -602,7 +604,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                         if(pc)
                         {
                             LockSendingCommands();
-                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                         }
                     }
                 }
@@ -633,8 +635,10 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                             if(NavMesh.SamplePosition(padlaPosition + punch_dir * punch1_dashDistance, out navMeshHit, 0.05f, NavMesh.AllAreas))
                             {
                                 dash_pos = navMeshHit.position;
-                                // InGameConsole.LogFancy("We DO <color=green>DASH ATTACK</color>");
+                                InGameConsole.LogFancy("We DO <color=green>DASH ATTACK</color>");
                             }
+                            else
+                                InGameConsole.LogFancy("We DO <color=orange>NOT DASH ATTACK</color>");
                             
                             LockSendingCommands();
                             if(numberOfPunchesPerformed % 2 == 0)
@@ -646,7 +650,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                                 NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability1, dash_pos);
                             }
                         }
-                        else if(brainTimer > PATH_UPDATE_CD)
+                        else if(brainTimer > path_update_cd)
                         {
                             brainTimer = 0;
                             
@@ -672,7 +676,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                             if(pc)
                             {
                                 LockSendingCommands();
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                             }
                         }
                         else
@@ -704,7 +708,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                             if(pc)
                             {
                                 LockSendingCommands();
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                             }
                         }
                         else

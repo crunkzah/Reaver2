@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: PadlaAvatarMask
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: PadlaLong_Armature
+    m_Weight: 0
+  - m_Path: PadlaLong_Armature/Root_pelvis
+    m_Weight: 0
+  - m_Path: PadlaLong_Armature/Root_pelvis/Chest
+    m_Weight: 1
+  - m_Path: PadlaLong_Armature/Root_pelvis/Chest/Arm1.l
+    m_Weight: 1
+  - m_Path: PadlaLong_Armature/Root_pelvis/Chest/Arm1.l/Arm2.l
+    m_Weight: 1
+  - m_Path: PadlaLong_Armature/Root_pelvis/Chest/Arm1.l/Arm2.l/Hand.l
+    m_Weight: 1
+  - m_Path: PadlaLong_Armature/Root_pelvis/Chest/Arm1.r
+    m_Weight: 1
+  - m_Path: PadlaLong_Armature/Root_pelvis/Chest/Arm1.r/Arm2.r
+    m_Weight: 1
+  - m_Path: PadlaLong_Armature/Root_pelvis/Chest/Arm1.r/Arm2.r/Hand.r
+    m_Weight: 1
+  - m_Path: PadlaLong_Armature/Root_pelvis/Chest/Head
+    m_Weight: 0
+  - m_Path: PadlaLong_Armature/Root_pelvis/Leg1.l
+    m_Weight: 0
+  - m_Path: PadlaLong_Armature/Root_pelvis/Leg1.l/Leg2.l
+    m_Weight: 0
+  - m_Path: PadlaLong_Armature/Root_pelvis/Leg1.l/Leg2.l/Foot.l
+    m_Weight: 0
+  - m_Path: PadlaLong_Armature/Root_pelvis/Leg1.r
+    m_Weight: 0
+  - m_Path: PadlaLong_Armature/Root_pelvis/Leg1.r/Leg2.r
+    m_Weight: 0
+  - m_Path: PadlaLong_Armature/Root_pelvis/Leg1.r/Leg2.r/Foot.r
+    m_Weight: 0
+  - m_Path: PadlaLong_mesh
+    m_Weight: 0

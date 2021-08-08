@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Photon.Pun;
 
 public class Kaboom1 : MonoBehaviour
@@ -52,14 +52,14 @@ public class Kaboom1 : MonoBehaviour
         
         isMine = _isMine;
         
-        Debug.DrawRay(pos, Vector3.up * radius, Color.green, 3);
-        Debug.DrawRay(pos, Vector3.right * radius, Color.red, 3);
-        Debug.DrawRay(pos, Vector3.left * radius, Color.red, 3);
-        Debug.DrawRay(pos, Vector3.down * radius, Color.green, 3);
-        Debug.DrawRay(pos, Vector3.forward * radius, Color.cyan, 3);
-        Debug.DrawRay(pos, Vector3.back * radius, Color.cyan, 3);
+        // Debug.DrawRay(pos, Vector3.up * radius, Color.green, 3);
+        // Debug.DrawRay(pos, Vector3.right * radius, Color.red, 3);
+        // Debug.DrawRay(pos, Vector3.left * radius, Color.red, 3);
+        // Debug.DrawRay(pos, Vector3.down * radius, Color.green, 3);
+        // Debug.DrawRay(pos, Vector3.forward * radius, Color.cyan, 3);
+        // Debug.DrawRay(pos, Vector3.back * radius, Color.cyan, 3);
         
-        InGameConsole.LogOrange("Explosion_scale is <color=green>" + explosion_scale.ToString() + "</color>" + " : Radius is <color=green>" + radius.ToString("f") + "</color>");
+        // InGameConsole.LogOrange("Explosion_scale is <color=green>" + explosion_scale.ToString() + "</color>" + " : Radius is <color=green>" + radius.ToString("f") + "</color>");
         
         ps.Clear();
         ps.Play();
@@ -132,7 +132,7 @@ public class Kaboom1 : MonoBehaviour
         PlayerController local_pc = PhotonManager.GetLocalPlayer();
         if(local_pc)
         {
-            float distance = Vector3.Distance(local_pc.transform.position, pos);
+            float distance = Vector3.Distance(local_pc.GetCenterPosition(), pos);
             if(distance < radius)
             {
                 Vector3 dir = local_pc.GetFPSPosition() - pos;
@@ -147,13 +147,10 @@ public class Kaboom1 : MonoBehaviour
                 FollowingCamera.Singleton().ShakeXZ(1.5f);
                 // InGameConsole.LogOrange("Explosion force: " + force);
                 local_pc.BoostVelocity(force);
-            }
-            else
-            {
-                if(distance < 60)
-                {
-                    CameraShaker.ShakeY(1f);
-                }
+                
+                float x = Mathf.InverseLerp(0, radius, distance);
+                float trauma = Mathf.Lerp(1f, 3f, x);
+                CameraShaker.MakeTrauma(trauma);
             }
         }
         

@@ -65,6 +65,7 @@
      <Compile Include="Assets\Code\AI\PadlaController.cs" />
      <Compile Include="Assets\Code\AI\PadlaLongController.cs" />
      <Compile Include="Assets\Code\AI\PlayerInventory.cs" />
+     <Compile Include="Assets\Code\AI\ScourgeController.cs" />
      <Compile Include="Assets\Code\AI\Shooter2Controller.cs" />
      <Compile Include="Assets\Code\AI\Shooter3_shotgun.cs" />
      <Compile Include="Assets\Code\AI\SinclaireController.cs" />
@@ -106,6 +107,7 @@
      <Compile Include="Assets\Code\Animations Scripts\PersistenRotation.cs" />
      <Compile Include="Assets\Code\Animations Scripts\PipingAnimator.cs" />
      <Compile Include="Assets\Code\Animations Scripts\RotationAnimator.cs" />
+     <Compile Include="Assets\Code\Animations Scripts\RotationAnimator_Randomized.cs" />
      <Compile Include="Assets\Code\Animations Scripts\ShipsWheelAnimator.cs" />
      <Compile Include="Assets\Code\Animations Scripts\SurveillanceOwl.cs" />
      <Compile Include="Assets\Code\Animations Scripts\WalkStateBehaviour.cs" />
@@ -146,9 +148,11 @@
      <Compile Include="Assets\Code\Classes\StructsAndClasses.cs" />
      <Compile Include="Assets\Code\CoverForNPC.cs" />
      <Compile Include="Assets\Code\CrossbowBoltController.cs" />
+     <Compile Include="Assets\Code\CrosshairController.cs" />
      <Compile Include="Assets\Code\DamagableLimb.cs" />
      <Compile Include="Assets\Code\DeferredGroundSlam.cs" />
      <Compile Include="Assets\Code\DeferredShooter.cs" />
+     <Compile Include="Assets\Code\DeferredStrike.cs" />
      <Compile Include="Assets\Code\DestroyOnPlay.cs" />
      <Compile Include="Assets\Code\DestructableThing.cs" />
      <Compile Include="Assets\Code\Detectable.cs" />
@@ -194,6 +198,7 @@
      <Compile Include="Assets\Code\GlobalShooter.cs" />
      <Compile Include="Assets\Code\GoreManager.cs" />
      <Compile Include="Assets\Code\GoToMainMenuDebug.cs" />
+     <Compile Include="Assets\Code\GroundStomp.cs" />
      <Compile Include="Assets\Code\GunController.cs" />
      <Compile Include="Assets\Code\Health.cs" />
      <Compile Include="Assets\Code\HealthCrystal.cs" />
@@ -384,6 +389,7 @@
      <None Include="Assets\Characters\MrCoal\IMPORT_MEMO.txt" />
      <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
      <None Include="Assets\Models\Materials\Shaders\StandardRim.shader" />
+     <None Include="Assets\Models\Materials\Good Materials\Standard_Triplanar.shader" />
      <None Include="Assets\PostProcessing\Resources\Shaders\MotionBlur.cginc" />
      <None Include="Assets\PostProcessing\Resources\Shaders\Fog.shader" />
      <None Include="Assets\PostProcessing\Editor Resources\Monitors\ParadeRender.shader" />
@@ -435,6 +441,7 @@
      <None Include="Assets\PostProcessing\Resources\Shaders\BuiltinDebugViews.shader" />
      <None Include="Assets\Models\Materials\Shaders\Toon.shader" />
      <None Include="Assets\PSX_Shaders\Shaders\Trasparent\psx-trasparent-unlit.shader" />
+     <None Include="Assets\Models\Materials\Good Materials\UnlitColorHDR_Rim.shader" />
      <None Include="Assets\PostProcessing\Resources\Shaders\Common.cginc" />
      <None Include="Assets\SineVFX\MatCapPro\Resources\Shaders\GalaxyMaterial.shader" />
      <None Include="Assets\PostProcessing\Resources\Bluenoise64\COPYING.txt" />
@@ -466,6 +473,7 @@
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Surface.cginc" />
      <None Include="Assets\SineVFX\MatCapPro\Resources\Environment\EnvShaders\PrototypeGridCenterMask.shader" />
      <None Include="Assets\SokobanShaderForge\Shaders\SurfEmissionOnly.shader" />
+     <None Include="Assets\Models\Materials\Good Materials\Triplanar_Rim.shader" />
      <None Include="Assets\Models\Materials\Shaders\ParticleCustom1.shader" />
      <None Include="Assets\PSX_Shaders\Shaders\Reflective\psx-vertexlit-mult.shader" />
      <None Include="Assets\PSX_Shaders\Shaders\Reflective\psx-unlit_noambient-mult.shader" />
@@ -482,6 +490,7 @@
      <None Include="Assets\PostProcessing\Editor Resources\Monitors\VectorscopeRender.shader" />
      <None Include="Assets\PostProcessing\Resources\Shaders\EyeAdaptation.shader" />
      <None Include="Assets\Models\Materials\Shaders\ParticleCustomOpaque1.shader" />
+     <None Include="Assets\Models\Materials\Good Materials\UnlitTextured_Rim.shader" />
      <None Include="Assets\Models\Materials\Shaders\ParticleCustom3.shader" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF.shader" />
      <None Include="Assets\PostProcessing\Resources\Shaders\ColorGrading.cginc" />

@@ -8,14 +8,16 @@ public enum PadlaLongState : byte
 {
     Idle,
     Chasing,
-    Attacking1,
-    Attacking2,
+    Stomping,
     Dead
 }
 
 public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLocal
 {
     public GameObject remoteAgent_prefab;
+    public GameObject stomp_prefab;
+    public GameObject deferredStrike_prefab;
+    
     NavMeshAgent remoteAgent;
     Transform remoteAgentTransform;
     
@@ -32,10 +34,6 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
     
     
     DamagableLimb[] limbs;
-    
-    
-    //public TrailRendererController trail_arm;
-    public TrailRendererController trail_spine;
     
     SpawnedObject spawnedObjectComp;
     
@@ -65,6 +63,7 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
             groundMask = LayerMask.GetMask("Ground", "Ceiling");
         }
         
+        path_update_cd = PhotonNetwork.OfflineMode ? PATH_UPDATE_BASE / 2 : PATH_UPDATE_BASE;
     }
     
     void InitAsMaster()
@@ -79,7 +78,6 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
         {
             InitAsMaster();
         }
-        
         
         HitPoints = MaxHealth;
         SetMovePos(thisTransform.localPosition);
@@ -160,20 +158,35 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
                 if(state == PadlaLongState.Dead)
                     return;
                 
-                Vector3 attackDashPos = (Vector3)args[0];
+                Vector3 stompPos = (Vector3)args[0];
+                Vector3 stompDir = (Vector3)args[1];
                 
                 brainTimer = 0;
-                attack_timer = 0;
+                //attack_timer = 0;
+                stomp_timer = 0;
                 
-                SetDashPos(attackDashPos);
+                SetStompPos(stompPos, stompDir);
                 
-                SetMovePos(currentDestination);
-                WarpRemoteAgent(currentDestination);
-                UpdateRemoteAgentDestination(currentDestination);
-                Kick();
-                SetState(PadlaLongState.Attacking1);
+                SetMovePos(stompPos);
+                WarpRemoteAgent(stompPos);
+                UpdateRemoteAgentDestination(stompPos);
+                Stomp(stompPos);
+                SetState(PadlaLongState.Stomping);
                 
                 
+                break;
+            }
+            case(NetworkCommand.Ability1):
+            {
+                UnlockSendingCommands();
+                Clap();
+                break;
+            }
+            case(NetworkCommand.Ability2):
+            {
+                //UnlockSendingCommands();
+                Vector3 _clap_pos = (Vector3)args[0];
+                NetworkClap(_clap_pos);
                 break;
             }
             case(NetworkCommand.SetState):
@@ -193,7 +206,6 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
             }
             case(NetworkCommand.DieWithForce):
             {
-                
                 Vector3 force = (Vector3)args[0];
                 
                 byte limb_id = 0;
@@ -230,10 +242,12 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
         
         switch(_state)
         {
-            case(PadlaLongState.Attacking1):
+            case(PadlaLongState.Stomping):
             {
-                canDoMeleeDamageToLocalPlayer = true;
                 anim.SetFloat(MoveSpeedHash, 0);
+                stomp_happened = false;
+                stomp_local_timer = 0;
+                
                 break;
             }
             case(PadlaLongState.Chasing):
@@ -327,7 +341,7 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
     }
     
     
-    const int MaxHealth = 1800;
+    const int MaxHealth = 4800;
     public int HitPoints = MaxHealth;
     
     public int GetCurrentHP()
@@ -356,14 +370,17 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
     
     public PadlaLongState state = PadlaLongState.Idle;
     
-    const float PATH_UPDATE_CD = 0.125F * 2;
+    const float PATH_UPDATE_BASE = 0.125F * 2;
+    float path_update_cd;
     float brainTimer = 0;
     
-    Vector3 dashPos;
+    Vector3 stompLocalPos;
+    Vector3 stompLocalDir;
     
-    void SetDashPos(Vector3 _dashPos)
+    void SetStompPos(Vector3 _dashPos, Vector3 _stompLocalDir)
     {
-        dashPos = _dashPos;
+        stompLocalPos = _dashPos;
+        stompLocalDir = _stompLocalDir;
     }
     
     void SetMovePos(Vector3 pos)
@@ -375,8 +392,8 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
     static readonly Vector3 vUp = new Vector3(0, 1, 0);
     Quaternion deriv;
     
-    const float moveSpeed = 8F;
-    const float rotateTime = 0.1F;
+    const float moveSpeed = 3.5F;
+    const float rotateTime = 0.2F;
     float speedMult = 1;
     
     const float rotationDistanceEpsilon = 0.01F;
@@ -453,23 +470,16 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
         target_pc = target;
     }
     
-    public float attack_timer = 0;
-    bool canDoMeleeDamageToLocalPlayer = true;
-    const float kick_duration = 1.1f;//2.5F / 2.5f;
+    const float stomp_distance  = 12F;
+    const float stomp_cooldown  = 2.25F;
+    const float stomp_duration  = 2F;
+    const float stomp_radius    = 5F;
+    const int   stomp_dmg       = 20;
+          float stomp_timer     = 0F;
+    float stomp_local_timer     = 0f;
     
-    const float kick_damageTimingStart = 0.5F / 2;
-    const float kick_damageTimingEnd = 0.85F / 2;
-    
-    const float dashSpeed = 18F;
-    
-    public Vector3 localStrikeOffset = new Vector3(0, 1.25f, 1.0f);
-    
-    const float kick_cooldown = 5F;
-    const float kick_distance = 3F;
-    const float kick_radius = 2.25F;
-    const int kick_dmg = 30;
-    const float kick_dashDistance = 0.5F;
-    
+    float clap_timer            = 0f;
+    const float clap_cooldown   = 4f;
     
     void UpdateBrain(float dt)
     {
@@ -486,7 +496,7 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
                         if(pc)
                         {
                             LockSendingCommands();
-                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                         }
                     }
                 }
@@ -496,6 +506,8 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
             case(PadlaLongState.Chasing):
             {
                 brainTimer += dt;
+                stomp_timer += dt;
+                clap_timer += dt;
                 
                 if(target_pc)
                 {
@@ -503,33 +515,31 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
                     
                     UpdateRemoteAgentDestination(targetGroundPos);
                     
-                    Vector3 padlaPosition = thisTransform.localPosition;
+                    Vector3 padlaLongPosition = thisTransform.localPosition;
                     
                     if(canSendCommands)
                     {
-                        if(Math.SqrDistance(targetGroundPos, padlaPosition) < kick_distance  * kick_distance)
+                        if(stomp_timer > stomp_cooldown &&  Math.SqrDistance(targetGroundPos, padlaLongPosition) < stomp_distance  * stomp_distance)
                         {
-                            NavMeshHit navMeshHit;
-                            //Vector3 punch_dir = (Math.GetXZ(targetGroundPos - padlaPosition)).normalized;
-                            Vector3 punch_dir = (targetGroundPos - padlaPosition).normalized;
-                            
-                            Vector3 dash_pos = padlaPosition;
-                            if(NavMesh.SamplePosition(padlaPosition + punch_dir * kick_dashDistance, out navMeshHit, 1f, NavMesh.AllAreas))
-                            {
-                                dash_pos = navMeshHit.position;
-                                // InGameConsole.LogFancy("We DO <color=green>DASH ATTACK</color>");
-                            }
+                            Vector3 stompPos = padlaLongPosition;
+                            Vector3 stompDir = Math.GetXZ((targetGroundPos - padlaLongPosition).normalized).normalized;
                             
                             LockSendingCommands();
-                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Attack, dash_pos);
+                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Attack, stompPos, stompDir);
                         }
-                        else if(brainTimer > PATH_UPDATE_CD)
+                        else if(clap_timer > clap_cooldown)
+                        {
+                            clap_timer = 0;
+                            LockSendingCommands();
+                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability1);
+                        }
+                        else if(brainTimer > path_update_cd)
                         {
                             brainTimer = 0;
                             
                             Vector3 remoteAgentPos = GetRemoteAgentPos();
                             
-                            if(Math.SqrDistance(padlaPosition, remoteAgentPos) > 0.175F * 0.175F)
+                            if(Math.SqrDistance(padlaLongPosition, remoteAgentPos) > 0.175F * 0.175F)
                             {
                                 LockSendingCommands();
                                 NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Move, remoteAgentPos);
@@ -549,7 +559,7 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
                             if(pc)
                             {
                                 LockSendingCommands();
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                             }
                         }
                         else
@@ -562,18 +572,18 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
                 
                 break;
             }
-            case(PadlaLongState.Attacking1):
+            case(PadlaLongState.Stomping):
             {
                 brainTimer += dt;
                 
                 if(canSendCommands)
                 {
-                    if(brainTimer > kick_duration)
+                    if(brainTimer > stomp_duration)
                     {
                         brainTimer = 0;
                         Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
-                        UpdateRemoteAgentDestination(dashPos);
-                        WarpRemoteAgent(dashPos);
+                        UpdateRemoteAgentDestination(stompLocalPos);
+                        WarpRemoteAgent(stompLocalPos);
                         
                         if(potentialTarget)
                         {
@@ -581,7 +591,7 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
                             if(pc)
                             {
                                 LockSendingCommands();
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                             }
                         }
                         else
@@ -594,11 +604,6 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
                 }
                 break;
             }
-            case(PadlaLongState.Attacking2):
-            {
-                break;
-            }
-            
             case(PadlaLongState.Dead):
             {
                 break;
@@ -606,58 +611,75 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
         }
     }
     
-    // bool IsGroundedAndOnNavMesh(Vector3 positionCheck, float distanceCheck, out Vector3 navMeshPos)
-    // {
-    //     bool Result = false;
-        
-    //     navMeshPos = positionCheck;
-        
-    //     RaycastHit hit;
-    //     if(Physics.Raycast(positionCheck, -vUp, out hit, distanceCheck, groundMask))
-    //     {
-    //         NavMeshHit navMeshHit;
-    //         if(NavMesh.SamplePosition(positionCheck, out navMeshHit, 1, NavMesh.AllAreas))
-    //         {
-    //             navMeshPos = navMeshHit.position;
-    //             Result = true;
-    //         }
-    //     }
-        
-    //     return Result;
-    // }
-   
+    bool stomp_happened = false;
     
-    Vector3 GetCapsulePointBottom()
+    void Stomp(Vector3 pos)
     {
-        Vector3 Result = thisTransform.localPosition;
+        anim.Play("Base.Stomp", 0, 0);
         
-        //Result.x += col.center.x;
-        Result.y += col.center.y - col.height/2 + col.radius;
-        //Result.z += col.center.z;
         
-        return Result;
-    }
-    
-    Vector3 GetCapsulePointTop()
-    {
-        Vector3 Result = thisTransform.localPosition;
         
-        //Result.x += col.center.x;
-        Result.y += col.center.y + col.height/2 - col.radius;
-        //Result.z += col.center.z;
-        
-        return Result;
-    }
-    
-    void Kick()
-    {
-        anim.Play("Base.Kick", 0, 0);
-        
-        //trail_spine.EmitFor(kick_duration);
         //audio_src.clip = clipKick;
         //audio_src.PlayDelayed(punch1_damageTimingStart);
     }
     
+    public ParticleSystem clap_cooking_ps_l;
+    public ParticleSystem clap_cooking_ps_r;
+    public ParticleSystem clap_ps;
+    
+    public void NetworkClap(Vector3 clap_pos)
+    {
+        GameObject clap_deferred_strike = Instantiate(deferredStrike_prefab, clap_pos, Quaternion.identity);
+        float delay = PhotonNetwork.OfflineMode ? 0.65f : 0.5f;
+        clap_deferred_strike.GetComponent<DeferredStrike>().DoStartStrike(clap_pos, delay, 5f, 10, 11f);
+    }
+    
+    
+    
+    public void OnClap()
+    {
+        if(PhotonNetwork.IsMasterClient)
+        {
+            //Vector3 clap_pos = thisTransform.localPosition + new Vector3(Random.Range(-1f, 1f), 0.0f, Random.Range(-1f, 1f)) * 5;
+            
+            for(int i = 0; i < UberManager.Singleton().players_controller.Count; i++)
+            {
+                PlayerController t = UberManager.Singleton().players_controller[i];
+                if(t)
+                {
+                    Vector3 ground_pos = t.GetGroundPosition();
+                    InGameConsole.LogFancy("GroundPos: " + ground_pos);
+                    // RaycastHit hit;
+                    // if(Physics.Raycast(ground_pos + new Vector3(0, 1, 0), new Vector3(0, -1, 0), out hit, 3f, groundMask))
+                    // {
+                    //     ground_pos = hit.point;
+                    // }
+                    
+                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability2, ground_pos);
+                }
+            }
+        }
+        
+        //audio_src.PlayOneShot(clipClap, 0.7f);
+        clap_ps.Play();
+        
+        InGameConsole.LogOrange("<color=green>OnClap</color>");
+    }
+    
+    public void OnClapEnd()
+    {
+        //InGameConsole.LogOrange("<color=red>OnClapEnd</color>");
+        anim.SetLayerWeight(1, 0f);
+    }
+    
+    void Clap()
+    {
+        anim.SetLayerWeight(1, 1f);
+        anim.Play("Clap", 1, 0);
+        
+        clap_cooking_ps_l.Play();
+        clap_cooking_ps_r.Play();
+    }
     
     Vector3 gizmoP1;
     Vector3 gizmoP2;
@@ -675,7 +697,7 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
         style.fontSize = 18;
         style.fontStyle = FontStyle.Bold;
         
-        UnityEditor.Handles.Label(transform.localPosition + new Vector3(0, 2.75f, 0), state.ToString(), style);
+        UnityEditor.Handles.Label(transform.localPosition + new Vector3(0, 4f, 0), state.ToString(), style);
         
     }
 #endif
@@ -685,7 +707,7 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
     
     
     
-    const float footStepDistance = 3f;
+    const float footStepDistance = 2.1f;
     float distanceTravelledRunningSqr;
     
     void UpdateBrainLocally(float dt)
@@ -730,50 +752,27 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
                 
                 break;
             }
-            case(PadlaLongState.Attacking1):
+            case(PadlaLongState.Stomping):
             {
                 Vector3 currentPos = thisTransform.localPosition;
-                
-                
                 float dV = speedMult * dt * moveSpeed;
+                stomp_local_timer += dt;
                 
+                //RotateToLookAt(stompLocalPos, rotateTime * speedMult / 4, false);
+                Vector3 stompingDirXZ = Math.GetXZ(stompLocalDir);
+                Quaternion desiredRotation = Quaternion.LookRotation(stompingDirXZ);
                 
-                attack_timer += dt;
-                RotateToLookAt(dashPos, rotateTime * speedMult / 4, false);
+                thisTransform.localRotation = Quaternion.RotateTowards(thisTransform.localRotation, desiredRotation, dt * 720);
                 
-                if(attack_timer > kick_damageTimingStart)
+                thisTransform.localPosition = Vector3.MoveTowards(currentPos, currentDestination, dV);
+                
+                if(!stomp_happened && stomp_local_timer > 0.775F)
                 {
-                    
-                    dV = speedMult * dt * dashSpeed;
-                    thisTransform.localPosition = Vector3.MoveTowards(currentPos, dashPos, dV);
-                    SetMovePos(dashPos);
-                }
-                else
-                {
-                    thisTransform.localPosition = Vector3.MoveTowards(currentPos, currentDestination, dV);
-                }
-                
-                if(canDoMeleeDamageToLocalPlayer)
-                {
-                    
-                    if(attack_timer > kick_damageTimingStart && attack_timer < kick_damageTimingEnd)
-                    {
-                        Vector3 dmgPos = thisTransform.localPosition;
-                        dmgPos = dmgPos + thisTransform.up * localStrikeOffset.y + thisTransform.forward * localStrikeOffset.z;
-                        float dmgRadius = kick_radius;
-                        
-                        if(TryDoMeleeDamageToLocalPlayer(dmgPos, dmgRadius))
-                        {
-                            canDoMeleeDamageToLocalPlayer = false;    
-                        }
-                    }
-                    
+                    stomp_happened = true;
+                    GameObject stomp = Instantiate(stomp_prefab, stompLocalPos, Quaternion.identity);
+                    stomp.GetComponent<GroundStomp>().MakeStomp(20, stomp_dmg, stomp_radius);
                 }
                 
-                break;
-            }
-            case(PadlaLongState.Attacking2):
-            {
                 break;
             }
             case(PadlaLongState.Dead):
@@ -817,41 +816,12 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
         
         return result;
     }
-    
-    bool TryDoMeleeDamageToLocalPlayer(Vector3 pos, float radius)
-    {
-        //InGameConsole.LogFancy(string.Format("Padla: <color=yellow>{0}</color>", "TryDoMeleeDamageToLocalPlayer"));
-        PlayerController local_pc = PhotonManager.GetLocalPlayer();
-        
-        // gizmoPos = pos;
-        // gizmoRadius = radius;
-        
-        if(local_pc)
-        {
-            float sqrDistanceToPlayer = Math.SqrDistance(local_pc.GetGroundPosition() + new Vector3(0, 0.5f, 0), pos);
-            
-            //InGameConsole.LogFancy(string.Format("Distance to player: <color=yellow>{0}</color>", Mathf.Sqrt(sqrDistanceToPlayer).ToString("f")));
-            
-            if(sqrDistanceToPlayer < radius * radius)
-            {
-                Vector3 dmgDir = -thisTransform.localPosition + local_pc.GetGroundPosition();
-                dmgDir.y = 0;
-                dmgDir.Normalize();
-                
-                dmgDir.y = 1;
-                local_pc.BoostVelocity(dmgDir * 18);
-                
-                local_pc.TakeDamage(kick_dmg);
-                return true;
-            }
-        }
-        
-        return false;
-    }
+   
     
     [Header("Clips:")]
     public AudioClip clipStep;
     public AudioClip clipHurt1;
     public AudioClip clipDeath;
-    public AudioClip clipKick;
+    public AudioClip clipStomp;
+    public AudioClip clipClap;
 }

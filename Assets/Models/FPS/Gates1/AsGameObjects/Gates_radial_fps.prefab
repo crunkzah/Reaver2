@@ -51,7 +51,7 @@ MonoBehaviour:
   detectionMode: 1
   state: 0
   audioSource: {fileID: 0}
-  openClip: {fileID: 8300000, guid: c85869b1f3c88a74a8ffac8b25774a4b, type: 3}
+  openClip: {fileID: 8300000, guid: bb2a12b006c0c834d917d7b29e45c5f4, type: 3}
   closedClip: {fileID: 8300000, guid: bc5d943e60257a343bd598f0f1cb2b07, type: 3}
   animationSpeed: 13.5
   detectionTransform: {fileID: 7474537247153692447}
@@ -64,6 +64,8 @@ MonoBehaviour:
   status_emissives: []
   closed_mat: {fileID: 0}
   locked_mat: {fileID: 0}
+  unlock_clip: {fileID: 0}
+  lock_clip: {fileID: 0}
   radius: 9
 --- !u!82 &9026295831702234508
 AudioSource:
@@ -87,7 +89,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 45
+  MaxDistance: 60
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0

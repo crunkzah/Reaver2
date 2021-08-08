@@ -487,7 +487,7 @@ public class BulletController : MonoBehaviour, IPooledObject
             
             if(soundOnHit != SoundType.None)
             {
-                AudioManager.Play3D(SoundType.bullet_impact_sound1, point);
+                AudioManager.Play3D(SoundType.bullet_impact_sound1, point, Random.Range(0.9f, 1), 0.6f);
             }
             if(rend)
             {

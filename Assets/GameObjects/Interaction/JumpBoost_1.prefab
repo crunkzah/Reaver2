@@ -165,10 +165,10 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: c85869b1f3c88a74a8ffac8b25774a4b, type: 3}
+  m_audioClip: {fileID: 8300000, guid: bd4bb512d5f3c4447ba30822e0b5aede, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.484
-  m_Pitch: 1
+  m_Volume: 1
+  m_Pitch: 0.8
   Loop: 0
   Mute: 0
   Spatialize: 0
@@ -176,9 +176,9 @@ AudioSource:
   Priority: 128
   DopplerLevel: 0
   MinDistance: 1
-  MaxDistance: 50
+  MaxDistance: 64
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 2
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -186,23 +186,68 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
+      time: 0.015625
       value: 1
-      inSlope: 0
-      outSlope: 0
+      inSlope: -64.0256
+      outSlope: -64.0256
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.03125
+      value: 0.5
+      inSlope: -16.0064
+      outSlope: -16.0064
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.0625
+      value: 0.25
+      inSlope: -4.0016
+      outSlope: -4.0016
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.125
+      value: 0.125
+      inSlope: -1.0004
+      outSlope: -1.0004
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.25
+      value: 0.0625
+      inSlope: -0.2501
+      outSlope: -0.2501
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.5
+      value: 0.03125
+      inSlope: -0.062525
+      outSlope: -0.062525
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
     - serializedVersion: 3
       time: 1
       value: 0
-      inSlope: 0
-      outSlope: 0
+      inSlope: -0.01563125
+      outSlope: -0.01563125
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
@@ -5084,7 +5129,7 @@ ParticleSystem:
 --- !u!199 &2118565197088507609
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -5628,6 +5673,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3023539518760388700}
     m_Modifications:
+    - target: {fileID: 2288865218031078902, guid: 1d289edab1b28c94da9547fc9cc8d499,
+        type: 3}
+      propertyPath: m_Name
+      value: Fireflies_burst
+      objectReference: {fileID: 0}
     - target: {fileID: 2288865218031078901, guid: 1d289edab1b28c94da9547fc9cc8d499,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5682,11 +5732,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2288865218031078902, guid: 1d289edab1b28c94da9547fc9cc8d499,
-        type: 3}
-      propertyPath: m_Name
-      value: Fireflies_burst
       objectReference: {fileID: 0}
     - target: {fileID: 2288865218031078923, guid: 1d289edab1b28c94da9547fc9cc8d499,
         type: 3}

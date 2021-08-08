@@ -677,7 +677,7 @@ public class SniperGirlController : MonoBehaviour, INetworkObject, IDamagableLoc
                         if(pc)
                         {
                             LockSendingCommands();
-                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                         }
                     }
                 }
@@ -759,7 +759,7 @@ public class SniperGirlController : MonoBehaviour, INetworkObject, IDamagableLoc
                             if(pc)
                             {
                                 LockSendingCommands();
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                             }
                         }
                         else
@@ -837,7 +837,7 @@ public class SniperGirlController : MonoBehaviour, INetworkObject, IDamagableLoc
                                 if(pc)
                                 {
                                     LockSendingCommands();
-                                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                                 }
                             }
                             else
@@ -874,7 +874,7 @@ public class SniperGirlController : MonoBehaviour, INetworkObject, IDamagableLoc
                             PlayerController pc = potentialTarget.GetComponent<PlayerController>();
                             if(pc)
                             {
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                             }
                         }
                         else

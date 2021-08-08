@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     public PlayerAliveState aliveState = PlayerAliveState.Normal;
 
-    public PhotonView photonView;
+    public PhotonView pv;
     
     public Material hurtMaterial;
     Material mainMaterial;
@@ -57,7 +57,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         controller       = GetComponent<CharacterController>();
         playerCamera     = FindObjectOfType<Camera>();
         camera_transform = playerCamera.transform;
-        photonView       = GetComponent<PhotonView>();
+        pv       = GetComponent<PhotonView>();
         thisTransform    = GetComponent<Transform>();
         platformMask = LayerMask.GetMask("Fadable", "Ground", "Default");
         externalVelocityMask = LayerMask.GetMask("Ground", "Fadable", "InvisibleCollider");
@@ -95,10 +95,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
         
         
-        if(photonView.IsMine)
+        if(pv.IsMine)
         {
             MakePlayerBlob();
             LockCursor();
+            wind_audioSource.enabled = true;
             
             //Physics.M
             
@@ -113,6 +114,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
         else
         {
+            Destroy(wind_audioSource.gameObject);
             Destroy(fpsWeaponPlaceMover);
         }
         
@@ -229,7 +231,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     void Revive()
     {
-        if(photonView.IsMine)
+        if(pv.IsMine)
         {
             SetFPSCameraToPlayer();
             
@@ -424,13 +426,24 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     public void SetFPSCameraToPlayer()
     {
-        if(photonView.IsMine)
+        if(pv.IsMine)
         {
             Transform _camTr = FollowingCamera.Singleton().transform;
+            if(_camTr)
+            {
+                Rigidbody _camRb = _camTr.gameObject.GetComponent<Rigidbody>();
+                SphereCollider _camCol = _camTr.gameObject.GetComponent<SphereCollider>();
+                if(_camRb)
+                    Destroy(_camRb);
+                if(_camCol)
+                    Destroy(_camCol);
+            }
             
             _camTr.SetParent(fpsCameraPlace);
             _camTr.localPosition = Vector3.zero;
             _camTr.transform.localRotation = Quaternion.identity;
+            
+            
             fpsCamXRotation = 0;
             
             Camera guiCamera = FollowingCamera.Singleton().GUI3d_cam;
@@ -448,7 +461,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     public Transform fpsCameraPlace;
     public Transform fpsCameraTilting;
     //FPS:
-    const float MAX_GRAVITY_NEG = -65F;
+    const float MAX_GRAVITY_NEG = -75F;
     public Vector3 fpsVelocity;
     bool invertVertical = true;
     
@@ -555,7 +568,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         controller.height = slideControllerHeight;
         controller.center = new Vector3(0, 0.5f, 0);
         
-        if(photonView.IsMine)
+        if(pv.IsMine)
         {
             CameraShaker.Slide();
             fpsCameraPlace.localPosition = duckCameraPlacePosition;
@@ -587,7 +600,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         {
             controller.height = normalControllerHeight;
             controller.center = new Vector3(0, 1f, 0);
-            if(photonView.IsMine)
+            if(pv.IsMine)
             {
                 slideVel.x = 0;
                 slideVel.z = 0;
@@ -719,7 +732,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     void LateUpdate()
     {
-        if(!photonView.IsMine)
+        if(!pv.IsMine)
         {
             return;
         }
@@ -758,7 +771,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     
     int SlamDirectDamage = 420;
-    const float slamVelocityY = -65F;//-39;
+    const float slamVelocityY = MAX_GRAVITY_NEG;//-39;
     
     public AudioClip noStaminaClip;
     public AudioClip slamDirectDamageClip;
@@ -771,7 +784,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     [PunRPC]
     void GroundSlam(Vector3 _pos)
     {
-        if(photonView.IsMine)
+        if(pv.IsMine)
         {
             if(!tryingToSlam)
             {
@@ -810,6 +823,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
     float damageImmuneTimer = 0;
     
     public ParticleSystem wind_player_ps;
+    
+    
     
     void FPSDash(Vector3 dashDirWorldSpace)
     {
@@ -862,7 +877,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             }
         }
         
-        photonView.RPC("FPSDashFX", RpcTarget.All);
+        pv.RPC("FPSDashFX", RpcTarget.All);
     }
     
     public AudioClip dashAudioClip;
@@ -955,7 +970,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
                         
                         PlayDirSlam();
                         
-                        photonView.RPC("PlayDirSlam", RpcTarget.Others);
+                        pv.RPC("PlayDirSlam", RpcTarget.Others);
                         
                         //Vector3 randomOffset = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
                         //Vector3 playerBoostDir = 0.5f * randomOffset + hit.normal;
@@ -1002,9 +1017,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
         GameObject groundSlam_go = ObjectPool.s().Get(ObjectPoolKey.DeferredGroundSlam, false);
         DeferredGroundSlam deferredSlam = groundSlam_go.GetComponent<DeferredGroundSlam>();
-        deferredSlam.DoDeferredSlam(slam_pos, (float)UberManager.GetPhotonTimeDelayedBy(GetGroundSlamDelay()), 16, photonView.IsMine);
+        deferredSlam.DoDeferredSlam(slam_pos, (float)UberManager.GetPhotonTimeDelayedBy(GetGroundSlamDelay()), 16, pv.IsMine);
         
-        if(photonView.IsMine)
+        if(pv.IsMine)
         {
             tryingToSlam = false;
             CameraShaker.ShakeY(5.1f);
@@ -1085,9 +1100,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     void OnBecomeGrounded()
     {
-        if(photonView.IsMine)
+        if(pv.IsMine)
         {
-            CameraShaker.ShakeY(4.1f);
+            CameraShaker.ShakeY(4.4f);
             
             velocityBeforeGrounded = fpsVelocity;
             //InGameConsole.LogOrange(string.Format("<b>VelocityBeforeGrounded:</b> <color=blue>{0}</color>", velocityBeforeGrounded));
@@ -1187,6 +1202,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
             input *= 0;
         }
         tiltingTargetAngle = input.x == 0 ? 0 : Mathf.Sign(input.x) * -tiltAngle;
+        tiltingTargetAngle *= 1 - Math.Abs(fpsCameraPlace.forward.y);
+        //InGameConsole.LogFancy("Camera forward dir: <color=yellow>" + fpsCameraPlace.forward.ToString() + "</color>");
         
         if(input.x * input.z != 0f)
         {
@@ -1314,7 +1331,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
                 {
                     Vector3 slamPosition = thisTransform.localPosition;
                     GroundSlam(slamPosition);
-                    photonView.RPC("GroundSlam", RpcTarget.All, slamPosition);
+                    pv.RPC("GroundSlam", RpcTarget.All, slamPosition);
                 }
             }
             
@@ -1405,7 +1422,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
                 bool isKeyPressed = Input.GetKey(KeyCode.LeftControl);
                 if(isKeyPressed && timeInAir > 0.2f)
                 {
-                    photonView.RPC("OnGroundSlammed", RpcTarget.All, slamHit.point);
+                    pv.RPC("OnGroundSlammed", RpcTarget.All, slamHit.point);
                 }
                 else
                 {
@@ -1421,7 +1438,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     }
     
     
-    
+    public ParticleSystem slamLaunch_ps;
     
     void FPSJump()
     {
@@ -1458,6 +1475,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             else
             {
                 fpsVelocity.y = fpsJumpForce * 2.0f;
+                slamLaunch_ps.Play();
             }
             playerAudioSource.PlayOneShot(jumpLocalClip, 0.275f);
         }
@@ -1505,7 +1523,12 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     public Transform GetFPSCameraTransform()
     {
-        return fpsCam_camera.transform;
+        if(fpsCam_camera)
+        {
+            return fpsCam_camera.transform;
+        }
+        else
+            return null;
     }
     
     const float fpsRayOffset = 0.125F;
@@ -1608,7 +1631,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         return;
         
-        if(photonView.IsMine)
+        if(pv.IsMine)
         {
             
             GUIStyle style = new GUIStyle();
@@ -1628,7 +1651,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     void DoImpact(Vector3 pos, Vector3 upDir)
     {
         Impact(pos, upDir);
-        photonView.RPC("Impact", RpcTarget.Others, pos, upDir);
+        pv.RPC("Impact", RpcTarget.Others, pos, upDir);
     }
     
     [PunRPC]
@@ -1651,7 +1674,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             else
             {
                 int ping = PhotonNetwork.NetworkingClient.LoadBalancingPeer.RoundTripTime;
-                photonView.RPC("ReceiveRTT", RpcTarget.MasterClient, ping);
+                pv.RPC("ReceiveRTT", RpcTarget.MasterClient, ping);
             }
             rttSendTimer = 0;
         }
@@ -1659,6 +1682,18 @@ public class PlayerController : MonoBehaviour, IPunObservable
         {
             rttSendTimer += dt;
         }
+    }
+    
+    public AudioSource wind_audioSource;
+    
+    void WindTick()
+    {
+        float vol = 0;
+        float vel_y_abs = Math.Abs(fpsVelocity.y);
+        float vol_t = Mathf.InverseLerp(16f, 50f, vel_y_abs);
+        vol = Mathf.Lerp(0f, 1f, vol_t);
+        
+        wind_audioSource.volume = vol;
     }
     
     void Update()
@@ -1672,9 +1707,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
             damageImmuneTimer = 0;
         }
         
-        if(photonView.IsMine)
+        if(pv.IsMine)
         {
             CheckOutOfBounds();
+            WindTick();
             switch(aliveState)
             {
                 case PlayerAliveState.Normal:
@@ -1815,7 +1851,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     public void BoostVelocityAdditive(Vector3 boostVel)
     {
-        if(photonView.IsMine)
+        if(pv.IsMine)
         {
             
             tryingToSlam = false;
@@ -1836,7 +1872,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     [PunRPC]
     public void BoostVelocity(Vector3 boostVel)
     {
-        if(photonView.IsMine)
+        if(pv.IsMine)
         {
             if(isSliding)
             {
@@ -1851,7 +1887,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     public void TakeDamageOnline(int dmg)
     {
-        photonView.RPC("TakeDamage", RpcTarget.All, dmg);
+        pv.RPC("TakeDamage", RpcTarget.All, dmg);
     }
     
     
@@ -1928,7 +1964,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     void OnTakeDamage(int dmg)
     {
-        if(photonView.IsMine)
+        if(pv.IsMine)
         {
             //PostProcessingController.AddSaturation(-0.15f);
             CameraShaker.MakeTrauma(0.45f * Mathf.InverseLerp(1, 100, dmg));
@@ -1948,11 +1984,22 @@ public class PlayerController : MonoBehaviour, IPunObservable
         //         NPCManager.Singleton().UnregisterAiTarget(this.transform);
         //     }
         // }
-       if(photonView.IsMine && FollowingCamera.Singleton() && fpsCameraPlace.childCount > 0)
+       if(pv.IsMine && FollowingCamera.Singleton() && fpsCameraPlace.childCount > 0)
        {
-            FollowingCamera.Singleton().transform.SetParent(null);
-            FollowingCamera.Singleton().transform.localPosition  = new Vector3(0, 8, 0);
-            FollowingCamera.Singleton().transform.localRotation  = Quaternion.Euler(45f, 0, 0);
+            Transform _camTr = FollowingCamera.Singleton().transform;
+            _camTr.SetParent(null);
+            _camTr.localPosition  = new Vector3(0, 8, 0);
+            _camTr.localRotation  = Quaternion.Euler(45f, 0, 0);
+            
+            if(_camTr)
+            {
+                Rigidbody _camRb = _camTr.gameObject.GetComponent<Rigidbody>();
+                SphereCollider _camCol = _camTr.gameObject.GetComponent<SphereCollider>();
+                if(_camRb)
+                    Destroy(_camRb);
+                if(_camCol)
+                    Destroy(_camCol);
+            }
             // fpsCam_transform = null;
             fpsCam_camera = null;
             fpsCam_weaponView_cam = null;
@@ -1977,7 +2024,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             NPCManager.Singleton().aiTargets.Remove(this.transform);
         }
         
-        if(photonView.IsMine == false)
+        if(pv.IsMine == false)
         {
             if(playerLight)
             {
@@ -1995,7 +2042,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     [PunRPC]
     void DashFXStart()
     {
-        if(!photonView.IsMine)
+        if(!pv.IsMine)
             player_renderer.enabled = false;
         dash.Play();
     }
@@ -2003,7 +2050,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     [PunRPC]
     void DashFXEnd()
     {
-        if(!photonView.IsMine)
+        if(!pv.IsMine)
             player_renderer.enabled = true;
         dash.Stop();
     }
@@ -2033,7 +2080,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
                 if(dash_timer > dash_duration)
                 {
                     aliveState = PlayerAliveState.Normal;
-                    photonView.RPC("DashFXEnd", RpcTarget.All);
+                    pv.RPC("DashFXEnd", RpcTarget.All);
                     //DashFXEnd();
                 }
                 else
@@ -2068,7 +2115,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         aliveState = PlayerAliveState.Dashing;
         dash_timer = 0f;
         
-        photonView.RPC("DashFXStart", RpcTarget.All);
+        pv.RPC("DashFXStart", RpcTarget.All);
     }
     
     //[PunRPC]
@@ -2082,8 +2129,25 @@ public class PlayerController : MonoBehaviour, IPunObservable
             NPCManager.Singleton().UnregisterAiTarget(this.transform);
         }
         
+        if(pv.IsMine)
+        {
+            Transform _camTr = FollowingCamera.Singleton().transform;
+            Rigidbody _camRb = _camTr.gameObject.AddComponent<Rigidbody>();
+            _camRb.drag = 1.5f;
+            _camRb.mass = 50;
+            _camRb.AddForce(Vector3.up * 0.05f, ForceMode.VelocityChange);
+            _camRb.AddTorque(Random.onUnitSphere * 0.01f, ForceMode.VelocityChange);
+            SphereCollider _camCol = _camRb.gameObject.AddComponent<SphereCollider>();
+            _camCol.radius = 1;
+            _camTr.SetParent(null);
+            
+            Camera _cam = FollowingCamera.Singleton().GetComponent<Camera>();
+        }
+        
+        
+        
         isAlive = false;
         InGameConsole.LogFancy(string.Format("Player {0} has <color=red>died</color>", this.gameObject.name));
-        GlobalShooter.MakeGibs(thisTransform.localPosition, 32);
+        //GlobalShooter.MakeGibs(thisTransform.localPosition, 32);
     }
 }

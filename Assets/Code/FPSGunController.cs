@@ -41,7 +41,7 @@ public class FPSGunController : MonoBehaviour
     public AudioSource gunAudio;
     
     const int revolverDmg = 300;
-    const int revolverDmg_reflect = 110;
+    const int revolverDmg_reflect = 120;
     const int revolverDmg_ult = 550;//530;
     const float revolverFireRate = 0.325F * 2;
     const float revolverPump_Rate = 0.365F / 1.0f;
@@ -1714,6 +1714,7 @@ public class FPSGunController : MonoBehaviour
         }
     }
     
+    float crosshairTrauma = 1;
     
     [PunRPC]
     void FPSCommand(byte func_byte, Vector3 pos, Vector3 dir)
@@ -1728,6 +1729,8 @@ public class FPSGunController : MonoBehaviour
                 {
                     if(GetCurrentWeapon() != GunType.Revolver && pController.isAlive)
                         return;
+                    
+                    CrosshairController.MakeTrauma(crosshairTrauma);
                 }
                 
                 ShootRevolver(pos, dir);
@@ -1739,6 +1742,8 @@ public class FPSGunController : MonoBehaviour
                 {
                     if(GetCurrentWeapon() != GunType.Revolver && pController.isAlive)
                         return;
+                        
+                    CrosshairController.MakeTrauma(crosshairTrauma);
                 }
                 
                 ShootRevolver_Stronger(pos, dir);
@@ -1750,6 +1755,8 @@ public class FPSGunController : MonoBehaviour
                 {
                     if(GetCurrentWeapon() != GunType.Revolver && pController.isAlive)
                         return;
+                        
+                    CrosshairController.MakeTrauma(crosshairTrauma);
                 }
                 
                 ShootRevolver_Ult(pos, dir);
@@ -1761,6 +1768,8 @@ public class FPSGunController : MonoBehaviour
                 {
                     if(GetCurrentWeapon() != GunType.Shotgun && pController.isAlive)
                         return;
+                        
+                    CrosshairController.MakeTrauma(crosshairTrauma);
                 }
                 
                 ShootShotgun_Alt2(pos, dir);
@@ -1772,6 +1781,8 @@ public class FPSGunController : MonoBehaviour
                 {
                     if(GetCurrentWeapon() != GunType.AR && pController.isAlive)
                         return;
+                        
+                    CrosshairController.MakeTrauma(crosshairTrauma);
                 }
                 //ShootAR(pos, dir);
                 ShootAR_HitScan(pos, dir);
@@ -1783,6 +1794,8 @@ public class FPSGunController : MonoBehaviour
                 {
                     if(GetCurrentWeapon() != GunType.AR && pController.isAlive)
                         return;
+                        
+                    CrosshairController.MakeTrauma(crosshairTrauma);
                 }
                 //ShootARGhost(pos, dir);
                 ShootARGhost_HitScan(pos, dir);
@@ -1794,6 +1807,8 @@ public class FPSGunController : MonoBehaviour
                 {
                     if(GetCurrentWeapon() != GunType.RocketLauncher && pController.isAlive)
                         return;
+                        
+                    CrosshairController.MakeTrauma(crosshairTrauma);
                 }
                 ShootRocketLauncher(pos, dir);
                 break;
@@ -1820,6 +1835,7 @@ public class FPSGunController : MonoBehaviour
                 {
                     if(GetCurrentWeapon() != GunType.RocketLauncher && pController.isAlive)
                         return;
+                    CrosshairController.MakeTrauma(crosshairTrauma);
                 }
                 
                 ShootRocketLauncher_Alt(pos, dir, upDir);
@@ -1848,6 +1864,7 @@ public class FPSGunController : MonoBehaviour
                 {
                     if(GetCurrentWeapon() != GunType.Shotgun && pController.isAlive)
                         return;
+                    CrosshairController.MakeTrauma(crosshairTrauma);
                 }
                 
                 ShootShotgun_HitScan(pos, dir, seed);
@@ -1860,6 +1877,7 @@ public class FPSGunController : MonoBehaviour
                 {
                     if(GetCurrentWeapon() != GunType.Shotgun && pController.isAlive)
                         return;
+                    CrosshairController.MakeTrauma(crosshairTrauma);
                 }
                 
                 ShootShotgun_Alt(pos, dir, seed);

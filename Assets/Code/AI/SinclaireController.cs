@@ -103,6 +103,8 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
         shooterHelper.localRotation = Quaternion.identity;
         shooterHelper.localPosition = new Vector3(0, 0, 0);
         
+        
+        path_update_cd = PhotonNetwork.OfflineMode ? PATH_UPDATE_BASE / 2.5f : PATH_UPDATE_BASE;
     }
     
     void InitAsMaster()
@@ -436,7 +438,8 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
         return result;
     }
     
-    const float PATH_UPDATE_CD = 0.15F;
+    const float PATH_UPDATE_BASE = 0.15F;
+    float path_update_cd;
     float brainTimer = 0;
     
     void WarpRemoteAgent(Vector3 pos)
@@ -470,7 +473,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     bool canDoMeleeDamageToLocalPlayer = true;
     const float sword_attack1_duration = 4.2F / 3.5f;
     
-    const float sword_attack1_damageTimingStart = 0.3F / 3;
+    const float sword_attack1_damageTimingStart = 0.27F / 3;
     //const float sword_attack1_damageTimingEnd = 1.1F / 4;
     
     //const float sword_attack1_distance = 2F;
@@ -628,7 +631,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                         if(pc)
                         {
                             LockSendingCommands();
-                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                         }
                     }
                 }
@@ -706,7 +709,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                                 firing_masterTimer = firing_cooldown * 0.75f;
                             }
                         }
-                        else if(brainTimer > PATH_UPDATE_CD)
+                        else if(brainTimer > path_update_cd)
                         {
                             brainTimer = 0;
                             
@@ -731,7 +734,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                             if(pc)
                             {
                                 LockSendingCommands();
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                             }
                         }
                     }
@@ -756,7 +759,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                             PlayerController pc = potentialTarget.GetComponent<PlayerController>();
                             if(pc)
                             {
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                             }
                         }
                         else
@@ -784,7 +787,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                             PlayerController pc = potentialTarget.GetComponent<PlayerController>();
                             if(pc)
                             {
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                             }
                         }
                         else
@@ -974,7 +977,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     }
     
     
-    const int MaxHealth = 3250;
+    const int MaxHealth = 4250;
     [SerializeField] int HitPoints = MaxHealth;
     
     void TakeDamage(int dmg)

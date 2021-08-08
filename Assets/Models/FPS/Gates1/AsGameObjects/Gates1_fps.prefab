@@ -245,7 +245,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 1.9340001, y: 2.97, z: 0.549}
+  m_Extents: {x: 1.9340001, y: 3.175, z: 0.549}
   m_MoveThreshold: 0.1
   m_Carve: 0
   m_CarveOnlyStationary: 1
@@ -355,7 +355,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 1.9340001, y: 2.97, z: 0.549}
+  m_Extents: {x: 1.9340001, y: 3.175, z: 0.549}
   m_MoveThreshold: 0.1
   m_Carve: 0
   m_CarveOnlyStationary: 1
@@ -426,7 +426,7 @@ MonoBehaviour:
   detectionMode: 0
   state: 0
   audioSource: {fileID: 0}
-  openClip: {fileID: 8300000, guid: c85869b1f3c88a74a8ffac8b25774a4b, type: 3}
+  openClip: {fileID: 8300000, guid: bb2a12b006c0c834d917d7b29e45c5f4, type: 3}
   closedClip: {fileID: 8300000, guid: bc5d943e60257a343bd598f0f1cb2b07, type: 3}
   animationSpeed: 9
   detectionTransform: {fileID: 0}
@@ -468,7 +468,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 45
+  MaxDistance: 60
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -656,6 +656,10 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8c1e53ef826cb7d40a67594e952e386f, type: 2}
     - target: {fileID: 400000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -700,10 +704,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2300000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 8c1e53ef826cb7d40a67594e952e386f, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
 --- !u!4 &3963606378035607893 stripped
@@ -733,6 +733,10 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8c1e53ef826cb7d40a67594e952e386f, type: 2}
     - target: {fileID: 400000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -777,10 +781,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2300000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 8c1e53ef826cb7d40a67594e952e386f, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
 --- !u!4 &5723363244358449620 stripped

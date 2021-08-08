@@ -288,21 +288,42 @@ public class MainMenuManager : MonoBehaviour
     
     public void Level1_Button()
     {
-        UberManager.Load_Level(3);
+        UberManager.Load_Level(2);
     }
     
     public void Level2_Button()
     {
-        UberManager.Load_Level(4);
+        UberManager.Load_Level(3);
     }
     
     public void Level3_Button()
     {
-        UberManager.Load_Level(5);
+        UberManager.Load_Level(4);
     }
     
     public void Level4_Button()
     {
+        UberManager.Load_Level(5);
+    }
+    
+    public void Level5_Button()
+    {
         UberManager.Load_Level(6);
     }
+    
+    public void LevelClouds_Button()
+    {
+        UberManager.Load_Level(7);
+    }
+    
+    public void LevelStraight_Button()
+    {
+        UberManager.Load_Level(8);
+    }
+    
+    public void LevelBossArena_Button()
+    {
+        UberManager.Load_Level(9);
+    }
+    
 }

@@ -74,6 +74,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             projectileMask = LayerMask.GetMask("Ground", "Ceiling", "Player");
         }
         
+        path_update_cd = PhotonNetwork.OfflineMode ? PATH_UPDATE_BASE / 2 : PATH_UPDATE_BASE;
     }
     
     void InitAsMaster()
@@ -518,7 +519,8 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     
     public StepaState state = StepaState.Idle;
     
-    const float PATH_UPDATE_CD = 0.2F;//0.15F;
+    const float PATH_UPDATE_BASE = 0.2F;//0.15F;
+    float path_update_cd;
     float brainTimer = 0;
     
     void SetMovePos(Vector3 pos)
@@ -688,7 +690,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                         if(pc)
                         {
                             LockSendingCommands();
-                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                         }
                     }
                 }
@@ -746,7 +748,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                                 NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Shoot, _shotPos, _shotDir);
                             }
                         }
-                        else if(brainTimer > PATH_UPDATE_CD)
+                        else if(brainTimer > path_update_cd)
                         {
                             brainTimer = 0;
                             Vector3 remoteAgentPos = GetRemoteAgentPos();
@@ -770,7 +772,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                             if(pc)
                             {
                                 LockSendingCommands();
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                             }
                         }
                         else
@@ -802,7 +804,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                             Vector3 offsetDir = new Vector3(Random.Range(-1F, 1F), 0, Random.Range(-1F, 1F));
                             offsetDir.Normalize();
                             
-                            Vector3 positionToTry = thisTransform.localPosition + offsetDir * fleeingRange;
+                            Vector3 positionToTry = thisTransform.localPosition + offsetDir * Random.Range(1f, fleeingRange);
                             
                             samplingIterationNumber++;
                             foundNavPos = NavMesh.SamplePosition(positionToTry, out navMeshHit, 0.05F, NavMesh.AllAreas);
@@ -848,7 +850,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                                 if(pc)
                                 {
                                     LockSendingCommands();
-                                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                                 }
                             }
                             else
@@ -885,7 +887,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                             PlayerController pc = potentialTarget.GetComponent<PlayerController>();
                             if(pc)
                             {
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.photonView.ViewID);
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
                             }
                         }
                         else
@@ -895,7 +897,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                     }
                     else
                     {
-                        if(brainTimer > PATH_UPDATE_CD)
+                        if(brainTimer > PATH_UPDATE_BASE)
                         {
                             brainTimer = 0;
                             Vector3 remoteAgentPos = GetRemoteAgentPos();

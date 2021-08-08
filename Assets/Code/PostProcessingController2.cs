@@ -36,7 +36,7 @@ public class PostProcessingController2 : MonoBehaviour
         fixAOtimer = 0;
         
         AmbientOcclusionModel.Settings AO_settings = outside_camera_profile.ambientOcclusion.settings;
-        AO_settings.highPrecision = true;
+        AO_settings.highPrecision = false;
         outside_camera_profile.ambientOcclusion.settings = AO_settings;
     }
     
@@ -46,7 +46,7 @@ public class PostProcessingController2 : MonoBehaviour
         fixed_ao = true;
         
         AmbientOcclusionModel.Settings AO_settings = outside_camera_profile.ambientOcclusion.settings;
-        AO_settings.highPrecision = false;
+        AO_settings.highPrecision = true;
         outside_camera_profile.ambientOcclusion.settings = AO_settings;
     }
 

@@ -56,7 +56,7 @@ public class JumpPad : MonoBehaviour, IActivatable
                     
                     PlayerController player_on_booster = standings[0].GetComponent<PlayerController>();
                     
-                    if(player_on_booster && player_on_booster.photonView.IsMine && player_on_booster.aliveState != PlayerAliveState.Dashing)
+                    if(player_on_booster && player_on_booster.pv.IsMine && player_on_booster.aliveState != PlayerAliveState.Dashing)
                     {
                         Vector3 global_velocity = thisTransform.TransformVector(boostVelocityInLocal);
                         

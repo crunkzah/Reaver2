@@ -4639,7 +4639,7 @@ ParticleSystem:
 --- !u!199 &1368263318778725042
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -4710,12 +4710,13 @@ GameObject:
   - component: {fileID: 659284109286643167}
   - component: {fileID: 659284109285545759}
   - component: {fileID: 7592514992050177920}
+  - component: {fileID: 7867277595837102815}
   m_Layer: 10
   m_Name: Wall_holed_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 111
   m_IsActive: 1
 --- !u!4 &659284109287446015
 Transform:
@@ -4789,5 +4790,15 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 6, y: 3, z: 0.1}
+  m_Size: {x: 6, y: 3, z: 0.15}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!41 &7867277595837102815
+OcclusionPortal:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 659284109287541215}
+  m_Open: 0
+  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 6, y: 3, z: 0.1}
