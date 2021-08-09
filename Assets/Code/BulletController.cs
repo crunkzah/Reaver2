@@ -71,6 +71,10 @@ public class BulletController : MonoBehaviour, IPooledObject
     public int max_reflects = 4;
     int reflects_count = 0;
     int pierced_num = 0;
+    public bool useGravity = false;
+    public Vector3 gravProjV;
+    public const float gravity_Y = -9.8F;
+    public float gravityMultiplier = 1f;
     
     
     
@@ -163,8 +167,6 @@ public class BulletController : MonoBehaviour, IPooledObject
         collision_type = BulletCollisionType.Sphere;
         
         
-        
-        
         ClearEffects();
         if(rend)
         {
@@ -172,8 +174,6 @@ public class BulletController : MonoBehaviour, IPooledObject
             rend.enabled = true;
         }
         isWorking = true;
-        
-        
     }
     
     void OnDrawGizmosSelected()
@@ -191,26 +191,45 @@ public class BulletController : MonoBehaviour, IPooledObject
     void SphereMode(float dt)
     {
         RaycastHit hit;
-        float distanceThisFrame = currentSpeed * dt;
-        
-        
-        if(Physics.SphereCast(thisTransform.localPosition, sphere_radius, fly_direction, out hit, distanceThisFrame, collisionMask))
+        if(useGravity)
         {
-            OnHit(hit.point, fly_direction, hit.normal, hit.collider);
+            gravProjV.y += gravity_Y * gravityMultiplier * dt;
+            
+            float distanceThisFrame = Math.Magnitude(gravProjV * dt);
+            
+            if(Physics.SphereCast(thisTransform.localPosition, sphere_radius, fly_direction, out hit, distanceThisFrame, collisionMask))
+            {
+                OnHit(hit.point, fly_direction, hit.normal, hit.collider);
+            }
+            
+            thisTransform.localPosition = thisTransform.localPosition + gravProjV * dt;
+            thisTransform.Rotate(new Vector3(270f * dt, 0, 0), Space.Self);
         }
+        else
+        {
+            float distanceThisFrame = currentSpeed * dt;
+            
+            
+            if(Physics.SphereCast(thisTransform.localPosition, sphere_radius, fly_direction, out hit, distanceThisFrame, collisionMask))
+            {
+                OnHit(hit.point, fly_direction, hit.normal, hit.collider);
+            }
 
-// #if UNITY_EDITOR
-//         gizmoSphere = thisTransform.localPosition;
-//         gizmoRadius = sphere_radius;
-// #endif
-        Vector3 newPosition = new Vector3();
-        Vector3 currentPos = thisTransform.localPosition;
-        
-        newPosition.x = currentPos.x + fly_direction.x * distanceThisFrame;
-        newPosition.y = currentPos.y + fly_direction.y * distanceThisFrame;
-        newPosition.z = currentPos.z + fly_direction.z * distanceThisFrame;
-        
-        transform.localPosition = newPosition;
+    // #if UNITY_EDITOR
+    //         gizmoSphere = thisTransform.localPosition;
+    //         gizmoRadius = sphere_radius;
+    // #endif
+            Vector3 newPosition = new Vector3();
+            Vector3 currentPos = thisTransform.localPosition;
+            
+            
+            newPosition.x = currentPos.x + fly_direction.x * distanceThisFrame;
+            newPosition.y = currentPos.y + fly_direction.y * distanceThisFrame;
+            newPosition.z = currentPos.z + fly_direction.z * distanceThisFrame;
+            
+            
+            transform.localPosition = newPosition;
+        }
     }
     
     public void UpdateMe()

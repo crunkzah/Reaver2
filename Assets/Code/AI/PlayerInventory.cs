@@ -60,10 +60,10 @@ public class PlayerInventory : MonoBehaviour, IOnEventCallback
     void Start()
     {
         DontDestroyOnLoad(this);
-        playerGunSlots[0] = GunType.Revolver;
-        playerGunSlots[1] = GunType.Shotgun;
-        playerGunSlots[2] = GunType.RocketLauncher;
-        playerGunSlots[3] = GunType.AR;
+        // playerGunSlots[0] = GunType.Revolver;
+        // playerGunSlots[1] = GunType.Shotgun;
+        // playerGunSlots[2] = GunType.RocketLauncher;
+        // playerGunSlots[3] = GunType.AR;
     }
     
     
@@ -73,12 +73,12 @@ public class PlayerInventory : MonoBehaviour, IOnEventCallback
     
     public void GiveWeaponLocally(GunType gunToGive)
     {
+        PlayerController localPlayer = PhotonManager.GetLocalPlayer();
         switch(gunToGive)
         {
             case(GunType.Revolver):
             {
                 playerGunSlots[0] = gunToGive;
-                PlayerController localPlayer = PhotonManager.GetLocalPlayer();
                 
                 if(localPlayer)
                 {
@@ -92,8 +92,6 @@ public class PlayerInventory : MonoBehaviour, IOnEventCallback
             {
                 playerGunSlots[1] = gunToGive;
                 
-                PlayerController localPlayer = PhotonManager.GetLocalPlayer();
-                
                 if(localPlayer)
                 {
                     FPSGunController localFPSGunController = localPlayer.GetComponent<FPSGunController>();
@@ -106,11 +104,37 @@ public class PlayerInventory : MonoBehaviour, IOnEventCallback
             case(GunType.RocketLauncher):
             {
                 playerGunSlots[2] = gunToGive;
+                
+                if(localPlayer)
+                {
+                    FPSGunController localFPSGunController = localPlayer.GetComponent<FPSGunController>();
+                    localFPSGunController.ReadPlayerInventory();
+                    localFPSGunController.WieldRocketLauncher();
+                }
                 break;
             }
             case(GunType.AR):
             {
                 playerGunSlots[3] = gunToGive;
+                if(localPlayer)
+                {
+                    FPSGunController localFPSGunController = localPlayer.GetComponent<FPSGunController>();
+                    localFPSGunController.ReadPlayerInventory();
+                    localFPSGunController.WieldAR();
+                }
+                
+                break;
+            }
+            case(GunType.MP5_alt):
+            {
+                playerGunSlots[3] = gunToGive;
+                playerGunSlots[3] = gunToGive;
+                if(localPlayer)
+                {
+                    FPSGunController localFPSGunController = localPlayer.GetComponent<FPSGunController>();
+                    localFPSGunController.ReadPlayerInventory();
+                    localFPSGunController.WieldMP5_alt();
+                }
                 break;
             }
             default:

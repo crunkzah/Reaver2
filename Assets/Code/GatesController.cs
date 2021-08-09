@@ -58,6 +58,11 @@ public class GatesController : MonoBehaviour, INetworkObject
                 Open();
                 break;
             }
+            case(NetworkCommand.LockGates):
+            {
+                Lock();
+                break;
+            }
             default:
             {
                 

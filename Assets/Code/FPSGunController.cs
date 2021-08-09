@@ -9,7 +9,8 @@ public enum GunType : byte
     Revolver,
     Shotgun,
     RocketLauncher,
-    AR
+    AR,
+    MP5_alt
 }
 
 public enum MeleeState : byte
@@ -65,6 +66,12 @@ public class FPSGunController : MonoBehaviour
     const float ARFireRateFastest = 0.075F;//0.1F;
     const float ARFireRateSlowest = 0.135F;
     
+    const int mp5_dmg = 70;
+    const float mp5FireRate = 0.1F;
+    const int mp5_alt_dmg = 700;
+    const float mp5_alt_force = 14f;
+    const float mp5FireRate_alt = 1.0f;
+    public float mp5_grenade_upMult = 0.5f;
     
     public ArmType currentArm = ArmType.Arm1;
     
@@ -101,6 +108,13 @@ public class FPSGunController : MonoBehaviour
     public ParticleSystem AR_ps;
     public ParticleSystem AR_stronger_ps;
     
+    public Transform mp5_alt_fps;
+    public Transform mp5_alt_gunpointFPS;
+    public Animator mp5_alt_animatorFPS;
+    public ParticleSystem mp5_alt_ps;
+    public Transform gunPoint_mp5_grenade_fps;
+    
+    
     public Transform AR_ghost_fps;
     public Transform AR_gunpoint_ghostFPS;
     public Animator AR_ghost_animator_fps;
@@ -111,7 +125,9 @@ public class FPSGunController : MonoBehaviour
     public Transform revolver_tps;
     public Transform shotgun_tps;
     public Transform rocketLauncher_tps;
-    
+    public Transform AR_tps;
+    public Transform AR_ghost_tps;
+    public Transform mp5_alt_tps;
     public Transform gunPoint_revolver_tps;
     
     PlayerController pController;
@@ -174,6 +190,33 @@ public class FPSGunController : MonoBehaviour
         }
     }
     
+    public void WieldRocketLauncher()
+    {
+        if(pv.IsMine)
+        {
+            currentSlot = 2;
+            WieldGunFPS();
+        }
+    }
+    
+    public void WieldAR()
+    {
+        if(pv.IsMine)
+        {
+            currentSlot = 3;
+            WieldGunFPS();
+        }
+    }
+    
+    public void WieldMP5_alt()
+    {
+        if(pv.IsMine)
+        {
+            currentSlot = 3;
+            WieldGunFPS();
+        }
+    }
+    
     void Start()
     {
         if(pv.IsMine)
@@ -200,6 +243,7 @@ public class FPSGunController : MonoBehaviour
         Destroy(AR_ghost_fps.gameObject);
         Destroy(arm_animator.gameObject);
         Destroy(arm_right_animator.gameObject);
+        Destroy(mp5_alt_fps.gameObject);
     }
     
     void IncrementCurrentSlot(int x)
@@ -235,6 +279,11 @@ public class FPSGunController : MonoBehaviour
         currentSlot = newSlotIndex;
         
         prevSlot = t;
+    }
+    
+    bool SwapAltWeaponKey()
+    {
+        return Inputs.GetInteractKeyDown();
     }
     
     int KeyboardSwitchWeapon()
@@ -287,7 +336,7 @@ public class FPSGunController : MonoBehaviour
         AR_ghost_fps.gameObject.SetActive(true);
     }
     
-    [PunRPC]
+    
     void EquipARGhostRPC(bool val)
     {
         //AR_ghost_tps.gameObject.SetActive(val);
@@ -804,6 +853,7 @@ public class FPSGunController : MonoBehaviour
     }
     
     float switchWeaponTimer = 0f;
+    const float SwitchWeaponRate = 0.25F;
     
     bool SwitchToPrevSlot_KeyDown()
     {
@@ -980,6 +1030,43 @@ public class FPSGunController : MonoBehaviour
                     WieldGunFPS();
                 }
             }
+            else if(SwapAltWeaponKey())
+            {
+                GunType currentGun = slots[currentSlot];
+                switch(currentGun)
+                {
+                    case(GunType.None):
+                    {
+                        break;
+                    }
+                    case(GunType.Revolver):
+                    {
+                        break;
+                    }
+                    case(GunType.Shotgun):
+                    {
+                        break;
+                    }
+                    case(GunType.RocketLauncher):
+                    {
+                        break;
+                    }
+                    case(GunType.AR):
+                    {
+                        slots[currentSlot] = GunType.MP5_alt;
+                        switchWeaponTimer = SwitchWeaponRate;
+                        WieldGunFPS();
+                        break;
+                    }
+                    case(GunType.MP5_alt):
+                    {
+                        slots[currentSlot] = GunType.AR;
+                        switchWeaponTimer = SwitchWeaponRate;
+                        WieldGunFPS();
+                        break;
+                    }
+                }
+            }
             //     }
             // }
         }
@@ -990,7 +1077,7 @@ public class FPSGunController : MonoBehaviour
                 if(switchWeaponTimer == 0)
                 {
                     SetCurrentSlot(keyBoard);
-                    switchWeaponTimer = 0.2f;
+                    switchWeaponTimer = SwitchWeaponRate;
                     WieldGunFPS();
                 }
             }
@@ -1319,6 +1406,54 @@ public class FPSGunController : MonoBehaviour
                 }
                 break;
             }
+            case(GunType.MP5_alt):
+            {
+                if(gunTimer == 0)
+                {
+                    if(primaryFire)
+                    {
+                        Ray mp5Ray = pController.GetFPSRay();
+                        gunTimer += mp5FireRate;
+                        byte fpsCommand = (byte)FPS_Func.Shoot_mp5;
+                        FPSCommand(fpsCommand, mp5Ray.origin, mp5Ray.direction);
+                        pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand, mp5Ray.origin, mp5Ray.direction);
+                    }
+                    else
+                    {
+                        if(altFire)
+                        {
+                            Vector3 _shotPos = gunPoint_mp5_grenade_fps.position;
+                            Vector3 _shotDir = gunPoint_mp5_grenade_fps.forward;
+                            
+                            if(pController.CheckIfFPSRayObscure())
+                            {
+                                Ray mp5_grenade_Ray = pController.GetFPSRay();
+                                _shotPos = mp5_grenade_Ray.origin;
+                                _shotDir = mp5_grenade_Ray.direction;
+                                _shotPos -= _shotDir * 1.0F;
+                            }
+                            else
+                            {
+                                float dot = Vector3.Dot(Vector3.up, _shotDir);
+                                if(dot < 0.5f)
+                                {
+                                    _shotDir += Vector3.up * mp5_grenade_upMult;
+                                    _shotDir.Normalize();
+                                    InGameConsole.LogFancy(string.Format("Shooting grenade, dot: {0}, _ShotDir: {1}", dot, _shotDir));
+                                }
+                            }
+                            
+                            gunTimer += mp5FireRate_alt;
+                            
+                            byte fpsCommand = (byte)FPS_Func.Shoot_mp5_grenade;
+                                        
+                            FPSCommand(fpsCommand, _shotPos, _shotDir);
+                            pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand, _shotPos, _shotDir);
+                        }
+                    }
+                }
+                break;
+            }
             default:
             {
                 break;
@@ -1454,7 +1589,7 @@ public class FPSGunController : MonoBehaviour
         }
     }
     
-    const float switchWeaponDuration = 0.3f;
+    const float switchWeaponDuration = 0.35f;
     
     public MeleeState meleeState;
     
@@ -1491,6 +1626,7 @@ public class FPSGunController : MonoBehaviour
                 rocketLauncher_fps.gameObject.SetActive(false);
                 AR_fps.gameObject.SetActive(false);
                 AR_ghost_fps.gameObject.SetActive(false);
+                mp5_alt_fps.gameObject.SetActive(false);
                 
                 arm_right_animator.Play("Base.Hidden", 0, 0);
                 
@@ -1508,6 +1644,7 @@ public class FPSGunController : MonoBehaviour
                 rocketLauncher_fps.gameObject.SetActive(false);
                 AR_fps.gameObject.SetActive(false);
                 AR_ghost_fps.gameObject.SetActive(false);
+                mp5_alt_fps.gameObject.SetActive(false);
                 
                 gunTimer = switchWeaponDuration;
                 revolver_fps.shaking_mult = 0;
@@ -1524,6 +1661,7 @@ public class FPSGunController : MonoBehaviour
                 rocketLauncher_fps.gameObject.SetActive(false);
                 AR_fps.gameObject.SetActive(false);
                 AR_ghost_fps.gameObject.SetActive(false);
+                mp5_alt_fps.gameObject.SetActive(false);
                 
                 arm_right_animator.Play("Base.Hidden", 0, 0);
                 gunTimer = switchWeaponDuration;
@@ -1539,6 +1677,7 @@ public class FPSGunController : MonoBehaviour
                 rocketLauncher_fps.gameObject.SetActive(true);
                 AR_fps.gameObject.SetActive(false);
                 AR_ghost_fps.gameObject.SetActive(false);
+                mp5_alt_fps.gameObject.SetActive(false);
                 
                 arm_right_animator.Play("Base.Hidden", 0, 0);
                 
@@ -1553,6 +1692,7 @@ public class FPSGunController : MonoBehaviour
                 shotgun_fps.gameObject.SetActive(false);
                 rocketLauncher_fps.gameObject.SetActive(false);
                 AR_fps.gameObject.SetActive(true);
+                mp5_alt_fps.gameObject.SetActive(false);
                 
                 currentARFireRate = ARFireRateFastest;
                 
@@ -1569,6 +1709,20 @@ public class FPSGunController : MonoBehaviour
                 
                 break;
             }
+            case(GunType.MP5_alt):
+            {
+                revolver_fps.gameObject.SetActive(false);
+                shotgun_fps.gameObject.SetActive(false);
+                rocketLauncher_fps.gameObject.SetActive(false);
+                AR_fps.gameObject.SetActive(false);
+                mp5_alt_fps.gameObject.SetActive(true);
+                
+                arm_right_animator.Play("Base.Hidden", 0, 0);
+                
+                
+                gunTimer = switchWeaponDuration;
+                break;
+            }
         }
     }
     
@@ -1583,6 +1737,8 @@ public class FPSGunController : MonoBehaviour
                 revolver_tps.gameObject.SetActive(false);
                 shotgun_tps.gameObject.SetActive(false);
                 rocketLauncher_tps.gameObject.SetActive(false);
+                AR_tps.gameObject.SetActive(false);
+                mp5_alt_tps.gameObject.SetActive(false);
                 //AR_tps.gameObject.SetActive(false)
                 
                 break;
@@ -1592,6 +1748,8 @@ public class FPSGunController : MonoBehaviour
                 revolver_tps.gameObject.SetActive(true);
                 shotgun_tps.gameObject.SetActive(false);
                 rocketLauncher_tps.gameObject.SetActive(false);
+                AR_tps.gameObject.SetActive(false);
+                mp5_alt_tps.gameObject.SetActive(false);
                 
                 break;
             }
@@ -1600,6 +1758,8 @@ public class FPSGunController : MonoBehaviour
                 revolver_tps.gameObject.SetActive(false);
                 shotgun_tps.gameObject.SetActive(true);
                 rocketLauncher_tps.gameObject.SetActive(false);
+                AR_tps.gameObject.SetActive(false);
+                mp5_alt_tps.gameObject.SetActive(false);
                 
                 break;
             }
@@ -1608,6 +1768,30 @@ public class FPSGunController : MonoBehaviour
                 revolver_tps.gameObject.SetActive(false);
                 shotgun_tps.gameObject.SetActive(false);
                 rocketLauncher_tps.gameObject.SetActive(true);
+                AR_tps.gameObject.SetActive(false);
+                mp5_alt_tps.gameObject.SetActive(false);   
+                
+                break;
+            }
+            case(GunType.AR):
+            {
+                revolver_tps.gameObject.SetActive(false);
+                shotgun_tps.gameObject.SetActive(false);
+                rocketLauncher_tps.gameObject.SetActive(false);
+                AR_tps.gameObject.SetActive(true);
+                mp5_alt_tps.gameObject.SetActive(false);
+                   
+                break;
+            }
+            case(GunType.MP5_alt):
+            {
+                revolver_tps.gameObject.SetActive(false);
+                shotgun_tps.gameObject.SetActive(false);
+                rocketLauncher_tps.gameObject.SetActive(false);
+                AR_tps.gameObject.SetActive(false);
+                mp5_alt_tps.gameObject.SetActive(true);
+                
+                
                 
                 break;
             }
@@ -1799,6 +1983,30 @@ public class FPSGunController : MonoBehaviour
                 }
                 //ShootARGhost(pos, dir);
                 ShootARGhost_HitScan(pos, dir);
+                break;
+            }
+            case(FPS_Func.Shoot_mp5):
+            {
+                if(pv.IsMine)
+                {
+                    if(GetCurrentWeapon() != GunType.MP5_alt && pController.isAlive)
+                        return;
+                        
+                    CrosshairController.MakeTrauma(crosshairTrauma);
+                }
+                ShootMP5_HitScan(pos, dir);
+                break;
+            }
+            case(FPS_Func.Shoot_mp5_grenade):
+            {
+                if(pv.IsMine)
+                {
+                    if(GetCurrentWeapon() != GunType.MP5_alt && pController.isAlive)
+                        return;
+                        
+                    CrosshairController.MakeTrauma(crosshairTrauma);
+                }
+                ShootMP5_alt(pos, dir);
                 break;
             }
             case(FPS_Func.Shoot_rocketLauncher):
@@ -2129,7 +2337,6 @@ public class FPSGunController : MonoBehaviour
         }
     }
     
-    //[PunRPC]
     void ShootShotgun(Vector3 shotPos, Vector3 dir, byte seed)
     {
         if(playerGunLight)
@@ -2420,6 +2627,8 @@ public class FPSGunController : MonoBehaviour
     public ParticleSystem AR_bulletShells_ps;
     public ParticleSystem ARGhost_bulletShells_ps;
     
+    public ParticleSystem mp5_alt_bulletShells_ps;
+    
     
     void ShootAR_HitScan(Vector3 shotPos, Vector3 hitScanDirection)
     {
@@ -2523,6 +2732,81 @@ public class FPSGunController : MonoBehaviour
             OnHitScan(shotPos + hitScanDirection * ray_max_distance, hitScanDirection, -hitScanDirection, revolverDmg, null);
         }
     }
+    
+    void ShootMP5_HitScan(Vector3 shotPos, Vector3 hitScanDirection)
+    {
+        if(playerGunLight)
+        {
+            playerGunLight.ShootRevolver();
+        }
+        if(gunAudio)
+        {
+            gunAudio.PlayOneShot(arShotClip, 0.9f);
+        }
+        
+        if(pv.IsMine)
+        {
+            CameraShaker.MakeTrauma(0.025f);
+            mp5_alt_animatorFPS.Play(BaseFire1_hash, 0, 0);
+            if(mp5_alt_bulletShells_ps)
+            {
+                mp5_alt_bulletShells_ps.Emit(1);
+            }
+        }
+        
+        mp5_alt_ps.Play();
+        
+        RaycastHit hit;
+        Ray ray = new Ray(shotPos, hitScanDirection);
+        
+        float ray_max_distance = 200f;
+        float bullet_speed = 220f;
+        
+        GameObject bullet = ObjectPool2.s().Get(ObjectPoolKey.mp5_bullet);    
+        BulletController bulletController = bullet.GetComponent<BulletController>();
+        
+        bulletController.LaunchAsSphere(mp5_alt_gunpointFPS.position, ray.direction, 0.05f, bulletMask, bullet_speed, 0, false);
+        bulletController.time_to_be_alive = ray_max_distance / bullet_speed;
+        bulletController.on_die_behave = BulletOnDieBehaviour.Hurtless;
+        
+        if(Physics.Raycast(ray, out hit, ray_max_distance, bulletMask))
+        {
+            bulletController.time_to_be_alive = hit.distance / bullet_speed;
+            OnHitScan(hit.point, hitScanDirection, hit.normal, mp5_dmg, hit.collider, null, 1.5f, 0.075f);
+        }
+        else
+        {
+            OnHitScan(shotPos + hitScanDirection * ray_max_distance, hitScanDirection, -hitScanDirection, revolverDmg, null);
+        }
+    }
+    
+    void ShootMP5_alt(Vector3 shotPos, Vector3 direction)
+    {
+        GameObject bullet = ObjectPool2.s().Get(ObjectPoolKey.mp5_grenade);
+                
+        BulletController bulletController = bullet.GetComponent<BulletController>();
+        
+        if(pv.IsMine)
+        {
+            CameraShaker.MakeTrauma(0.1f);
+            mp5_alt_animatorFPS.Play("Base.Fire2", 0, 0);
+        }
+        
+        if(gunAudio)
+        {
+            gunAudio.PlayOneShot(rocketLauncherShotClip, 1);
+        }
+        
+        //rocketLauncher_FX.Play();
+        bool isMine = pv.IsMine;
+        float grenade_speed = 30;
+        bulletController.LaunchAsSphere(shotPos, direction, 0.15F, bulletMask, grenade_speed, mp5_alt_dmg, isMine);
+        bulletController.gravProjV = direction * grenade_speed;
+        bulletController.useGravity = true;
+        bulletController.gravityMultiplier = 2;
+        bulletController.on_die_behave = BulletOnDieBehaviour.Explode_1;
+    }
+    
     
     void OnHitScan(Vector3 point, Vector3 damageDirection, Vector3 normal, int damage, Collider col = null, NetworkObject targetNetworkObject = null, float headshotDmgMult = 2, float shakeMultiplier = 1)
     {

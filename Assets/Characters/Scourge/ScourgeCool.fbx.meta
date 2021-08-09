@@ -1,0 +1,154 @@
+fileFormatVersion: 2
+guid: eed1876fa1713bd47b06cbe932fe7efc
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: Arm1.l
+    100002: Arm1.r
+    100004: Arm1_s.l
+    100006: Arm1_s.r
+    100008: Arm2.l
+    100010: Arm2.r
+    100012: Arm2_s.l
+    100014: Arm2_s.r
+    100016: Chest
+    100018: Foot1.l
+    100020: Foot1.r
+    100022: Hand.l
+    100024: Hand.r
+    100026: Hand_s.l
+    100028: Hand_s.r
+    100030: Head
+    100032: Leg1.l
+    100034: Leg1.r
+    100036: Leg2.l
+    100038: Leg2.r
+    100040: Root_pelvis
+    100042: //RootNode
+    100044: ScourgeCool
+    100046: ScourgeCool_Armature
+    400000: Arm1.l
+    400002: Arm1.r
+    400004: Arm1_s.l
+    400006: Arm1_s.r
+    400008: Arm2.l
+    400010: Arm2.r
+    400012: Arm2_s.l
+    400014: Arm2_s.r
+    400016: Chest
+    400018: Foot1.l
+    400020: Foot1.r
+    400022: Hand.l
+    400024: Hand.r
+    400026: Hand_s.l
+    400028: Hand_s.r
+    400030: Head
+    400032: Leg1.l
+    400034: Leg1.r
+    400036: Leg2.l
+    400038: Leg2.r
+    400040: Root_pelvis
+    400042: ScourgeCool
+    400044: //RootNode
+    400046: ScourgeCool_Armature
+    2100000: Material.002
+    2100002: Material
+    4300000: ScourgeCool
+    7400000: ScourgeCool_Armature|_T_Pose
+    7400002: ScourgeCool_Armature|Airbourne
+    7400004: ScourgeCool_Armature|Idle
+    7400006: ScourgeCool_Armature|Run
+    7400008: ScourgeCool_Armature|Shoot_Left
+    7400010: ScourgeCool_Armature|Shoot_Right
+    7400012: ScourgeCool_Armature|Shoot_s_Left
+    7400014: ScourgeCool_Armature|Shoot_s_Right
+    7400016: ScourgeCool_Armature|Slide
+    9500000: //RootNode
+    13700000: ScourgeCool
+    2186277476908879412: ImportLogs
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 0.01
+    hasPreviousCalculatedGlobalScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

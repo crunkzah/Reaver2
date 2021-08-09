@@ -44,7 +44,8 @@ public class EnemySpawner : MonoBehaviour, Interactable
 	public bool IsEnabled = true;
 	
 	public float initial_delay = 1f;
-	public float spawn_delay = 0.4F;
+	public float waves_delay = 0.5F;
+	public float single_spawn_delay = 0.25F;
 	
 	
 	public static Dictionary<int, EnemySpawner> all_spawners = new Dictionary<int, EnemySpawner>();
@@ -97,15 +98,27 @@ public class EnemySpawner : MonoBehaviour, Interactable
 		if(IsEnabled)
 		{
 			Invoke(nameof(InitialSpawn), initial_delay);
+			if(PhotonNetwork.IsMasterClient)
+			{
+				for(int i = 0; i < messages_on_init_spawn.Length; i++)
+				{
+					NetworkObjectsManager.CallNetworkFunction(messages_on_init_spawn[i].net_comp.networkId, messages_on_init_spawn[i].command);
+				}
+			}
 		}
 	}
+	
+	public NetworkObjectAndCommand[] messages_on_init_spawn;
 	
 	public void InitialSpawn()
 	{
 		if(state == EnemySpawnerState.Disabled)
 		{
+			
 			state = EnemySpawnerState.Spawning;
 		}
+		
+		
 	}
 	
 	int wavesSpawned = 0;
@@ -124,6 +137,8 @@ public class EnemySpawner : MonoBehaviour, Interactable
 		state = EnemySpawnerState.WaitingForNextWave;
 	}
 	
+	
+	
 	public void SetStateSpawning()
 	{
 		state = EnemySpawnerState.Spawning;
@@ -137,7 +152,7 @@ public class EnemySpawner : MonoBehaviour, Interactable
 		}
 		
 		enemies_spawned--;
-		InGameConsole.LogFancy("OnSpawnedChildDied() count is " + enemies_spawned.ToString());
+		//InGameConsole.LogFancy("OnSpawnedChildDied() count is " + enemies_spawned.ToString());
 		if(enemies_spawned <= 0)
 		{
 			enemies_spawned = 0;
@@ -148,7 +163,7 @@ public class EnemySpawner : MonoBehaviour, Interactable
 			}
 			else
 			{
-				Invoke(nameof(SetStateSpawning), 1F);		
+				Invoke(nameof(SetStateSpawning), waves_delay);		
 				
 			}
 		}
@@ -186,7 +201,7 @@ public class EnemySpawner : MonoBehaviour, Interactable
 				
 				float dt = UberManager.DeltaTime();
 				timer += dt;
-				if(timer >= spawn_delay)
+				if(timer >= single_spawn_delay)
 				{
 					// int len = waves_to_spawn[waves_spawned].singleSpawn.Length;
 					// if(enemies_spawned >= waves_to_spawn[waves_spawned].singleSpawn.Length)

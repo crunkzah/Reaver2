@@ -125,6 +125,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
         canSendCommands = true;
     }
     
+    Vector3 attackDashDir;
     
     public void ReceiveCommand(NetworkCommand command, params object[] args)
     {
@@ -163,6 +164,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                     return;
                 
                 Vector3 attackDashPos = (Vector3)args[0];
+                attackDashDir = (Vector3)args[1];
                 
                 brainTimer = 0;
                 attack_timer = 0;
@@ -181,10 +183,12 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             case(NetworkCommand.Ability1):
             {
                 UnlockSendingCommands();
+                
                 if(state == PadlaState.Dead || state == PadlaState.Airbourne)
                     return;
                 
                 Vector3 attackDashPos = (Vector3)args[0];
+                attackDashDir = (Vector3)args[1];
                 
                 brainTimer = 0;
                 attack_timer = 0;
@@ -632,7 +636,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                             Vector3 punch_dir = (targetGroundPos - padlaPosition).normalized;
                             
                             Vector3 dash_pos = padlaPosition;
-                            if(NavMesh.SamplePosition(padlaPosition + punch_dir * punch1_dashDistance, out navMeshHit, 0.05f, NavMesh.AllAreas))
+                            if(NavMesh.SamplePosition(padlaPosition + punch_dir * punch1_dashDistance, out navMeshHit, 0.125f, NavMesh.AllAreas))
                             {
                                 dash_pos = navMeshHit.position;
                                 InGameConsole.LogFancy("We DO <color=green>DASH ATTACK</color>");
@@ -643,11 +647,11 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                             LockSendingCommands();
                             if(numberOfPunchesPerformed % 2 == 0)
                             {
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Attack, dash_pos);
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Attack, dash_pos, punch_dir);
                             }
                             else
                             {
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability1, dash_pos);
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability1, dash_pos, punch_dir);
                             }
                         }
                         else if(brainTimer > path_update_cd)
@@ -948,12 +952,21 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             case(PadlaState.Attacking1):
             {
                 Vector3 currentPos = thisTransform.localPosition;
-                
-                
                 float dV = speedMult * dt * moveSpeed;
                 
-                
                 attack_timer += dt;
+                
+                Vector3 attackDashDirXZ = Math.GetXZ(attackDashDir);
+                // if(target_pc)
+                // {
+                //     shootingDirectionXZ = Math.GetXZ(target_pc.GetGroundPosition() - thisTransform.localPosition);
+                // }
+                
+                Quaternion desiredRotation = Quaternion.LookRotation(attackDashDirXZ);
+                
+                thisTransform.localRotation = Quaternion.RotateTowards(thisTransform.localRotation, desiredRotation, dt * 2080);
+                
+                
                 RotateToLookAt(dashPos, rotateTime * speedMult / 4, false);
                 
                 if(attack_timer > punch1_damageTimingStart)

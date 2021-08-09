@@ -88,7 +88,8 @@ public enum NetworkCommand : byte
      Flee,
      OpenGates,
      CloseGates,
-     ExplodeAsCorpse
+     ExplodeAsCorpse,
+     LockGates,
 }
 
 //Object pool keys:
@@ -179,7 +180,9 @@ public enum ObjectPoolKey : int
      Olios_direct_projectile,
      LightPooled,
      RocketLauncher_alt_projectile,
-     Bullet_yellow
+     Bullet_yellow,
+     mp5_bullet,
+     mp5_grenade
 }
 
 public enum FPS_Func : byte
@@ -193,6 +196,8 @@ public enum FPS_Func : byte
      Shoot_shotgun_alt,
      Shoot_rocketLauncher,
      Shoot_rocketLauncher_alt,
+     Shoot_mp5,
+     Shoot_mp5_grenade,
      Punch1,
      Punch1_ult
 }
