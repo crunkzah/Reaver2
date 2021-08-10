@@ -63,7 +63,7 @@ public class CarolineKneeling : MonoBehaviour, INetworkObject
             {
                 float distance_to_revolver = Vector3.Distance(shotgun_transform.position, masterPlayer.GetHeadPosition());
                 //InGameConsole.LogFancy("distance_to_revolver is " + distance_to_revolver.ToString("f"));
-                if(distance_to_revolver < 1f)
+                if(distance_to_revolver < 1.5f)
                 {
                     LockSendingCommands();
                     NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability1);

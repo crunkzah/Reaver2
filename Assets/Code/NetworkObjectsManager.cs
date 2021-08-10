@@ -749,6 +749,7 @@ public class NetworkObjectsManager : MonoBehaviour//MonoBehaviourPunCallbacks
     public GameObject Olios_npc;
     public GameObject PadlaLong_npc;
     public GameObject Scourge_npc;
+    public GameObject ScourgeCool_npc;
     
     
     public void SpawnNPC2(byte _npc, Vector3 pos, Vector3 forward, int playerId = -1)
@@ -929,7 +930,12 @@ public class NetworkObjectsManager : MonoBehaviour//MonoBehaviourPunCallbacks
             }
             case(NPCType.Scourge):
             {
-                npc_original = Scourge_npc;
+                npc_original =Scourge_npc;
+                break;
+            }
+            case(NPCType.ScourgeCool):
+            {
+                npc_original = ScourgeCool_npc;
                 break;
             }
             default:

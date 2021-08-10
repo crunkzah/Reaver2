@@ -66,6 +66,7 @@
      <Compile Include="Assets\Code\AI\PadlaLongController.cs" />
      <Compile Include="Assets\Code\AI\PlayerInventory.cs" />
      <Compile Include="Assets\Code\AI\ScourgeController.cs" />
+     <Compile Include="Assets\Code\AI\ScourgeCoolController.cs" />
      <Compile Include="Assets\Code\AI\Shooter2Controller.cs" />
      <Compile Include="Assets\Code\AI\Shooter3_shotgun.cs" />
      <Compile Include="Assets\Code\AI\SinclaireController.cs" />

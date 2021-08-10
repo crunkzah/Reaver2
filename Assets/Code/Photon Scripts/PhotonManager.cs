@@ -350,6 +350,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
             }
         }
         
+        spawnPlaceIndex = 0;
+        
         InGameConsole.Log(string.Format("Level '{0}' loaded!", scene.name));
         AudioManager.PlayClip(SoundType.level_start1, 0.09f, 1);
         

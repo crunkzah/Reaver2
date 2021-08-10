@@ -897,7 +897,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                     }
                     else
                     {
-                        if(brainTimer > PATH_UPDATE_BASE)
+                        if(brainTimer > path_update_cd)
                         {
                             brainTimer = 0;
                             Vector3 remoteAgentPos = GetRemoteAgentPos();

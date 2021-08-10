@@ -642,22 +642,29 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
         {
             //Vector3 clap_pos = thisTransform.localPosition + new Vector3(Random.Range(-1f, 1f), 0.0f, Random.Range(-1f, 1f)) * 5;
             
-            for(int i = 0; i < UberManager.Singleton().players_controller.Count; i++)
+            InGameConsole.LogOrange("Players count is <color=yellow>" + UberManager.Singleton().players_controller.Count.ToString() + "</color>");
+            
+            if(target_pc)
             {
-                PlayerController t = UberManager.Singleton().players_controller[i];
-                if(t)
-                {
-                    Vector3 ground_pos = t.GetGroundPosition();
-                    InGameConsole.LogFancy("GroundPos: " + ground_pos);
-                    // RaycastHit hit;
-                    // if(Physics.Raycast(ground_pos + new Vector3(0, 1, 0), new Vector3(0, -1, 0), out hit, 3f, groundMask))
-                    // {
-                    //     ground_pos = hit.point;
-                    // }
-                    
-                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability2, ground_pos);
-                }
+                Vector3 ground_pos = target_pc.GetGroundPosition();
+                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability2, ground_pos);
+                
             }
+            
+            // for(int i = 0; i < UberManager.Singleton().players_controller.Count; i++)
+            // {
+            //     PlayerController t = UberManager.Singleton().players_controller[i];
+            //     if(t)
+            //     {
+            //         InGameConsole.LogFancy("GroundPos: " + ground_pos);
+            //         // RaycastHit hit;
+            //         // if(Physics.Raycast(ground_pos + new Vector3(0, 1, 0), new Vector3(0, -1, 0), out hit, 3f, groundMask))
+            //         // {
+            //         //     ground_pos = hit.point;
+            //         // }
+                    
+            //     }
+            // }
         }
         
         //audio_src.PlayOneShot(clipClap, 0.7f);

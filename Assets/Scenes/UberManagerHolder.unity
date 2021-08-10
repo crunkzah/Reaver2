@@ -788,6 +788,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3794194158871260519, guid: 89120e048ad61c041bf8a48bb8f2abb9,
         type: 3}
+    - target: {fileID: 8387225941318978085, guid: d0958c5341d6fec4192a4bd3857d8dea,
+        type: 3}
+      propertyPath: ScourgeCool_npc
+      value: 
+      objectReference: {fileID: 5182788866066698222, guid: 4c3f0355d3c216746ac1f90984df752c,
+        type: 3}
     - target: {fileID: 8387225940815064967, guid: d0958c5341d6fec4192a4bd3857d8dea,
         type: 3}
       propertyPath: viewIdField

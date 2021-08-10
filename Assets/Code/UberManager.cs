@@ -27,7 +27,8 @@ public enum NPCType : byte
     PadlaLong,
     Olios,
     CatLady,
-    Scourge
+    Scourge,
+    ScourgeCool
 }
 
 public enum Language : int
@@ -288,7 +289,7 @@ public class UberManager : MonoBehaviour
     // ObjectPoolKey[] spawn_items = {ObjectPoolKey.Chaser2, ObjectPoolKey.RobotBasicShooter_npc, ObjectPoolKey.RobotBasicShooter_shotgun_npc, ObjectPoolKey.RobotCharger};
     // ObjectPoolKey[] spawn_items = {ObjectPoolKey.Witch, ObjectPoolKey.Shooter2, ObjectPoolKey.Shooter3_shotgunner};
     
-    NPCType[] spawn_npcs = {NPCType.Scourge, NPCType.PadlaLong, NPCType.SniperGirl, NPCType.Sinclaire, NPCType.Padla, NPCType.Stepa, NPCType.CatLady, NPCType.Olios};
+    NPCType[] spawn_npcs = {NPCType.Scourge, NPCType.PadlaLong, NPCType.ScourgeCool, NPCType.SniperGirl, NPCType.Sinclaire, NPCType.Padla, NPCType.Stepa, NPCType.CatLady, NPCType.Olios};
     int spawn_index = 0;
     
     void SpawnIndexIncrement()

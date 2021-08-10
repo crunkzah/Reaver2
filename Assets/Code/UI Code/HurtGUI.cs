@@ -86,7 +86,7 @@ public class HurtGUI : MonoBehaviour
             if(hurt_img.enabled)
             {
                 Color col = hurt_img.color;
-                hurtAlphaCurrentSpeed -= dt * hurtAlphaAcceleration;
+                hurtAlphaCurrentSpeed -= dt * hurtAlphaAcceleration * 2;
                 
                 col.a += dt * hurtAlphaCurrentSpeed;
                 if(col.a > 0)
@@ -101,7 +101,7 @@ public class HurtGUI : MonoBehaviour
             if(heal_img.enabled)
             {
                 Color col = heal_img.color;
-                healAlphaCurrentSpeed -= dt * healAlphaAcceleration;
+                healAlphaCurrentSpeed -= dt * healAlphaAcceleration * 2;
                 col.a += dt * healAlphaCurrentSpeed;
                 
                 if(col.a > 0)
