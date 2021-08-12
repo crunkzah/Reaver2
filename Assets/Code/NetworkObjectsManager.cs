@@ -834,6 +834,11 @@ public class NetworkObjectsManager : MonoBehaviour//MonoBehaviourPunCallbacks
                 npc_original = Scourge_npc;
                 break;
             }
+            case(NPCType.ScourgeCool):
+            {
+                npc_original = ScourgeCool_npc;
+                break;
+            }
             default:
             {
                 break;
@@ -980,11 +985,11 @@ public class NetworkObjectsManager : MonoBehaviour//MonoBehaviourPunCallbacks
     void ExludeParticularNetworkCommands()
     {
         commands_to_exclude_from_log.Add(NetworkCommand.Move);
-        // commands_to_exclude_from_log.Add(NetworkCommand.Shoot);
-        // commands_to_exclude_from_log.Add(NetworkCommand.Attack);
-        // commands_to_exclude_from_log.Add(NetworkCommand.Flee);
-        // commands_to_exclude_from_log.Add(NetworkCommand.TakeDamage);
-        // commands_to_exclude_from_log.Add(NetworkCommand.SetTarget);
+        commands_to_exclude_from_log.Add(NetworkCommand.Shoot);
+        commands_to_exclude_from_log.Add(NetworkCommand.Attack);
+        commands_to_exclude_from_log.Add(NetworkCommand.Flee);
+        commands_to_exclude_from_log.Add(NetworkCommand.TakeDamage);
+        commands_to_exclude_from_log.Add(NetworkCommand.SetTarget);
     }
 
     [PunRPC]

@@ -5,6 +5,7 @@ using TMPro;
 public enum CheckpointState : byte
 {
     Waiting,
+    Disabled,
     Activated
 }
 
@@ -85,6 +86,12 @@ public class Checkpoint : MonoBehaviour, INetworkObject
                 UnlockSendingCommands();
                 Activate();
                 
+                break;
+            }
+            case(NetworkCommand.Ability2):
+            {
+                UnlockSendingCommands();
+                state = CheckpointState.Waiting;
                 break;
             }
             default:
@@ -202,9 +209,6 @@ public class Checkpoint : MonoBehaviour, INetworkObject
                 }
             }
             
-            
-            
-            
             for(int i = 0; i < sliding_structures_to_call_on_activate.Length; i++)
             {
                 sliding_structures_to_call_on_activate[i].ToggleSlide();
@@ -277,10 +281,13 @@ public class Checkpoint : MonoBehaviour, INetworkObject
                     }
                 }
                 
-                
                 break;
             }
             case(CheckpointState.Activated):
+            {
+                break;
+            }
+            case(CheckpointState.Disabled):
             {
                 break;
             }

@@ -49,6 +49,12 @@ public class AudioManager : MonoBehaviour
     void InitAudioPool()
     {
         audio_pool = new Audio3dPooled[audio_pool_len];
+        
+        if(audio3dPrefab == null)
+        {
+            InGameConsole.LogFancy("audio3dPrefab is null");
+        }
+        
         for(int i = 0; i < audio_pool_len; i++)
         {
             GameObject audio3d = Instantiate(audio3dPrefab, new Vector3(2000, 2000, 2000), Quaternion.identity, this.transform);
@@ -186,13 +192,15 @@ public class AudioManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-        
-        _EmissionShaderID = Shader.PropertyToID("_Emission");
-        
-        music_src = GetComponent<AudioSource>();
-        
-        InitAudioLib();
-        InitAudioPool();
+        else
+        {
+            _EmissionShaderID = Shader.PropertyToID("_Emission");
+            
+            music_src = GetComponent<AudioSource>();
+            
+            InitAudioLib();
+            InitAudioPool();
+        }
     }
     
     static float globalClipAvailableTime = 0f;

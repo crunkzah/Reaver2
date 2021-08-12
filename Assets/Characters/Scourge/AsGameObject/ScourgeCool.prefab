@@ -220,7 +220,7 @@ MonoBehaviour:
   react: 0
   isRootLimb: 0
   isHeadshot: 0
-  canBeDestroyed: 0
+  canBeDestroyed: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
@@ -353,7 +353,7 @@ MonoBehaviour:
   react: 0
   isRootLimb: 0
   isHeadshot: 0
-  canBeDestroyed: 0
+  canBeDestroyed: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
@@ -578,7 +578,7 @@ MonoBehaviour:
   react: 0
   isRootLimb: 0
   isHeadshot: 0
-  canBeDestroyed: 0
+  canBeDestroyed: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
@@ -711,7 +711,7 @@ MonoBehaviour:
   react: 0
   isRootLimb: 0
   isHeadshot: 0
-  canBeDestroyed: 0
+  canBeDestroyed: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
@@ -908,7 +908,7 @@ MonoBehaviour:
   react: 0
   isRootLimb: 0
   isHeadshot: 0
-  canBeDestroyed: 0
+  canBeDestroyed: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
@@ -1100,7 +1100,7 @@ MonoBehaviour:
   react: 1
   isRootLimb: 1
   isHeadshot: 1
-  canBeDestroyed: 0
+  canBeDestroyed: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
@@ -1295,7 +1295,7 @@ MonoBehaviour:
   react: 0
   isRootLimb: 0
   isHeadshot: 0
-  canBeDestroyed: 0
+  canBeDestroyed: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
@@ -1428,7 +1428,7 @@ MonoBehaviour:
   react: 0
   isRootLimb: 0
   isHeadshot: 0
-  canBeDestroyed: 0
+  canBeDestroyed: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
@@ -1561,7 +1561,7 @@ MonoBehaviour:
   react: 0
   isRootLimb: 0
   isHeadshot: 0
-  canBeDestroyed: 0
+  canBeDestroyed: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
@@ -1694,7 +1694,7 @@ MonoBehaviour:
   react: 0
   isRootLimb: 0
   isHeadshot: 0
-  canBeDestroyed: 0
+  canBeDestroyed: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
@@ -1915,7 +1915,7 @@ MonoBehaviour:
   react: 0
   isRootLimb: 1
   isHeadshot: 0
-  canBeDestroyed: 0
+  canBeDestroyed: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []

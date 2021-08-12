@@ -175,6 +175,9 @@ public class InGameConsole : MonoBehaviour
     
     static void DrawConsole()
     {
+        if(!isEnabled)
+            return;
+            
         for(int i = 0; i < linesCount; i++)
         {
             //int index = (currentBufferIndex - i - 1);

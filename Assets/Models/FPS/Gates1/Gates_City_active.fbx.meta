@@ -10,6 +10,8 @@ ModelImporter:
     2300000: //RootNode
     3300000: //RootNode
     4300000: Gates_City_active
+    4300002: Gates_gears_active
+    4300004: Gates_city_active
   externalObjects: {}
   materials:
     importMaterials: 0

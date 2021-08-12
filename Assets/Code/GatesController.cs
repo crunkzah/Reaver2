@@ -149,6 +149,7 @@ public class GatesController : MonoBehaviour, INetworkObject
         net_comp = GetComponent<NetworkObject>();
         
         thisTransform = transform;
+        thisWorldPosition = transform.position;
         if(detectionMode == GateDetectionMode.New)
             detectionPosGlobal = detectionTransform.position;
     }
@@ -158,6 +159,8 @@ public class GatesController : MonoBehaviour, INetworkObject
         ProcessStatusLight(state);
     }
     
+    Vector3 thisWorldPosition;
+    
     bool Detect()
     {
         bool Result = false;
@@ -165,12 +168,33 @@ public class GatesController : MonoBehaviour, INetworkObject
         {
             case(GateDetectionMode.Old):
             {
-                Result = Physics.CheckSphere(thisTransform.position, radius, detectorMask);
+                //Result = Physics.CheckSphere(thisTransform.position, radius, detectorMask);
+                int len = NPCManager.AITargets().Count;
+                
+                for(int i = 0; i < len; i++)
+                {
+                    Vector3 playerPos = NPCManager.AITargets()[i].localPosition;
+                    if(Math.SqrDistance(playerPos, thisWorldPosition) < radius * radius)
+                    {
+                        Result = true;
+                    }
+                }
+                
                 break;
             }
             case(GateDetectionMode.New):
             {
-                Result = Physics.CheckSphere(detectionPosGlobal, radius, detectorMask);
+                //Result = Physics.CheckSphere(detectionPosGlobal, radius, detectorMask);
+                int len = NPCManager.AITargets().Count;
+                
+                for(int i = 0; i < len; i++)
+                {
+                    Vector3 playerPos = NPCManager.AITargets()[i].localPosition;
+                    if(Math.SqrDistance(playerPos, thisWorldPosition) < radius * radius)
+                    {
+                        Result = true;
+                    }
+                }
                 break;
             }
         }
@@ -227,7 +251,7 @@ public class GatesController : MonoBehaviour, INetworkObject
         if(Math.SqrDistance(leftGate.localPosition, targetPosLeftLocal) > 0.01F * 0.01F)
         {
             float dt = UberManager.DeltaTime();
-            float dPos = dt * animationSpeed;
+            float dPos = dt * animationSpeed * 1.5f;
             
             leftGate.localPosition = Vector3.MoveTowards(leftGate.localPosition, targetPosLeftLocal, dPos);
             rightGate.localPosition = Vector3.MoveTowards(rightGate.localPosition, targetPosRightLocal, dPos);

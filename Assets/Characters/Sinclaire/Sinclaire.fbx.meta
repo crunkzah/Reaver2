@@ -98,6 +98,7 @@ ModelImporter:
     7400022: Sinclaire_armature|Swing_sword3
     7400024: Sinclaire_armature|Fire2
     7400026: Sinclaire_armature|Run6
+    7400028: Sinclaire_armature|Floating
     9500000: //RootNode
     13700000: Sinclaire_mesh
     2186277476908879412: ImportLogs
@@ -526,6 +527,34 @@ ModelImporter:
       takeName: Sinclaire_armature|Run6
       firstFrame: 0
       lastFrame: 20
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Sinclaire_armature|Floating
+      takeName: Sinclaire_armature|Floating
+      firstFrame: 0
+      lastFrame: 19
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

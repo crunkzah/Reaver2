@@ -306,6 +306,7 @@ GameObject:
   m_Component:
   - component: {fileID: 701231165304722389}
   - component: {fileID: 374372683510740467}
+  - component: {fileID: 8500941044390000266}
   m_Layer: 10
   m_Name: pressureBox
   m_TagString: Untagged
@@ -340,6 +341,22 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 3, y: 1.4, z: 3}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8500941044390000266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5707275664546682133}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &7799794294397256050
 GameObject:
   m_ObjectHideFlags: 0
@@ -5950,15 +5967,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1d289edab1b28c94da9547fc9cc8d499, type: 3}
---- !u!4 &7167230558037335270 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2288865218031078901, guid: 1d289edab1b28c94da9547fc9cc8d499,
-    type: 3}
-  m_PrefabInstance: {fileID: 8986001709811536147}
-  m_PrefabAsset: {fileID: 0}
 --- !u!198 &7167230558037335832 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 2288865218031078923, guid: 1d289edab1b28c94da9547fc9cc8d499,
+    type: 3}
+  m_PrefabInstance: {fileID: 8986001709811536147}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7167230558037335270 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2288865218031078901, guid: 1d289edab1b28c94da9547fc9cc8d499,
     type: 3}
   m_PrefabInstance: {fileID: 8986001709811536147}
   m_PrefabAsset: {fileID: 0}

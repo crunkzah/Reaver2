@@ -197,9 +197,11 @@ public class BulletController : MonoBehaviour, IPooledObject
             
             float distanceThisFrame = Math.Magnitude(gravProjV * dt);
             
-            if(Physics.SphereCast(thisTransform.localPosition, sphere_radius, fly_direction, out hit, distanceThisFrame, collisionMask))
+            Vector3 gravProjV_dir = Math.Normalized(gravProjV);
+            
+            if(Physics.SphereCast(thisTransform.localPosition, sphere_radius, gravProjV_dir, out hit, distanceThisFrame, collisionMask))
             {
-                OnHit(hit.point, fly_direction, hit.normal, hit.collider);
+                OnHit(hit.point, gravProjV_dir, hit.normal, hit.collider);
             }
             
             thisTransform.localPosition = thisTransform.localPosition + gravProjV * dt;

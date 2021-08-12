@@ -544,7 +544,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     
     Transform shooterHelper;
     
-    const int daggerDamage = 25;
+    const int daggerDamage = 20;
     
     const float daggerSpeed = 36;
     

@@ -180,6 +180,7 @@
      <Compile Include="Assets\Code\FireFloor.cs" />
      <Compile Include="Assets\Code\FixScaleAfterAnimator.cs" />
      <Compile Include="Assets\Code\FixScaleAfterAnimator2.cs" />
+     <Compile Include="Assets\Code\FloorDestructable999.cs" />
      <Compile Include="Assets\Code\FlyingDagger.cs" />
      <Compile Include="Assets\Code\FlyingGib.cs" />
      <Compile Include="Assets\Code\FollowingCamera.cs" />
@@ -283,6 +284,7 @@
      <Compile Include="Assets\Code\Scenario\DistanceTriggerNet.cs" />
      <Compile Include="Assets\Code\ShootyThing1.cs" />
      <Compile Include="Assets\Code\ShotDirections.cs" />
+     <Compile Include="Assets\Code\SinclaireFloating.cs" />
      <Compile Include="Assets\Code\SinclaireSword.cs" />
      <Compile Include="Assets\Code\SlidingStructure.cs" />
      <Compile Include="Assets\Code\Sonar.cs" />
@@ -320,6 +322,7 @@
      <Compile Include="Assets\Code\WeaponManager.cs" />
      <Compile Include="Assets\Code\Weapons_code\Revolver.cs" />
      <Compile Include="Assets\Code\WeaponSway.cs" />
+     <Compile Include="Assets\DestructableController.cs" />
      <Compile Include="Assets\ExperimentalOrTemporary\GamePadInputDebug.cs" />
      <Compile Include="Assets\Kino\Binary\Binary.cs" />
      <Compile Include="Assets\Photon\PhotonRealtime\Demos\DemoLoadBalancing\ConnectAndJoinRandomLb.cs" />

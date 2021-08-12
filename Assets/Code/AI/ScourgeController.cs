@@ -320,7 +320,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
     
     const float projectileSpeed = 55F;
     const float projectileRadius = 0.25F;
-    const int projectileDamage = 10;
+    const int projectileDamage = 8;
     const int shotsPerRound = 3;
     int shotsPerformed = 0; 
     

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6739517951101208967}
   - component: {fileID: 9026295831702234508}
   - component: {fileID: 6665329434304340126}
+  - component: {fileID: 8212740992787880153}
   m_Layer: 10
   m_Name: Gates_radial_fps
   m_TagString: Untagged
@@ -53,7 +54,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   openClip: {fileID: 8300000, guid: bb2a12b006c0c834d917d7b29e45c5f4, type: 3}
   closedClip: {fileID: 8300000, guid: bc5d943e60257a343bd598f0f1cb2b07, type: 3}
-  animationSpeed: 13.5
+  animationSpeed: 16
   detectionTransform: {fileID: 7474537247153692447}
   leftGate: {fileID: 5811958581772768738}
   rightGate: {fileID: 4702584357131516590}
@@ -61,12 +62,14 @@ MonoBehaviour:
   openPosLeftLocal: {x: 4.25, y: 0, z: 0}
   closedPosRightLocal: {x: 0, y: 0, z: 0}
   openPosRightLocal: {x: -4.25, y: 0, z: 0}
-  status_emissives: []
-  closed_mat: {fileID: 0}
-  locked_mat: {fileID: 0}
+  status_emissives:
+  - {fileID: 577724773879464086}
+  - {fileID: 4042196943415395933}
+  closed_mat: {fileID: 2100000, guid: 8c1e53ef826cb7d40a67594e952e386f, type: 2}
+  locked_mat: {fileID: 2100000, guid: 9a493f0d1ba16254294c6b9eb2c23ead, type: 2}
   unlock_clip: {fileID: 0}
   lock_clip: {fileID: 0}
-  radius: 9
+  radius: 9.25
 --- !u!82 &9026295831702234508
 AudioSource:
   m_ObjectHideFlags: 0
@@ -174,6 +177,19 @@ OcclusionPortal:
   m_Open: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_Size: {x: 10, y: 10, z: 0.5}
+--- !u!114 &8212740992787880153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3746876369463525000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 372fb34a0a4dde34faff3fb232913ea0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkId: -1
 --- !u!65 &5811958581351816353
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -296,9 +312,15 @@ PrefabInstance:
     - target: {fileID: 2300000, guid: c0ab0e3a04b90f344810eca7bcd0aee0, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: a7106a32f9a403f43b73ce1392eed469, type: 2}
+      objectReference: {fileID: 2100000, guid: 8c1e53ef826cb7d40a67594e952e386f, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c0ab0e3a04b90f344810eca7bcd0aee0, type: 3}
+--- !u!23 &577724773879464086 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2300000, guid: c0ab0e3a04b90f344810eca7bcd0aee0,
+    type: 3}
+  m_PrefabInstance: {fileID: 577724773881370870}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4042196943413370429
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -365,9 +387,15 @@ PrefabInstance:
     - target: {fileID: 2300000, guid: c0ab0e3a04b90f344810eca7bcd0aee0, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: a7106a32f9a403f43b73ce1392eed469, type: 2}
+      objectReference: {fileID: 2100000, guid: 8c1e53ef826cb7d40a67594e952e386f, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c0ab0e3a04b90f344810eca7bcd0aee0, type: 3}
+--- !u!23 &4042196943415395933 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2300000, guid: c0ab0e3a04b90f344810eca7bcd0aee0,
+    type: 3}
+  m_PrefabInstance: {fileID: 4042196943413370429}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4702584357131903022
 PrefabInstance:
   m_ObjectHideFlags: 0
