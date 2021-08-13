@@ -797,7 +797,18 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                         NavMeshHit navMeshHit;
                         
                         int samplingIterationNumber = 0;
+                        
+                        // if(Math.SqrDistance(t))
                         bool foundNavPos = false;
+                        
+                        if(target_pc)
+                        {
+                            if(Math.SqrDistance(target_pc.GetGroundPosition(), thisTransform.localPosition) > 6 * 6)
+                            {
+                                samplingIterationNumber = 8;
+                            }
+                        }
+                        
                         
                         while(!foundNavPos && samplingIterationNumber < 8)
                         {

@@ -15,10 +15,20 @@ public enum CheckpointMode : byte
     Invisible
 }
 
+public enum CheckpointDetectionMode : byte
+{
+    Sphere,
+    Box
+}
+
 public class Checkpoint : MonoBehaviour, INetworkObject
 {
     public CheckpointMode mode;
     public CheckpointState state;
+    public CheckpointDetectionMode detectionMode = CheckpointDetectionMode.Sphere;
+    
+    public BoxCollider boxCol;
+    Bounds bounds;
     
     void Init()
     {
@@ -51,6 +61,7 @@ public class Checkpoint : MonoBehaviour, INetworkObject
     Transform thisTransform;
     
     
+    
     AudioSource audio_src;
     Light checkPoint_light;
     
@@ -58,6 +69,8 @@ public class Checkpoint : MonoBehaviour, INetworkObject
     
     public ParticleSystem activated_ps;
     public ParticleSystem static_ps;
+    
+    public bool trigger_on_one_player = false;
     
     public TextMeshPro label_tmp;
     
@@ -111,6 +124,7 @@ public class Checkpoint : MonoBehaviour, INetworkObject
     
     [Header("Objects to send message on activation, Master only:")]
     public GameObject[] objects_to_activate;
+    public NetworkObjectAndCommand[] messages_on_send;
     
     void Awake()
     {
@@ -122,6 +136,12 @@ public class Checkpoint : MonoBehaviour, INetworkObject
         if(DEBUG_disable_checkpoints)
         {
             this.enabled = false;
+        }
+        
+        if(boxCol)
+        {
+            bounds = boxCol.bounds;
+            Destroy(boxCol, 0.25f);
         }
         
         checkPoint_light = GetComponentInChildren<Light>();
@@ -138,15 +158,43 @@ public class Checkpoint : MonoBehaviour, INetworkObject
             return false;
         }
         
-        for(int i = 0; i < playersCount; i++)
+        switch(detectionMode)
         {
-            float sqrDistanceToPlayer = Math.SqrDistance(NPCManager.AITargets()[i].localPosition, thisTransform.position);
-            if(sqrDistanceToPlayer < radius * radius)
-            {
-                Result = true;
-            }
-            else
-                return false;
+                case(CheckpointDetectionMode.Sphere):
+                {
+                    for(int i = 0; i < playersCount; i++)
+                    {
+                        float sqrDistanceToPlayer = Math.SqrDistance(NPCManager.AITargets()[i].localPosition, thisTransform.position);
+                        if(sqrDistanceToPlayer < radius * radius)
+                        {
+                            if(trigger_on_one_player)
+                            {
+                                return true;
+                            }
+                            Result = true;
+                        }
+                        else
+                             return false;
+                    }
+                    break;
+                }
+                case(CheckpointDetectionMode.Box):
+                {
+                    for(int i = 0; i < playersCount; i++)
+                    {
+                        if(bounds.Contains(NPCManager.AITargets()[i].localPosition))
+                        {
+                            if(trigger_on_one_player)
+                            {
+                                return true;
+                            }
+                            Result = true;
+                        }
+                        else
+                            return false;
+                    }
+                    break;
+                }
         }
         
         return Result;
@@ -228,6 +276,11 @@ public class Checkpoint : MonoBehaviour, INetworkObject
                     {
                         _int.Interact();
                     }
+                }
+                
+                for(int i = 0; i < messages_on_send.Length; i++)
+                {
+                    NetworkObjectsManager.CallNetworkFunction(messages_on_send[i].net_comp.networkId, messages_on_send[i].command);
                 }
             }
         }

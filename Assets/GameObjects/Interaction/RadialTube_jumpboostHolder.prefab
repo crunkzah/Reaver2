@@ -27,7 +27,6 @@ Transform:
   m_LocalPosition: {x: 145, y: -20, z: 207}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 4824662466015674933}
   - {fileID: 7627138491400166552}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -82,7 +81,7 @@ PrefabInstance:
     - target: {fileID: 4219788296332287133, guid: a06f05f52e40f9a43b8ebdf7f015497f,
         type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4219788296332287133, guid: a06f05f52e40f9a43b8ebdf7f015497f,
         type: 3}
@@ -111,94 +110,4 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4219788296332287133, guid: a06f05f52e40f9a43b8ebdf7f015497f,
     type: 3}
   m_PrefabInstance: {fileID: 6005190653772890117}
-  m_PrefabAsset: {fileID: 0}
---- !u!1001 &6005190654493944746
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 6005190653425004435}
-    m_Modifications:
-    - target: {fileID: 1270610919518025151, guid: 16fcca08300767342a0fb57a13b0d403,
-        type: 3}
-      propertyPath: m_Name
-      value: CoalBlock_1_radialTube_city
-      objectReference: {fileID: 0}
-    - target: {fileID: 1270610919518185887, guid: 16fcca08300767342a0fb57a13b0d403,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1270610919518185887, guid: 16fcca08300767342a0fb57a13b0d403,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.119
-      objectReference: {fileID: 0}
-    - target: {fileID: 1270610919518185887, guid: 16fcca08300767342a0fb57a13b0d403,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1270610919518185887, guid: 16fcca08300767342a0fb57a13b0d403,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1270610919518185887, guid: 16fcca08300767342a0fb57a13b0d403,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1270610919518185887, guid: 16fcca08300767342a0fb57a13b0d403,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1270610919518185887, guid: 16fcca08300767342a0fb57a13b0d403,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1270610919518185887, guid: 16fcca08300767342a0fb57a13b0d403,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1270610919518185887, guid: 16fcca08300767342a0fb57a13b0d403,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1270610919518185887, guid: 16fcca08300767342a0fb57a13b0d403,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1270610919518185887, guid: 16fcca08300767342a0fb57a13b0d403,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1270610919518185887, guid: 16fcca08300767342a0fb57a13b0d403,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.65859646
-      objectReference: {fileID: 0}
-    - target: {fileID: 1270610919518185887, guid: 16fcca08300767342a0fb57a13b0d403,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.41390163
-      objectReference: {fileID: 0}
-    - target: {fileID: 1270610919518185887, guid: 16fcca08300767342a0fb57a13b0d403,
-        type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.65859646
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 16fcca08300767342a0fb57a13b0d403, type: 3}
---- !u!4 &4824662466015674933 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1270610919518185887, guid: 16fcca08300767342a0fb57a13b0d403,
-    type: 3}
-  m_PrefabInstance: {fileID: 6005190654493944746}
   m_PrefabAsset: {fileID: 0}

@@ -56,6 +56,7 @@
      <Compile Include="Assets\Code\Animations Scripts\Editor\CargoLineAnimatorEditor.cs" />
      <Compile Include="Assets\Code\Editor\CameraPlacerEditor.cs" />
      <Compile Include="Assets\Code\Editor\CoverForNPCEditor.cs" />
+     <Compile Include="Assets\Code\Editor\EnemySpawnerEditor.cs" />
      <Compile Include="Assets\Code\Editor\HierarchyHighlighter.cs" />
      <Compile Include="Assets\Code\Editor\LiftObjectEditor.cs" />
      <Compile Include="Assets\Code\Editor\NetworkObjectEditor.cs" />

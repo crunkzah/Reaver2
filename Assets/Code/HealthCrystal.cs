@@ -11,8 +11,8 @@ public class HealthCrystal : MonoBehaviour, IPooledObject
     }
     
     
-    const float maxSpeed = 16;
-    const float acceleration = 2;
+    const float maxSpeed = 25F;
+    const float acceleration = 12F;
     
     float currentSpeed = 0;
     

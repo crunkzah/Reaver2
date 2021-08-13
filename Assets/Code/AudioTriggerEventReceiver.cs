@@ -3,7 +3,8 @@
 public enum MusicToPlay
 {
     Omnissiah,
-    Daycore
+    Daycore,
+    Haze
 }
 public class AudioTriggerEventReceiver : MonoBehaviour, INetworkObject
 {
@@ -31,6 +32,11 @@ public class AudioTriggerEventReceiver : MonoBehaviour, INetworkObject
             case(MusicToPlay.Omnissiah):
             {
                 AudioManager.SetMusicOmnissiah();
+                break;
+            }
+            case(MusicToPlay.Haze):
+            {
+                AudioManager.SetMusicHaze();
                 break;
             }
             case(MusicToPlay.Daycore):

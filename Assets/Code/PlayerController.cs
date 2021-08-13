@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     Camera playerCamera;
     Transform camera_transform;
     
-    static readonly Vector3 GRAVITY = new Vector3(0, -13F, 0);
+    static readonly Vector3 PLAYER_GRAVITY = new Vector3(0, -13F, 0);
     
     Transform thisTransform;
     public SkinnedMeshRenderer player_renderer;
@@ -133,13 +133,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
         float decreaseSpeed = controller.isGrounded ? bunnyHopDecreaseRate * 3.4F : bunnyHopDecreaseRate;
         
         bunnyHopSpeedMult = Mathf.MoveTowards(bunnyHopSpeedMult, bunnyHopMinMult, dt * decreaseSpeed);
-        
         bunnyHopSpeedMult = Mathf.Clamp(bunnyHopSpeedMult, bunnyHopMinMult, bunnyHopMaxMult);
         
-        
-        
-        fpsMoveSpeed = baseMoveSpeed * bunnyHopSpeedMult;
-        
+        fpsMaxMoveSpeedCurrent = baseMoveSpeed * bunnyHopSpeedMult * moveSpeedMultiplier;
         
         fpsAcceleration = baseFpsAcceleration * bunnyHopSpeedMult;
         if(fpsAcceleration < baseFpsAcceleration)
@@ -336,7 +332,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             
             thisTransform.position = new Vector3(thisTransform.position.x, yCoordInterpolated, thisTransform.position.z);
             
-            float fpsSyncMagnitudeXZ = Mathf.Max(Math.Magnitude(syncVelocity), fpsMoveSpeed);
+            float fpsSyncMagnitudeXZ = Mathf.Max(Math.Magnitude(syncVelocity), fpsMaxMoveSpeedCurrent);
             
             if(Math.SqrDistance(thisTransform.position, syncEndPosition) > 8f * 8f)
             {
@@ -461,7 +457,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     public Transform fpsCameraPlace;
     public Transform fpsCameraTilting;
     //FPS:
-    const float MAX_GRAVITY_NEG = -75F;
+    const float MAX_NEGATIVE_GRAVITY = -75F;
     public Vector3 fpsVelocity;
     bool invertVertical = true;
     
@@ -469,7 +465,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     bool makeMouseSensitivityUniversal = false;
     public float fpsMouseSens = 1f;
     const float baseMoveSpeed = 12.5F;
-    float fpsMoveSpeed = 12.5f;
+    float fpsMaxMoveSpeedCurrent = 12.5f;
     
     float bunnyHopSpeedMult = bunnyHopMinMult;
     const float bunnyHopMaxMult = 1.5F;
@@ -479,6 +475,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     const float fpsSlideSpeed = 17.5F;
     const float fpsJumpForce = 10;
     const float fpsGravity = -9.8f * 3F;
+    public float player_gravity_multiplier = 1;
     float fpsAcceleration = baseFpsAcceleration;
     const float baseFpsAcceleration = 80F;
     const float fpsOppositeDecceleration = baseFpsAcceleration * 3;
@@ -505,10 +502,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
         return HeadTarget.position;
     }
     
-    public float moveSpeedMult = 1;
+    public float moveSpeedMultiplier = 1;
     public void SetMoveSpeedMult(float mult)
     {
-        moveSpeedMult = mult;
+        moveSpeedMultiplier = mult;
     }
     
     public bool isSliding = false;
@@ -555,7 +552,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     }
     
     float slideControllerHeight = 1;//1f;
-    float normalControllerHeight = 2.0f;
+    float normalControllerHeight = 2.2f;
     
     //public AudioSource slidingAudioClip;
     public AudioSource playerAudioSource_sliding;
@@ -599,7 +596,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         else
         {
             controller.height = normalControllerHeight;
-            controller.center = new Vector3(0, 1f, 0);
+            controller.center = new Vector3(0, normalControllerHeight/2f, 0);
             if(pv.IsMine)
             {
                 slideVel.x = 0;
@@ -771,7 +768,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     
     int SlamDirectDamage = 420;
-    const float slamVelocityY = MAX_GRAVITY_NEG;//-39;
+    const float slamVelocityY = MAX_NEGATIVE_GRAVITY;//-39;
     
     public AudioClip noStaminaClip;
     public AudioClip slamDirectDamageClip;
@@ -809,9 +806,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
     }
     
     
-    float StaminaRegenRate = 36f;
+    float StaminaRegenRate = 38f;
     const float dashStaminaCost = 33f;
-    const float groundSlamStaminaCost = 50;
+    const float groundSlamStaminaCost = 40;
     
     void ConsumeStamina(float cost)
     {
@@ -940,7 +937,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         p2.y += 0.1f;
         
         RaycastHit hit;
-        if(Physics.CapsuleCast(p1, p2, controller.radius * 1.25f, Vector3.down, out hit, dt * Math.Abs(slamVelocityY), npc2Mask))
+        if(Physics.CapsuleCast(p1, p2, controller.radius * 2.0f, Vector3.down, out hit, dt * Math.Abs(slamVelocityY), npc2Mask))
         {
             NetworkObject npc_net_comp = hit.collider.GetComponent<NetworkObject>();
             if(npc_net_comp != null)
@@ -1022,8 +1019,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
         if(pv.IsMine)
         {
             tryingToSlam = false;
-            CameraShaker.ShakeY(5.1f);
-            CameraShaker.MakeTrauma(0.75f);
+            CameraShaker.ShakeY(7.5f);
+            CameraShaker.MakeTrauma(0.85f);
             
             
             groundSlammed_timeStamp = Time.time;
@@ -1070,7 +1067,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
 		return Mathf.Clamp(angle, min, max);
 	}
     
-    bool secondJumpHappened = false;
+    
+    
+    public bool secondJumpHappened = false;
     bool jumpedThisFrame = false;
     
     
@@ -1187,13 +1186,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
         float vertClamped = Mathf.Clamp(fpsCam_transform.localRotation.eulerAngles.x, -90f, 90f);
         vertClamped = fpsCam_transform.localRotation.eulerAngles.x;
         
-        
-        
-        
         fpsCam_transform.localRotation = Quaternion.Euler(vertClamped, fpsCam_transform.localRotation.y, fpsCam_transform.localRotation.z);
         
         thisTransform.Rotate(0, horizontalRotation, 0);
-        
         
         Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
         
@@ -1203,23 +1198,14 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
         tiltingTargetAngle = input.x == 0 ? 0 : Mathf.Sign(input.x) * -tiltAngle;
         tiltingTargetAngle *= 1 - Math.Abs(fpsCameraPlace.forward.y);
-        //InGameConsole.LogFancy("Camera forward dir: <color=yellow>" + fpsCameraPlace.forward.ToString() + "</color>");
         
         if(input.x * input.z != 0f)
         {
             input = Math.Normalized(input);
         }
-        
-        // float moveSpeed = fpsMoveSpeed;
-        
-        
-        // if(isSliding)
-        // {
-        //     moveSpeed = fpsSlideSpeed;
-        // }
         Vector3 inputDirWorldSpace = thisTransform.TransformDirection(input);
         
-        desiredVelWorld = inputDirWorldSpace * fpsMoveSpeed * moveSpeedMult;
+        desiredVelWorld = inputDirWorldSpace * fpsMaxMoveSpeedCurrent * moveSpeedMultiplier;
         
         capsuleP1 = GetTopCapsuleP();
         capsuleP2 = GetBottomCapsuleP();
@@ -1251,7 +1237,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
                     
                 if(isSliding)
                 {
-                    if(!Input.GetKey(KeyCode.LeftControl))
+                    if(!Inputs.GetSlamAndSlide_Key())
                     {
                         OnSlideEnded();
                     }
@@ -1260,7 +1246,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
                 
                 if(!isSliding && canSlide)
                 {
-                    if(Input.GetKeyDown(KeyCode.LeftControl))
+                    if(Inputs.GetSlamAndSlide_KeyDown())
                     {
                         if(fpsVelocity.x == 0 && fpsVelocity.z == 0)
                         {
@@ -1273,7 +1259,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
                         slideVel.y = 0;
                         slideVel = Math.Normalized(slideVel);
                         
-                        slideVel *= fpsSlideSpeed;
+                        slideVel *= fpsSlideSpeed * moveSpeedMultiplier;
                         OnSlideStarted();
                     }
                 }
@@ -1287,6 +1273,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
                     }
                     
                     Vector3 fpsVelocityXZ = Math.GetXZ(fpsVelocity);
+                    //fpsVelocityXZ = Vector3.MoveTowards(fpsVelocityXZ, desiredVelWorld, fpsFriction * dt * moveSpeedMultiplier);
                     fpsVelocityXZ = Vector3.MoveTowards(fpsVelocityXZ, desiredVelWorld, fpsFriction * dt);
                     
                     fpsVelocity.x = fpsVelocityXZ.x;
@@ -1337,8 +1324,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
             
             
             
-            fpsVelocity.y += fpsGravity * dt;
-            fpsVelocity.y = Mathf.Clamp(fpsVelocity.y, MAX_GRAVITY_NEG, 200);
+            fpsVelocity.y += fpsGravity * dt * player_gravity_multiplier;
+            fpsVelocity.y = Mathf.Clamp(fpsVelocity.y, MAX_NEGATIVE_GRAVITY, 200);
             
             Vector3 fpsVelocityXZ = Math.GetXZ(fpsVelocity);
             Vector3 targetVel = Math.SqrMagnitude(desiredVelWorld) > 0.1f ? desiredVelWorld : fpsVelocityXZ;
@@ -1348,11 +1335,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
             fpsVelocity.x = fpsVelocityXZ.x;
             fpsVelocity.z = fpsVelocityXZ.z;
             
-            
             float fpsVelMagnitude = Math.Magnitude(fpsVelocity);
             
-            
-            //if(!jumpedThisFrame && Math.SqrMagnitude(desiredVelWorld) > 0.01f)
             if(!jumpedThisFrame)
             {
                 Ray wallJumpRay = GetFPSRay();
@@ -1378,7 +1362,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
                 }
                 else
                 {
-                    if(!secondJumpHappened && Stamina >= 10 && Inputs.GetJumpKeyDown() && timeInAir > 0.25f /*&& fpsVelocity.y < 0*/)
+                    if(!secondJumpHappened && Stamina >= secondJumpStaminaCost && Inputs.GetJumpKeyDown() && timeInAir > 0.25f /*&& fpsVelocity.y < 0*/)
                     {
                         jumpedThisFrame = true;
                         SecondJumpFPS();
@@ -1419,14 +1403,14 @@ public class PlayerController : MonoBehaviour, IPunObservable
             
             if(Physics.Raycast(ray, out slamHit, Math.Abs(slamVelocityY) * dt, groundAndNPCMask))
             {
-                bool isKeyPressed = Input.GetKey(KeyCode.LeftControl);
+                bool isKeyPressed = Inputs.GetSlamAndSlide_Key();
                 if(isKeyPressed && timeInAir > 0.2f)
                 {
                     pv.RPC("OnGroundSlammed", RpcTarget.All, slamHit.point);
                 }
                 else
                 {
-                    //InGameConsole.Log(string.Format("<color=red>Failed to slam ground</color> <color=green>LeftControl: {0}, timeInAir: {1} </color>", isKeyPressed, timeInAir.ToString("f")));
+                    ////InGameConsole.Log(string.Format("<color=red>Failed to slam ground</color> <color=green>LeftControl: {0}, timeInAir: {1} </color>", isKeyPressed, timeInAir.ToString("f")));
                 }
                 tryingToSlam = false;
             }
@@ -1474,7 +1458,15 @@ public class PlayerController : MonoBehaviour, IPunObservable
             }
             else
             {
-                fpsVelocity.y = fpsJumpForce * 2.0f;
+                // if(thisTransform.localPosition.y < groundSlamStartPos.y)
+                // {
+                //     float height_travelled = Math.Abs(thisTransform.localPosition.y - groundSlamStartPos.y);
+                //     slamLaunchForce = fpsGravity * 0.5f * 0.5f + height_travelled / 0.5f;
+                // }
+                float slamLaunchForce = fpsJumpForce * 2f * moveSpeedMultiplier;
+                
+                    
+                fpsVelocity.y = slamLaunchForce;
                 slamLaunch_ps.Play();
             }
             playerAudioSource.PlayOneShot(jumpLocalClip, 0.275f);
@@ -1484,6 +1476,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
         //InGameConsole.LogFancy("FPSJump()");
     }
     
+    int secondJumpStaminaCost;
+    
     public void SecondJumpFPS()
     {
         if(tryingToSlam)
@@ -1491,7 +1485,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             return;
         }
         
-        ConsumeStamina(10);
+        ConsumeStamina(secondJumpStaminaCost);
         
         secondJumpHappened = true;
         if(fpsVelocity.y < fpsJumpForceSecond)
@@ -1940,7 +1934,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
         TimeWhenTookDamage = Time.time;
         // dmg = 1;
-        HitPoints -= dmg;
+        //HitPoints -= dmg;
         if(HitPoints <= 0)
         {
             // InGameConsole.LogOrange("HitPoints <= 0");
@@ -2135,8 +2129,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
             Rigidbody _camRb = _camTr.gameObject.AddComponent<Rigidbody>();
             _camRb.drag = 1.5f;
             _camRb.mass = 50;
-            _camRb.AddForce(Vector3.up * 0.05f, ForceMode.VelocityChange);
-            _camRb.AddTorque(Random.onUnitSphere * 0.01f, ForceMode.VelocityChange);
+            _camRb.AddForce(Vector3.up * 0.01f, ForceMode.VelocityChange);
+            //_camRb.AddTorque(Random.onUnitSphere * 0.01f, ForceMode.VelocityChange);
             SphereCollider _camCol = _camRb.gameObject.AddComponent<SphereCollider>();
             _camCol.radius = 1;
             _camTr.SetParent(null);

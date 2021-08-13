@@ -508,7 +508,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
         hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0));
     }
     
-    const int MaxHealth = 900;
+    const int MaxHealth = 800;
     public int HitPoints = MaxHealth;
     
     public int GetCurrentHP()

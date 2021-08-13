@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
+using Photon.Pun;
 
 public class DestructableController : MonoBehaviour, INetworkObject
 {
@@ -11,6 +12,8 @@ public class DestructableController : MonoBehaviour, INetworkObject
     public ParticleSystem ps_destructable_floor_static;
     public AudioSource audio_src;
     public BoxCollider floor_col;
+    
+    public float delay = 3F;
     
     NetworkObject net_comp;
     
@@ -27,7 +30,7 @@ public class DestructableController : MonoBehaviour, INetworkObject
             {
                 if(isAlive)
                 {
-                    Invoke(nameof(BlowUpAndDestroy), 3);
+                    Invoke(nameof(BlowUpAndDestroy), delay);
                 }
                 break;
             }
@@ -38,43 +41,84 @@ public class DestructableController : MonoBehaviour, INetworkObject
         }
     }
         
+    public Vector3 offsetToPlaceBeforeBlowUp = new Vector3(240, 0, 0);
+    
+    public FloorDestructable999[] premadeDestructables;
+        
     void Start()
     {
         
-        floors = FindObjectsOfType<FloorDestructable999>();
-        int len = floors.Length;
-        for(int i = 0; i < len; i++)
+        if(premadeDestructables == null || premadeDestructables.Length == 0)
         {
-            floors[i].transform.localPosition += new Vector3(240, 0, 0);
+            floors = FindObjectsOfType<FloorDestructable999>();
+            int len = floors.Length;
+            for(int i = 0; i < len; i++)
+            {
+                floors[i].transform.localPosition += offsetToPlaceBeforeBlowUp;
+            }
+        }
+        else
+        {
+            int len = premadeDestructables.Length;
+            for(int i = 0; i < len; i++)
+            {
+                premadeDestructables[i].transform.localPosition += offsetToPlaceBeforeBlowUp;
+            }
+            
         }
     }
     
     bool isAlive = true;
     
+    public Vector3 boostVelocity = new Vector3(0, 45f, 0);
+    
     void BlowUpAndDestroy()
     {
-        navObstacle.enabled = true;
-        navObstacle.carving = true;
+        if(navObstacle)
+        {
+            navObstacle.enabled = true;
+            navObstacle.carving = true;
+        }
         isAlive = false;
         
         floor_col.enabled = false;
         
         audio_src.Play();
-        ps_destructable_floor_static.Play();
+        
+        if(ps_destructable_floor_static)
+            ps_destructable_floor_static.Play();
         ps_destructable_blowUp.Play();
         
         PlayerController local_pc = PhotonManager.GetLocalPlayer();
         if(local_pc)
         {
-            local_pc.BoostVelocity(new Vector3(0, 45f, 0));
+            if(Math.SqrMagnitude(boostVelocity) > 0)
+            {
+                local_pc.BoostVelocity(boostVelocity);
+            }
         }
         
-        for(int i = 0; i < floors.Length; i++)
+        int len = 0;
+        
+        if(floors != null)
         {
-            floors[i].gameObject.SetActive(false);
+            len = floors.Length;
+            for(int i = 0; i < len; i++)
+            {
+                floors[i].gameObject.SetActive(false);
+            }
         }
         
-        InGameConsole.LogOrange("<color=red>Destroy()</color>");
+        if(premadeDestructables != null)
+        {
+            // len = premadeDestructables.Length;
+            for(int i = 0; i < premadeDestructables.Length; i++)
+            {
+                premadeDestructables[i].gameObject.SetActive(false);
+            }
+        }
+        
+        //InGameConsole.LogOrange("<color=red>Destroying destructables()</color>");
     }
     
     void BecomeAlive()

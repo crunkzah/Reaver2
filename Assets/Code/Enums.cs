@@ -237,3 +237,8 @@ public enum LeverState : int
      On
 }
 
+public static class EventCodes
+{
+     public const byte GiveItem = 1;
+}
+

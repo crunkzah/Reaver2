@@ -15,7 +15,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &2837219245198556948
 Transform:
@@ -56,7 +56,7 @@ GameObject:
   - component: {fileID: 6290723914189470552}
   - component: {fileID: 6290723914188339608}
   m_Layer: 10
-  m_Name: Column48
+  m_Name: Column48_A
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

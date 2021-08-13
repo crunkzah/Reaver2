@@ -2,9 +2,17 @@
 using UnityEngine.PostProcessing;
 using UnityEngine.SceneManagement;
 
+//public struct 
+
 public class PostProcessingController2 : MonoBehaviour
 {
     public PostProcessingProfile outside_camera_profile;
+    
+    public bool changeColorGrading = true;
+    
+    public ColorGradingModel colorGrading_model;
+    public ColorGradingModel colorGrading_berserk;
+    public ColorGradingModel colorGrading_dead;
     
     
     
@@ -16,6 +24,7 @@ public class PostProcessingController2 : MonoBehaviour
         {
             UnFixAo();
         }
+        
     }
     
     

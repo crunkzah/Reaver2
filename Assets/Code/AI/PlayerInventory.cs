@@ -5,7 +5,7 @@ using Photon.Realtime;
 using Photon.Pun;
 using ExitGames.Client.Photon;
 
-public class PlayerInventory : MonoBehaviour, IOnEventCallback
+public class PlayerInventory : MonoBehaviour
 {
     static PlayerInventory _instance;
     
@@ -19,17 +19,16 @@ public class PlayerInventory : MonoBehaviour, IOnEventCallback
         return _instance;
     }
     
-    private void OnEnable()
-    {
-        PhotonNetwork.AddCallbackTarget(this);
-    }
+    // private void OnEnable()
+    // {
+    //     PhotonNetwork.AddCallbackTarget(this);
+    // }
 
-    private void OnDisable()
-    {
-        PhotonNetwork.RemoveCallbackTarget(this);
-    }
+    // private void OnDisable()
+    // {
+    //     PhotonNetwork.RemoveCallbackTarget(this);
+    // }
     
-    public const byte GiveItemEventCode = 1;
     
     public void RaiseEventGiveWeaponToAllPlayers(GunType gunToGive)
     {
@@ -37,25 +36,30 @@ public class PlayerInventory : MonoBehaviour, IOnEventCallback
         {
             object[] content = new object[] { (byte)gunToGive }; // Array contains the target position and the IDs of the selected units
             RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All }; // You would have to set the Receivers to All in order to receive this event on the local client as well
-            PhotonNetwork.RaiseEvent(GiveItemEventCode, content, raiseEventOptions, SendOptions.SendReliable);
+            PhotonNetwork.RaiseEvent(EventCodes.GiveItem, content, raiseEventOptions, SendOptions.SendReliable);
         }
     }
+    // public const byte GiveItemEventCode = 1;
     
-    public void OnEvent(EventData photonEvent)
-    {
-        InGameConsole.LogFancy(string.Format("OnEvent() {0}", photonEvent.Code));
+    // public void OnEvent(EventData photonEvent)
+    // {
+    //     //InGameConsole.LogFancy(string.Format("OnEvent() {0}", photonEvent.Code));
         
-        byte eventCode = photonEvent.Code;
+    //     byte eventCode = photonEvent.Code;
         
-        if (eventCode == GiveItemEventCode)
-        {
-            object[] data = (object[])photonEvent.CustomData;
+    //     if (eventCode == GiveItemEventCode)
+    //     {
+    //         object[] data = (object[])photonEvent.CustomData;
+    //         // for(int i = 0; i < data.Length; i++)
+    //         // {
+    //         //     InGameConsole.LogFancy("Data: <color=yellow>" + data[i].ToString() + "</color>");
+    //         // }
 
-            GunType gunToGive = (GunType)data[0];
-            GiveWeaponLocally(gunToGive);
-        }
+    //         GunType gunToGive = (GunType)data[0];
+    //         GiveWeaponLocally(gunToGive);
+    //     }
         
-    }
+    // }
     
     void Start()
     {

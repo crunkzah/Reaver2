@@ -179,6 +179,7 @@ public class AudioManager : MonoBehaviour
     [Header("Music:")]
     public AudioClip children_of_the_omnissiah;
     public AudioClip daycore;
+    public AudioClip haze;
     public AudioClip cyber_grind;
     public AudioClip mainMenu_theme;
     public AudioSource music_src;
@@ -584,6 +585,17 @@ public class AudioManager : MonoBehaviour
     public void SetMusic(string name)
     {
         return;
+    }
+    
+    public static void SetMusicHaze()
+    {
+        AudioManager inst = Singleton();
+        inst.music_src.clip = inst.haze;
+        inst.music_src.pitch = 1.0f;
+        inst.music_src.volume = LOUD;
+        inst.music_src.loop = true;
+        
+        inst.music_src.Play();
     }
     
     public static void SetMusicDaycore()

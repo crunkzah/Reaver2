@@ -24,7 +24,7 @@ public class FPSFoostepPlayer : MonoBehaviour
     
     float basePitch = 0.4f;
     float pitchRange = 0.1f;
-    public float stepShakeY = 3f;
+    public float stepShakeY = 4f;
     
     void Update()
     {

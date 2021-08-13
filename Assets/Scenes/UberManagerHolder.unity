@@ -836,6 +836,11 @@ PrefabInstance:
       propertyPath: clipsAndTypes.Array.data[27].clip
       value: 
       objectReference: {fileID: 8300000, guid: d5224c85bcbb7b743a78f1bc90a87063, type: 3}
+    - target: {fileID: 8387225940991049876, guid: d0958c5341d6fec4192a4bd3857d8dea,
+        type: 3}
+      propertyPath: haze
+      value: 
+      objectReference: {fileID: 8300000, guid: aa0131ce2574f094393ae1d754ff84b1, type: 3}
     - target: {fileID: 8387225941318978085, guid: d0958c5341d6fec4192a4bd3857d8dea,
         type: 3}
       propertyPath: Scourge_npc

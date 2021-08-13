@@ -20,6 +20,15 @@ ModelImporter:
     100028: //RootNode
     100030: RobotArm_armature
     100032: Hand_1_3
+    100034: Arm_ik
+    100036: Arm_ik_end
+    100038: Arm_pole
+    100040: Arm_pole_end
+    100042: Hand_1_3_end
+    100044: Hand_2_2_end
+    100046: Hand_3_2_end
+    100048: Hand_4_2_end
+    100050: Hand_5_2_end
     400000: Arm_1
     400002: Arm_2
     400004: Arm_3
@@ -37,6 +46,15 @@ ModelImporter:
     400028: //RootNode
     400030: RobotArm_armature
     400032: Hand_1_3
+    400034: Arm_ik
+    400036: Arm_ik_end
+    400038: Arm_pole
+    400040: Arm_pole_end
+    400042: Hand_1_3_end
+    400044: Hand_2_2_end
+    400046: Hand_3_2_end
+    400048: Hand_4_2_end
+    400050: Hand_5_2_end
     2100000: No Name
     4300000: RobotArm
     7400000: RobotArm_armature|Rest
@@ -45,8 +63,13 @@ ModelImporter:
     7400006: RobotArm_armature|Hook1
     7400008: RobotArm_armature|Revolver_ult
     7400010: RobotArm_armature|Revolver_ultToEnd
+    7400012: RobotArm_armature|BerserkInject
+    7400014: RobotArm_armature|Hook1_impact
+    7400016: RobotArm_armature|Punch2_impact
+    7400018: RobotArm_armature|Punch2
     9500000: //RootNode
     13700000: RobotArm
+    2186277476908879412: ImportLogs
   externalObjects: {}
   materials:
     importMaterials: 0
@@ -218,6 +241,118 @@ ModelImporter:
     - serializedVersion: 16
       name: RobotArm_armature|Revolver_ultToEnd
       takeName: RobotArm_armature|Revolver_ultToEnd
+      firstFrame: 0
+      lastFrame: 59
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: RobotArm_armature|BerserkInject
+      takeName: RobotArm_armature|BerserkInject
+      firstFrame: 0
+      lastFrame: 59
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: RobotArm_armature|Hook1_impact
+      takeName: RobotArm_armature|Hook1_impact
+      firstFrame: 0
+      lastFrame: 59
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: RobotArm_armature|Punch2_impact
+      takeName: RobotArm_armature|Punch2_impact
+      firstFrame: 0
+      lastFrame: 59
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: RobotArm_armature|Punch2
+      takeName: RobotArm_armature|Punch2
       firstFrame: 0
       lastFrame: 59
       wrapMode: 0

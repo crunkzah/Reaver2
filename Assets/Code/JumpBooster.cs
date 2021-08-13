@@ -98,6 +98,7 @@ public class JumpBooster : MonoBehaviour, IActivatable, INetworkObject
                         {
                             Vector3 vel_in_localSpace = transform.TransformVector(boostVelocity);
                             player_on_booster.BoostVelocity(vel_in_localSpace);
+                            player_on_booster.secondJumpHappened = false;
                         }
                         else
                         {

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Photon.Pun;
+using Photon.Realtime;
+//using Photon.Pun;
+using ExitGames.Client.Photon;
 
 
 
@@ -14,7 +17,7 @@ public struct NetObjectPrefab
 }
 
 
-public class NetworkObjectsManager : MonoBehaviour//MonoBehaviourPunCallbacks
+public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehaviourPunCallbacks
 {
 
     #region  Singleton
@@ -68,6 +71,36 @@ public class NetworkObjectsManager : MonoBehaviour//MonoBehaviourPunCallbacks
         }
     }
     
+    void OnEnable()
+    {
+        PhotonNetwork.AddCallbackTarget(this);
+    }
+
+    void OnDisable()
+    {
+        PhotonNetwork.RemoveCallbackTarget(this);
+    }
+    
+    
+   public void OnEvent(EventData photonEvent)
+    {
+        //InGameConsole.LogFancy(string.Format("OnEvent() {0}", photonEvent.Code));
+        
+        byte eventCode = photonEvent.Code;
+        
+        if (eventCode == EventCodes.GiveItem)
+        {
+            object[] data = (object[])photonEvent.CustomData;
+            // for(int i = 0; i < data.Length; i++)
+            // {
+            //     InGameConsole.LogFancy("Data: <color=yellow>" + data[i].ToString() + "</color>");
+            // }
+
+            GunType gunToGive = (GunType)data[0];
+            PlayerInventory.Singleton().GiveWeaponLocally(gunToGive);
+        }
+        
+    }
     
 
     public struct PackedNetworkCommand 

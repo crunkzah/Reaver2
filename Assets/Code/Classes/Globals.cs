@@ -160,6 +160,15 @@ public static class Math
         return v.x * v.x + v.y * v.y + v.z * v.z;
     }
     
+    public static Vector3 SmoothStepVector(Vector3 from, Vector3 to, float t)
+    {
+        float x = Mathf.SmoothStep(from.x, to.x, t);
+        float y = Mathf.SmoothStep(from.y, to.y, t);
+        float z = Mathf.SmoothStep(from.z, to.z, t);
+        
+        return new Vector3(x, y, z);
+    }
+    
     public static Vector2 SolveQuad(float a, float b, float c)
     {
         //ax^2 + bx + c = 0

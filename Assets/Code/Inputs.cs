@@ -44,6 +44,53 @@ public class Inputs : MonoBehaviour
         return Input.GetKey(KeyCode.LeftShift);
     }
     
+    public static bool GetAbilityR_KeyDown()
+    {
+        return Input.GetKeyDown(KeyCode.R);
+    }
+    
+    public static bool GetAbilityR_Key()
+    {
+        return Input.GetKey(KeyCode.R);
+    }
+    
+    public static bool AbilityF()
+    {
+        return Input.GetKey(KeyCode.F);
+    }
+    
+    public static bool GetSlamAndSlide_Key()
+    {
+        return Input.GetKey(KeyCode.LeftControl);
+    }
+    
+    public static bool GetSlamAndSlide_KeyDown()
+    {
+        return Input.GetKeyDown(KeyCode.LeftControl);
+    }
+    
+    public static bool SwitchToPrevSlot_KeyDown()
+    {
+        return Input.GetKeyDown(KeyCode.Q);
+    }
+    
+    public static bool Arm_FKeyDown()
+    {
+        return Input.GetKeyDown(KeyCode.F);
+    }
+    
+    public static bool AbilityFKeyUp()
+    {
+        return Input.GetKeyUp(KeyCode.F);
+    }
+    
+    
+    
+    public static bool SwitchArmKeyDown()
+    {
+        return Input.GetKeyDown(KeyCode.G);
+    }
+    
     public static bool GetKeyDown(KeyCode key, bool ignoreConsole = true)
     {
         if(!ignoreConsole)
