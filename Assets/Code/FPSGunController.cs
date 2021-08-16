@@ -898,9 +898,10 @@ public class FPSGunController : MonoBehaviour
     
     void OnRevolverUltStarted()
     {
-        pController.moveSpeedMultiplier = 0.6f;
+        pController.moveSpeedMultiplier_RevolverUlt = 0.6f;
         pController.canSlide = false;
-        pController.SetTargetFov(130, 30);
+        pController.SetBerserkFov();
+        PostProcessingController2.SetState(PostProcessingState.Berserk);  
         if(CurrentArmAnimator())
         {
             CurrentArmAnimator().Play("Base.Revolver_Ult", 0, 0);
@@ -911,24 +912,22 @@ public class FPSGunController : MonoBehaviour
     
     void OnRevolverUltEnded()
     {
-        SetPlayerControllerNormalState();
-         if(CurrentArmAnimator() != null)
+        if(CurrentArmAnimator() != null)
         {
             CurrentArmAnimator().Play("Base.UltToEnd", 0, 0);
+        }
+        if(!isInBerserk)
+        {
+            SetPlayerControllerNormalState();
         }
     }
     
     void SetPlayerControllerNormalState()
     {
-        pController.moveSpeedMultiplier = 1f;
+        PostProcessingController2.SetState(PostProcessingState.Normal);  
+        pController.moveSpeedMultiplier_RevolverUlt = 1;
         pController.canSlide = true;
-        pController.ResetFov();
-        
-        // if(CurrentArmAnimator() != null)
-        // {
-        //     CurrentArmAnimator().Play("Base.Hidden", 0, 0);
-        // }
-        
+        pController.SetTargetFovNormal();
     }
     
     public GunType GetCurrentWeapon()
@@ -976,12 +975,12 @@ public class FPSGunController : MonoBehaviour
     
     int revolver_alt_fired_count            = 0;
     float revolver_charge;
-    const float revolver_chargeRate         = 1.66F;
+    const float revolver_chargeRate         = 2.25F;
     
     float Ability_R_timer                   = 0;
     float Ability_R_cooldown_timer          = 0;
-    const float Ability_R_Cooldown          = 2 + Ability_R_Berserk_duration;
-    const float Ability_R_Berserk_duration  = 3.5F;
+    const float Ability_R_Cooldown          = Ability_R_Berserk_duration;
+    const float Ability_R_Berserk_duration  = 4.5F;
     bool isInBerserk = false;
     
     float berserkMultiplier = 0.4F;
@@ -994,8 +993,8 @@ public class FPSGunController : MonoBehaviour
             BerserkPowerUp();
             AudioManager.PlayClip(SoundType.gun_pick_up, 0.8f, 1f);
             Invoke("rofl1", 0.150f);
-            Invoke("rofl2", 0.150f);
-            Invoke("rofl3", 0.150f);
+            // Invoke("rofl2", 0.150f);
+            // Invoke("rofl3", 0.150f);
         }
         InGameConsole.LogFancy("OnInject()");
     }
@@ -1005,15 +1004,15 @@ public class FPSGunController : MonoBehaviour
         AudioManager.PlayClip(SoundType.gun_pick_up, 0.6f, 1.1f);
     }
     
-    public void rofl2()
-    {
-        AudioManager.PlayClip(SoundType.gun_pick_up, 0.3f, 1.2f);
-    }
+    // public void rofl2()
+    // {
+    //     AudioManager.PlayClip(SoundType.gun_pick_up, 0.3f, 1.2f);
+    // }
     
-    public void rofl3()
-    {
-        AudioManager.PlayClip(SoundType.gun_pick_up, 0.45f, 1.3f);
-    }
+    // public void rofl3()
+    // {
+    //     AudioManager.PlayClip(SoundType.gun_pick_up, 0.45f, 1.3f);
+    // }
     
     public void StartArmInject()
     {
@@ -1023,6 +1022,8 @@ public class FPSGunController : MonoBehaviour
             _currentArmAnim.Play("Base.Inject", 0, 0);
         }
         Invoke(nameof(OnInject), 1.05f / 2.5f);
+        Ability_R_timer = Ability_R_Berserk_duration;
+        Ability_R_cooldown_timer = Ability_R_Cooldown;
         
     }
     
@@ -1030,9 +1031,11 @@ public class FPSGunController : MonoBehaviour
     {
         if(pv.IsMine)
         {
+            pController.SetBerserkFov();
+            PostProcessingController2.SetState(PostProcessingState.Berserk);  
             pController.TakeDamageNonLethal(50);
-            Ability_R_timer = Ability_R_Berserk_duration;
-            Ability_R_cooldown_timer = Ability_R_Cooldown;
+            // Ability_R_timer = Ability_R_Berserk_duration;
+            // Ability_R_cooldown_timer = Ability_R_Cooldown;
             
             pController.moveSpeedMultiplier += pController.moveSpeedMultiplier * berserkMultiplierMoveSpeed;
             
@@ -1046,7 +1049,8 @@ public class FPSGunController : MonoBehaviour
     {
         if(pv.IsMine)
         {
-            
+            pController.SetTargetFovNormal();
+            PostProcessingController2.SetState(PostProcessingState.Normal);  
             Ability_R_timer = Ability_R_Berserk_duration;
             Ability_R_cooldown_timer = Ability_R_Cooldown;
             
@@ -1059,7 +1063,6 @@ public class FPSGunController : MonoBehaviour
     
     void Ability_R_Tick(float dt)
     {
-        
         Ability_R_timer -= dt;
         if(isInBerserk)
         {
@@ -1190,6 +1193,10 @@ public class FPSGunController : MonoBehaviour
             {
                 if(switchWeaponTimer == 0)
                 {
+                    if(slots[currentSlot] == GunType.Revolver)
+                    {
+                        OnRevolverUltEnded();
+                    }
                     SetCurrentSlot(keyBoard);
                     switchWeaponTimer = SwitchWeaponRate;
                     WieldGunFPS();
@@ -1313,7 +1320,7 @@ public class FPSGunController : MonoBehaviour
                             else
                             {
                                 //InGameConsole.LogFancy(string.Format("Charging <color=yellow>{0}</color>", revolver_charge.ToString("f")));
-                                revolver_charge += dt * revolver_chargeRate;
+                                revolver_charge += dt * revolver_chargeRate * fireRateMultiplier;
                                 if(revolver_charge >= 1)
                                 {
                                     revolver_charge = 1f;
@@ -1749,7 +1756,7 @@ public class FPSGunController : MonoBehaviour
         gunAudio.PlayOneShot(switchWeaponClip, 0.3f);
         
         revolverState = RevolverState.Normal;
-        SetPlayerControllerNormalState();
+        //SetPlayerControllerNormalState();
         
         //ARGhostFireQueued = false;
         ARGhostFires_queued_num = 0;

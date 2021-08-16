@@ -15,6 +15,9 @@ public class LocalSettings
     public float musicVolume = 0.8F;
     public float effectsVolume = 1F;
     public float fov = 110F;
+    
+    public bool ambientOcclusion = true;
+    public bool colorGrading     = true;
 
     public void ReadLocalSettings()
     {
@@ -61,5 +64,8 @@ public class LocalSettings
         PlayerPrefs.SetFloat("MusicVolume", musicVolume);
         PlayerPrefs.SetFloat("EffectsVolume", effectsVolume);
         PlayerPrefs.SetFloat("Fov", fov);
+        PlayerPrefs.SetInt("AO", 1);
+        PlayerPrefs.SetInt("colorGrading", 1);
+        
     }
 }

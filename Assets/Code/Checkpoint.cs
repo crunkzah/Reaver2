@@ -69,6 +69,7 @@ public class Checkpoint : MonoBehaviour, INetworkObject
     
     public ParticleSystem activated_ps;
     public ParticleSystem static_ps;
+    public bool IsSavePoint = false;
     
     public bool trigger_on_one_player = false;
     

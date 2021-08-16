@@ -230,7 +230,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
         if(pv.IsMine)
         {
             SetFPSCameraToPlayer();
-            
+            PostProcessingController2.SetState(PostProcessingState.Normal);  
+               
             //playerCamera.GetComponent<FollowingCamera>().SetTarget(this.transform);
         }
         
@@ -503,6 +504,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
     }
     
     public float moveSpeedMultiplier = 1;
+    public float moveSpeedMultiplier_RevolverUlt = 1;
+    
     public void SetMoveSpeedMult(float mult)
     {
         moveSpeedMultiplier = mult;
@@ -515,8 +518,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
     Vector3 duckCameraPlacePosition = new Vector3(0, 0f, 0);//new Vector3(0, -1.626f, 0);
     float targetFov = 110;
     float fovSpeed = 60f;
-    float normalFov = 110;
-    float duckingFov = 120;
+    
+    const float normalFov = 110;
+    const float duckingFov = 120;
     
     
     public void TeleportPlayer(Vector3 tp_pos)
@@ -530,17 +534,28 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     float skipUpdatedsTimer = 0;
     
-    public void ResetFov()
+    // public void ResetFov()
+    // {
+    //     fovSpeed = 60f;
+    //     targetFov = normalFov;
+    // }
+    
+    public void SetBerserkFov()
     {
-        fovSpeed = 60f;
-        targetFov = normalFov;
+        targetFov = normalFov * 1.2f;
+        fovSpeed = 120f;
     }
     
-    
-    public void SetTargetFov(float _targetFov, float _fovSpeed)
+    void SetTargetFov(float _targetFov, float _fovSpeed)
     {
         targetFov = _targetFov;
         fovSpeed = _fovSpeed;
+    }
+    
+    public void SetTargetFovNormal()
+    {
+        targetFov = normalFov;
+        fovSpeed = 60f;
     }
     
     void InterpolateFov(float dt)
@@ -1205,7 +1220,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
         Vector3 inputDirWorldSpace = thisTransform.TransformDirection(input);
         
-        desiredVelWorld = inputDirWorldSpace * fpsMaxMoveSpeedCurrent * moveSpeedMultiplier;
+        desiredVelWorld = inputDirWorldSpace * fpsMaxMoveSpeedCurrent * moveSpeedMultiplier * moveSpeedMultiplier_RevolverUlt;
         
         capsuleP1 = GetTopCapsuleP();
         capsuleP2 = GetBottomCapsuleP();
@@ -1934,7 +1949,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
         TimeWhenTookDamage = Time.time;
         // dmg = 1;
-        //HitPoints -= dmg;
+        HitPoints -= dmg;
         if(HitPoints <= 0)
         {
             // InGameConsole.LogOrange("HitPoints <= 0");
@@ -2125,6 +2140,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
         if(pv.IsMine)
         {
+            PostProcessingController2.SetState(PostProcessingState.PlayerDead);
             Transform _camTr = FollowingCamera.Singleton().transform;
             Rigidbody _camRb = _camTr.gameObject.AddComponent<Rigidbody>();
             _camRb.drag = 1.5f;

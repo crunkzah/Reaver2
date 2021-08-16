@@ -1,14 +1,6 @@
 ﻿using UnityEngine.PostProcessing;
 using UnityEngine;
 
-
-public enum PostProcessingState : int
-{
-    Normal,
-    PlayerDead
-}
-
-
 [System.Serializable]
 public struct ProfileCustom
 {

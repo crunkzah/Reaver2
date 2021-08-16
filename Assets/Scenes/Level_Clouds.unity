@@ -63955,6 +63955,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 953715374621157702, guid: 2482f85333e6a084db56e8e8cbb8a536,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2482f85333e6a084db56e8e8cbb8a536, type: 3}
 --- !u!1001 &1722722765
@@ -69146,6 +69151,21 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 1174385251309680444, guid: c3661f186c8f8d9448d12325d8791ce3,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6552185490971104355, guid: c3661f186c8f8d9448d12325d8791ce3,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4337902188483537506, guid: c3661f186c8f8d9448d12325d8791ce3,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4337902189597649128, guid: c3661f186c8f8d9448d12325d8791ce3,
         type: 3}
       propertyPath: m_textInfo.characterCount
@@ -69166,16 +69186,6 @@ PrefabInstance:
       propertyPath: m_textInfo.pageCount
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1174385251309680444, guid: c3661f186c8f8d9448d12325d8791ce3,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4337902188483537506, guid: c3661f186c8f8d9448d12325d8791ce3,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4337902189835083862, guid: c3661f186c8f8d9448d12325d8791ce3,
         type: 3}
       propertyPath: m_IsActive
@@ -69184,11 +69194,6 @@ PrefabInstance:
     - target: {fileID: 4733286027394022621, guid: c3661f186c8f8d9448d12325d8791ce3,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6552185490971104355, guid: c3661f186c8f8d9448d12325d8791ce3,
-        type: 3}
-      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

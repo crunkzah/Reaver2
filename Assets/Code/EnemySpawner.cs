@@ -100,9 +100,12 @@ public class EnemySpawner : MonoBehaviour, Interactable
 			Invoke(nameof(InitialSpawn), initial_delay);
 			if(PhotonNetwork.IsMasterClient)
 			{
-				for(int i = 0; i < messages_on_init_spawn.Length; i++)
+				if(messages_on_init_spawn != null)
 				{
-					NetworkObjectsManager.CallNetworkFunction(messages_on_init_spawn[i].net_comp.networkId, messages_on_init_spawn[i].command);
+					for(int i = 0; i < messages_on_init_spawn.Length; i++)
+					{
+						NetworkObjectsManager.CallNetworkFunction(messages_on_init_spawn[i].net_comp.networkId, messages_on_init_spawn[i].command);
+					}
 				}
 			}
 		}

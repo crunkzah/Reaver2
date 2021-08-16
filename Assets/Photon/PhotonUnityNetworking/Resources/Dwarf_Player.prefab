@@ -508,6 +508,7 @@ MonoBehaviour:
   vertClamped: 0
   HeadTarget: {fileID: 66573356085502837}
   moveSpeedMultiplier: 1
+  moveSpeedMultiplier_RevolverUlt: 1
   isSliding: 0
   slidingPs: {fileID: 1565457584616037977}
   playerAudioSource_sliding: {fileID: 1068610734324334833}

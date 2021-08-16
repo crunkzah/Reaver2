@@ -3,6 +3,7 @@
 public enum GateState : int
 {
     Closed,
+    Orange,
     Open,
     Locked,
 }
@@ -43,7 +44,11 @@ public class GatesController : MonoBehaviour, INetworkObject
     public MeshRenderer[] status_emissives;
     
     public Material closed_mat;
+    public Material orange_mat;
     public Material locked_mat;
+    
+    public ParticleSystem locked_ps1;
+    public ParticleSystem locked_ps2;
     
     //public GameObject[] locks;
     
@@ -103,6 +108,15 @@ public class GatesController : MonoBehaviour, INetworkObject
                 {
                     status_emissives[i].sharedMaterial = closed_mat;
                 }
+                if(locked_ps1)
+                {
+                    if(locked_ps1.isPlaying)
+                    {
+                        locked_ps1.Stop();
+                        locked_ps2.Stop();
+                    }
+                }
+                
                 break;
             }
             case(GateState.Open):
@@ -112,6 +126,35 @@ public class GatesController : MonoBehaviour, INetworkObject
                 {
                     status_emissives[i].sharedMaterial = closed_mat;
                 }
+                
+                if(locked_ps1)
+                {
+                    if(locked_ps1.isPlaying)
+                    {
+                        locked_ps1.Stop();
+                        locked_ps2.Stop();
+                    }
+                }
+                
+                break;
+            }
+            case(GateState.Orange):
+            {
+                int len2 = status_emissives.Length;
+                for(int i = 0; i < len2; i++)
+                {
+                    status_emissives[i].sharedMaterial = orange_mat;
+                }
+                
+                if(locked_ps1)
+                {
+                    if(locked_ps1.isPlaying)
+                    {
+                        locked_ps1.Stop();
+                        locked_ps2.Stop();
+                    }
+                }
+                
                 break;
             }
             case(GateState.Locked):
@@ -120,6 +163,15 @@ public class GatesController : MonoBehaviour, INetworkObject
                 for(int i = 0; i < len2; i++)
                 {
                     status_emissives[i].sharedMaterial = locked_mat;
+                }
+                
+                if(locked_ps1)
+                {
+                    if(!locked_ps1.isPlaying)
+                    {
+                        locked_ps1.Play();
+                        locked_ps2.Play();
+                    }
                 }
                 break;
             }
@@ -156,6 +208,10 @@ public class GatesController : MonoBehaviour, INetworkObject
     
     void Start()
     {
+        if(state == GateState.Locked)
+        {
+            state = GateState.Orange;
+        }
         ProcessStatusLight(state);
     }
     
@@ -212,7 +268,7 @@ public class GatesController : MonoBehaviour, INetworkObject
     
     void Update()
     {
-        if(state != GateState.Locked)
+        if(state != GateState.Locked && state != GateState.Orange)
         {
             if(Detect())
             {
