@@ -814,7 +814,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 709}
   viewIdField: 0
-  InstantiationId: 1
+  InstantiationId: 3
   isRuntimeInstantiated: 0
 --- !u!114 &8788468314865930829
 MonoBehaviour:
@@ -912,7 +912,7 @@ MonoBehaviour:
   revolverPumpClip: {fileID: 8300000, guid: 7dea385b046dcb14d8829e503a2adcb3, type: 3}
   meleeState: 0
   switchWeaponClip: {fileID: 8300000, guid: 5938505236bb939448978e5b4ae55d49, type: 3}
-  revolverShotClip: {fileID: 8300000, guid: d3afa806e975ce241ae0f43c74a9e765, type: 3}
+  revolverShotClip: {fileID: 8300000, guid: 3aca2911fe6d8b046bda4e1d61b47204, type: 3}
   revolverShot_strongerAdditionalClip: {fileID: 8300000, guid: a4be48c1286ccd64cafed51a4bb7a353,
     type: 3}
   shotgunShotClip: {fileID: 8300000, guid: dc051175d9e07f1459f9ad45005fb613, type: 3}
@@ -11604,6 +11604,10 @@ MonoBehaviour:
   localDirection: 1
   rotationSpeed: -140
   objectToRotate: {fileID: 0}
+  randomizeRotation: 0
+  randomizeRotationStep: 45
+  randomizePositionOnAxis: 0
+  randomizePositionStep: 0.075
   space: 1
 --- !u!1 &1886379986407271655
 GameObject:
@@ -11699,6 +11703,10 @@ MonoBehaviour:
   localDirection: 1
   rotationSpeed: 400
   objectToRotate: {fileID: 0}
+  randomizeRotation: 0
+  randomizeRotationStep: 45
+  randomizePositionOnAxis: 0
+  randomizePositionStep: 0.075
   space: 1
 --- !u!1 &1896577533617377780
 GameObject:
@@ -11840,6 +11848,10 @@ MonoBehaviour:
   localDirection: 0
   rotationSpeed: 60
   objectToRotate: {fileID: 0}
+  randomizeRotation: 0
+  randomizeRotationStep: 45
+  randomizePositionOnAxis: 0
+  randomizePositionStep: 0.075
   space: 1
 --- !u!1 &2258325373863929785
 GameObject:
@@ -12178,6 +12190,10 @@ MonoBehaviour:
   localDirection: 0
   rotationSpeed: 60
   objectToRotate: {fileID: 0}
+  randomizeRotation: 0
+  randomizeRotationStep: 45
+  randomizePositionOnAxis: 0
+  randomizePositionStep: 0.075
   space: 1
 --- !u!1 &3205503345161528558
 GameObject:
@@ -27515,6 +27531,10 @@ MonoBehaviour:
   localDirection: 0
   rotationSpeed: 90
   objectToRotate: {fileID: 0}
+  randomizeRotation: 0
+  randomizeRotationStep: 45
+  randomizePositionOnAxis: 0
+  randomizePositionStep: 0.075
   space: 1
 --- !u!1 &6161862141689659472
 GameObject:

@@ -474,7 +474,7 @@ GameObject:
   - component: {fileID: 675412112251807515}
   - component: {fileID: 1051144707857496034}
   - component: {fileID: 6111130611532820733}
-  - component: {fileID: 818155372657488186}
+  - component: {fileID: 5771730071245694838}
   m_Layer: 10
   m_Name: Chain2
   m_TagString: Untagged
@@ -570,23 +570,19 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &818155372657488186
-MonoBehaviour:
+--- !u!65 &5771730071245694838
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3112458488175399408}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8efb0e52604b69d419274f3cfff68343, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isActive: 1
-  localDirection: 1
-  rotationSpeed: 25
-  objectToRotate: {fileID: 0}
-  space: 1
+  serializedVersion: 2
+  m_Size: {x: 2.7, y: 54, z: 2.7}
+  m_Center: {x: 0, y: 22, z: 0}
 --- !u!1 &4275798190164087569
 GameObject:
   m_ObjectHideFlags: 0

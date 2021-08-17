@@ -77,6 +77,8 @@ public class Checkpoint : MonoBehaviour, INetworkObject
     
     public SlidingStructure[] sliding_structures_to_call_on_activate;
     
+    public int activate_msgs_num = 1;
+    
     int playersMask = -1;
     
     bool canSendCommands = true;
@@ -105,7 +107,11 @@ public class Checkpoint : MonoBehaviour, INetworkObject
             case(NetworkCommand.Ability2):
             {
                 UnlockSendingCommands();
-                state = CheckpointState.Waiting;
+                activate_msgs_num--;
+                if(activate_msgs_num <= 0)
+                {
+                    state = CheckpointState.Waiting;
+                }
                 break;
             }
             default:
@@ -264,10 +270,11 @@ public class Checkpoint : MonoBehaviour, INetworkObject
             }
             
             
-            if(PhotonNetwork.IsMasterClient)
+            if(PhotonNetwork.IsMasterClient && objects_to_activate != null)
             {
                 for(int i = 0; i < objects_to_activate.Length; i++)
                 {
+                    
                     Interactable _int = objects_to_activate[i].GetComponent<Interactable>();
                     if(_int == null)
                     {

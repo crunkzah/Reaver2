@@ -852,6 +852,16 @@ PrefabInstance:
       propertyPath: originals.Array.data[32].Quantity
       value: 32
       objectReference: {fileID: 0}
+    - target: {fileID: 8387225940203333414, guid: d0958c5341d6fec4192a4bd3857d8dea,
+        type: 3}
+      propertyPath: originals.Array.data[34].Quantity
+      value: 128
+      objectReference: {fileID: 0}
+    - target: {fileID: 8387225940203333414, guid: d0958c5341d6fec4192a4bd3857d8dea,
+        type: 3}
+      propertyPath: originals.Array.data[33].Quantity
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 8387225940991049876, guid: d0958c5341d6fec4192a4bd3857d8dea,
         type: 3}
       propertyPath: clipsAndTypes.Array.size

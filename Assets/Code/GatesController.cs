@@ -52,6 +52,11 @@ public class GatesController : MonoBehaviour, INetworkObject
     
     public int open_msgs_num = 1;
     
+    [Range(0, 100)]
+    public int checkPointPriority = 0;
+    public NetworkObjectAndCommand[] messages_on_load;
+    
+    
     //public GameObject[] locks;
     
     NetworkObject net_comp;

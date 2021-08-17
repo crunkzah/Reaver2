@@ -13,6 +13,8 @@ public class DestructableController : MonoBehaviour, INetworkObject
     public AudioSource audio_src;
     public BoxCollider floor_col;
     
+    public GameObject[] objects_to_set_active;
+    
     public float delay = 3F;
     
     NetworkObject net_comp;
@@ -115,6 +117,14 @@ public class DestructableController : MonoBehaviour, INetworkObject
             for(int i = 0; i < premadeDestructables.Length; i++)
             {
                 premadeDestructables[i].gameObject.SetActive(false);
+            }
+        }
+        
+        if(objects_to_set_active != null)
+        {
+            for(int i = 0; i < objects_to_set_active.Length; i++)
+            {
+                objects_to_set_active[i].SetActive(true);
             }
         }
         

@@ -696,9 +696,11 @@ MonoBehaviour:
   fpsVelocity: {x: 0, y: 0, z: 0}
   fpsWallJumpSensor: {fileID: 0}
   fpsMouseSens: 1
+  player_gravity_multiplier: 1
   vertClamped: 0
   HeadTarget: {fileID: 0}
-  moveSpeedMult: 1
+  moveSpeedMultiplier: 1
+  moveSpeedMultiplier_RevolverUlt: 1
   isSliding: 0
   slidingPs: {fileID: 0}
   playerAudioSource_sliding: {fileID: 0}
@@ -716,6 +718,7 @@ MonoBehaviour:
   dashAudioClip: {fileID: 0}
   tryingToSlam: 0
   fpsWeaponPlaceMover: {fileID: 0}
+  secondJumpHappened: 0
   OnBecomeGroundedClip: {fileID: 0}
   fpsCam_anim_recoil: {fileID: 0}
   slamLaunch_ps: {fileID: 0}

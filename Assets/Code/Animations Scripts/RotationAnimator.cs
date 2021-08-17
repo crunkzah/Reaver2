@@ -11,6 +11,12 @@ public class RotationAnimator : MonoBehaviour
     public float rotationSpeed = 60f; // This is in degrees
     public Transform objectToRotate;
     
+    public bool randomizeRotation = false;
+    public float randomizeRotationStep = 45F;
+    
+    public bool randomizePositionOnAxis = false;
+    public float randomizePositionStep = 0.075F;
+    
     Vector3 GetDirection()
     {
         Vector3 dir = Vector3.forward;
@@ -47,6 +53,18 @@ public class RotationAnimator : MonoBehaviour
     {
         if(objectToRotate == null)
             objectToRotate = transform;
+            
+        if(randomizeRotation)
+        {
+            float rand = Random.Range(-6, 6) * randomizeRotationStep;
+            objectToRotate.Rotate(GetDirection() * rand, space);
+        }
+        
+        if(randomizePositionOnAxis)
+        {
+            float rand = Random.Range(-1f, 1f) * randomizePositionStep;
+            objectToRotate.Translate(GetDirection() * rand, space);
+        }
         
 //        RotationManager.Singleton().RegisterRotator(this);
     }

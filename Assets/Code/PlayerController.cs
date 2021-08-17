@@ -2143,6 +2143,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             PostProcessingController2.SetState(PostProcessingState.PlayerDead);
             Transform _camTr = FollowingCamera.Singleton().transform;
             Rigidbody _camRb = _camTr.gameObject.AddComponent<Rigidbody>();
+            
             _camRb.drag = 1.5f;
             _camRb.mass = 50;
             _camRb.AddForce(Vector3.up * 0.01f, ForceMode.VelocityChange);

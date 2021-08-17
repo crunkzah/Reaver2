@@ -160,17 +160,17 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
     
     public static void ScheduleCommandLocally(int networkId, double timeSessionWhenExecute, NetworkCommand command, params object[] args)
     {
-        Singleton().ScheduleCommandRPC(networkId, timeSessionWhenExecute, (int)command, args);
+        Singleton().ScheduleCommandRPC(networkId, timeSessionWhenExecute, (byte)command, args);
     }
     
     public static void ScheduleCommand(int networkId, double timeSessionWhenExecute, NetworkCommand command, params object[] args)
     {
         // InGameConsole.Log(string.Format("<color=yellow>Scheduling! {0} seconds to go.</color>", (timeSessionWhenExecute - PhotonNetwork.Time).ToString("f")));
-        Singleton().photonView.RPC("ScheduleCommandRPC", RpcTarget.AllViaServer, networkId, timeSessionWhenExecute, (int)command, args);
+        Singleton().photonView.RPC("ScheduleCommandRPC", RpcTarget.AllViaServer, networkId, timeSessionWhenExecute, (byte)command, args);
     }
     
     [PunRPC]
-    public void ScheduleCommandRPC(int networkId, double timeSessionWhenExecute, int command, params object[] args)
+    public void ScheduleCommandRPC(int networkId, double timeSessionWhenExecute, byte command, params object[] args)
     {
         ScheduledNetworkCommand snc = new ScheduledNetworkCommand();
         snc.networkId = networkId;
@@ -567,7 +567,7 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
         for(int i = 0; i < commands_count; i++)
         {
             networkIds[i]   = cmds[i].networkId;
-            commands[i]     = (int)cmds[i].command;
+            commands[i]     = (byte)cmds[i].command;
             
             commands_args[i] = cmds[i].args.ToArray();
             

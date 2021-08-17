@@ -119,6 +119,7 @@
      <Compile Include="Assets\Code\AudioCode\AudioReact.cs" />
      <Compile Include="Assets\Code\AudioCode\AudioReactBands.cs" />
      <Compile Include="Assets\Code\AudioTriggerEventReceiver.cs" />
+     <Compile Include="Assets\Code\AxeTrap.cs" />
      <Compile Include="Assets\Code\BackButtonGUI.cs" />
      <Compile Include="Assets\Code\Balista.cs" />
      <Compile Include="Assets\Code\BigGatesRotating.cs" />
@@ -165,6 +166,7 @@
      <Compile Include="Assets\Code\DialogueManager.cs" />
      <Compile Include="Assets\Code\Dialogues.cs" />
      <Compile Include="Assets\Code\DirectionalLightController.cs" />
+     <Compile Include="Assets\Code\DisableOnDistance.cs" />
      <Compile Include="Assets\Code\DisableOnPlay.cs" />
      <Compile Include="Assets\Code\DismemberedCharacter.cs" />
      <Compile Include="Assets\Code\DroppedItem.cs" />
@@ -243,6 +245,7 @@
      <Compile Include="Assets\Code\ObjectPool.cs" />
      <Compile Include="Assets\Code\ObjectPool2.cs" />
      <Compile Include="Assets\Code\ObjectSpawner.cs" />
+     <Compile Include="Assets\Code\ObjectsSwitcher.cs" />
      <Compile Include="Assets\Code\OnDamageTakenEffects.cs" />
      <Compile Include="Assets\Code\OverrideLightSettings.cs" />
      <Compile Include="Assets\Code\OverrideSunSettings.cs" />
