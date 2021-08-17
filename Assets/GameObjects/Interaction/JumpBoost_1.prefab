@@ -121,6 +121,9 @@ MonoBehaviour:
   boostVelocity: {x: 0, y: 16, z: 0}
   standingOn: 0
   inLocalSpace: 0
+  status_emissives: []
+  active_mat: {fileID: 2100000, guid: a7106a32f9a403f43b73ce1392eed469, type: 2}
+  off_mat: {fileID: 2100000, guid: fd59be4f5745e4d4e89279cca6496baa, type: 2}
   active_y: 0
   mat1: {fileID: 2100000, guid: 49bea69ef29d24441bbed18f6b48a375, type: 2}
   mat2: {fileID: 2100000, guid: db19f79c913b32943965fbad8679af25, type: 2}

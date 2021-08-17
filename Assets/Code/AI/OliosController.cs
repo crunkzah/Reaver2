@@ -890,13 +890,13 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject
     {
         //InGameConsole.LogOrange("OliosController: Dropping health crystals");
         HealthCrystal hc = ObjectPool.s().Get(ObjectPoolKey.HealthCrystal).GetComponent<HealthCrystal>();
-        hc.Launch(parentTransform.localPosition + new Vector3(0, 1.25f, 0));
+        hc.Launch(parentTransform.localPosition + new Vector3(0, 1.25f, 0), 20);
         
         hc = ObjectPool.s().Get(ObjectPoolKey.HealthCrystal).GetComponent<HealthCrystal>();
-        hc.Launch(parentTransform.localPosition + new Vector3(0, 1.25f, 0));
+        hc.Launch(parentTransform.localPosition + new Vector3(0, 1.25f, 0), 20);
         
         hc = ObjectPool.s().Get(ObjectPoolKey.HealthCrystal).GetComponent<HealthCrystal>();
-        hc.Launch(parentTransform.localPosition + new Vector3(0, 1.25f, 0));
+        hc.Launch(parentTransform.localPosition + new Vector3(0, 1.25f, 0), 20);
     }
     
     Transform ChooseTargetClosest(Vector3 seekerPos)

@@ -423,7 +423,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     void DropHealthCrystals()
     {
         HealthCrystal hc = ObjectPool.s().Get(ObjectPoolKey.HealthCrystal).GetComponent<HealthCrystal>();
-        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0));
+        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0), 10);
     }
     
     

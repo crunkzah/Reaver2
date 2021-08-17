@@ -759,13 +759,13 @@ public class WitchController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     {
         limbForExplosions.ExplodeEveryLimb();
         HealthCrystal hc = ObjectPool.s().Get(ObjectPoolKey.HealthCrystal).GetComponent<HealthCrystal>();
-        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0));
+        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0), 10);
         
         hc = ObjectPool.s().Get(ObjectPoolKey.HealthCrystal).GetComponent<HealthCrystal>();
-        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0));
+        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0), 10);
         
         hc = ObjectPool.s().Get(ObjectPoolKey.HealthCrystal).GetComponent<HealthCrystal>();
-        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0));
+        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0), 10);
         
         //ragdollOwner.ApplyForceToHead(Vector3.up * 450 + Vector3.zero * 10);
         AudioManager.Play3D(SoundType.witch_death1, thisTransform.localPosition, 1);

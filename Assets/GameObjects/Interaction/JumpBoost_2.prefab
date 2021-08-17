@@ -196,9 +196,12 @@ MonoBehaviour:
   boostVelocity: {x: 0, y: 36, z: 0}
   standingOn: 0
   inLocalSpace: 0
+  status_emissives:
+  - {fileID: 7446686282605698684}
+  - {fileID: 9170482919249365875}
+  active_mat: {fileID: 2100000, guid: 138a13a16b6849d439ca6cae47dff1e8, type: 2}
+  off_mat: {fileID: 2100000, guid: 0a63906fbcacc5b4f9248e5197cdbc49, type: 2}
   active_y: 0
-  mat1: {fileID: 2100000, guid: 49bea69ef29d24441bbed18f6b48a375, type: 2}
-  mat2: {fileID: 2100000, guid: db19f79c913b32943965fbad8679af25, type: 2}
   mask:
     serializedVersion: 2
     m_Bits: 4096
@@ -10091,6 +10094,12 @@ PrefabInstance:
 --- !u!4 &7446686282603404444 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 0061b7c86bdf5cb4388048a37697bace,
+    type: 3}
+  m_PrefabInstance: {fileID: 7446686282603791900}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &7446686282605698684 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2300000, guid: 0061b7c86bdf5cb4388048a37697bace,
     type: 3}
   m_PrefabInstance: {fileID: 7446686282603791900}
   m_PrefabAsset: {fileID: 0}

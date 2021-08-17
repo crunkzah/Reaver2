@@ -436,9 +436,13 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
     void DropHealthCrystals()
     {
         HealthCrystal hc = ObjectPool.s().Get(ObjectPoolKey.HealthCrystal).GetComponent<HealthCrystal>();
-        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0));
+        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0), 10);
         hc = ObjectPool.s().Get(ObjectPoolKey.HealthCrystal).GetComponent<HealthCrystal>();
-        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0));
+        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0), 10);
+        hc = ObjectPool.s().Get(ObjectPoolKey.HealthCrystal).GetComponent<HealthCrystal>();
+        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0), 10);
+        hc = ObjectPool.s().Get(ObjectPoolKey.HealthCrystal).GetComponent<HealthCrystal>();
+        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0), 10);
     }
     
     const int MaxHealth = 2500;

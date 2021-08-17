@@ -11,8 +11,8 @@ public class HealthCrystal : MonoBehaviour, IPooledObject
     }
     
     
-    const float maxSpeed = 25F;
-    const float acceleration = 12F;
+    const float maxSpeed = 8F;
+    const float acceleration = 4F;
     
     float currentSpeed = 0;
     
@@ -38,15 +38,16 @@ public class HealthCrystal : MonoBehaviour, IPooledObject
     
     const float offsetVelocityMult = 0.2f;
     
-    public void Launch(Vector3 pos)
+    public void Launch(Vector3 pos, int _hp)
     {
         this.gameObject.SetActive(true);
+        
         
         isWorking = true;
         
         ps.Clear();
         ps.Play();
-        hp = 20;
+        hp = _hp;
         
         lifeTimer = Random.Range(LifeTime - 0.3f, LifeTime + 0.3f);
         // lifeTimer = LifeTime;
@@ -78,7 +79,7 @@ public class HealthCrystal : MonoBehaviour, IPooledObject
             Vector3 playerPos = PhotonManager.Singleton().local_controller.GetGroundPosition();
             playerPos.y += 1.15F;
             
-            if(lifeTimer < LifeTime - 0.25f && Math.SqrDistance(thisTransform.localPosition, playerPos) < 0.6F * 0.6F)
+            if(lifeTimer < LifeTime - 0.25f && Math.SqrDistance(thisTransform.localPosition, playerPos) < 0.8F * 0.8F)
             {
                 PhotonManager.Singleton().local_controller.Heal(hp);
                 EndLife();

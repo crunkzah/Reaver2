@@ -761,7 +761,7 @@ public class FPSGunController : MonoBehaviour
         {
             hc = ObjectPool.s().Get(ObjectPoolKey.HealthCrystal_smaller).GetComponent<HealthCrystal>(); 
             float y = Random.Range(0.75F, 1.5F);
-            hc.Launch(target_transform.position + new Vector3(0, y, 0));
+            hc.Launch(target_transform.position + new Vector3(0, y, 0), 20);
         }
     }
     
@@ -859,7 +859,7 @@ public class FPSGunController : MonoBehaviour
     }
     
     float switchWeaponTimer = 0f;
-    const float SwitchWeaponRate = 0.4F;
+    const float SwitchWeaponRate = 0.075F;
     
     // bool SwitchToPrevSlot_KeyDown()
     // {
@@ -910,15 +910,29 @@ public class FPSGunController : MonoBehaviour
         revolver_fps.anim.Play("Base.Ult", 0, 0);
     }
     
+    AnimatorStateInfo leftArmAnimatorStateInfo;
+    
     void OnRevolverUltEnded()
     {
         if(CurrentArmAnimator() != null)
         {
-            CurrentArmAnimator().Play("Base.UltToEnd", 0, 0);
+            if(revolverState == RevolverState.Ult)
+            {
+                CurrentArmAnimator().Play("Base.UltToEnd", 0, 0);
+            }
+            // leftArmAnimatorStateInfo = CurrentArmAnimator().GetCurrentAnimatorStateInfo(0);
+            // if(leftArmAnimatorStateInfo.shortNameHash == Animator.StringToHash("Base.UltToEnd"))
+            // {
+            //     InGameConsole.LogFancy(string.Format("NameHash: {0} is <color=green>OK</color>", leftArmAnimatorStateInfo.shortNameHash));
+            // }
+            // else
+            // {
+            //     InGameConsole.LogFancy(string.Format("NameHash: {0}", leftArmAnimatorStateInfo.shortNameHash));
+            // }
         }
         if(!isInBerserk)
         {
-            SetPlayerControllerNormalState();
+            pController.SetTargetFovNormal();
         }
     }
     
@@ -975,7 +989,7 @@ public class FPSGunController : MonoBehaviour
     
     int revolver_alt_fired_count            = 0;
     float revolver_charge;
-    const float revolver_chargeRate         = 2.25F;
+    const float revolver_chargeRate         = 1.25F;
     
     float Ability_R_timer                   = 0;
     float Ability_R_cooldown_timer          = 0;
@@ -1066,7 +1080,7 @@ public class FPSGunController : MonoBehaviour
         Ability_R_timer -= dt;
         if(isInBerserk)
         {
-            InGameConsole.LogFancy(string.Format("Ability_R_timer: <color=yellow>{0}</color>", Ability_R_timer.ToString("f")));
+            //InGameConsole.LogFancy(string.Format("Ability_R_timer: <color=yellow>{0}</color>", Ability_R_timer.ToString("f")));
             if(Ability_R_timer <= 0f)
             {
                 BerserkPowerDown();
@@ -1139,11 +1153,12 @@ public class FPSGunController : MonoBehaviour
             //     {
             if(Inputs.SwitchToPrevSlot_KeyDown() && pController.CanControlPlayer())
             {
-                if(slots[prevSlot] != GunType.None)
+                if(switchWeaponTimer == 0f && slots[prevSlot] != GunType.None)
                 {
                     int t = currentSlot;
                     currentSlot = prevSlot;
                     prevSlot = t;
+                    switchWeaponTimer = SwitchWeaponRate;
                     WieldGunFPS();
                 }
             }
@@ -1345,6 +1360,8 @@ public class FPSGunController : MonoBehaviour
                                 byte fpsCommand = (byte)FPS_Func.Shoot_revolver_ult;
                                 FPSCommand(fpsCommand, revolverRay.origin, revolverRay.direction);
                                 pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand, revolverRay.origin, revolverRay.direction);
+                                
+                                
                                 
                                 SetPlayerControllerNormalState();
                                 revolver_fps.shaking_mult = 0;
@@ -2369,7 +2386,7 @@ public class FPSGunController : MonoBehaviour
     
     const float shotgunSpread = 0.25F;
     // const float shotgunSpread_Alt = 0.275F * 2F;
-    const float shotgunSpread_Alt = 0.275F * 0.2F * 0.2F;
+    const float shotgunSpread_Alt = 0.275F * 0.175F * 0.175F;
     
     const int shotgunHits_len = 16;
     Collider[] shotgunHits = new Collider[shotgunHits_len];
@@ -2529,7 +2546,7 @@ public class FPSGunController : MonoBehaviour
         Ray ray = new Ray(shotPos, shotDir);
         Vector3 ortho = Vector3.Cross(shotDir, Vector3.up).normalized;
         
-        float pellet_speed = 60F;
+        float pellet_speed = 70F;
         
         bool isMine = pv.IsMine;
         

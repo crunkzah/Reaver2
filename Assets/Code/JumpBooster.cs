@@ -30,6 +30,14 @@ public class JumpBooster : MonoBehaviour, IActivatable, INetworkObject
     {
         switch(cmd)
         {
+            case(NetworkCommand.Ability1):
+            {
+                if(state == BoosterState.Off)
+                {
+                    SetState(BoosterState.Ready);
+                }
+                break;
+            }
             default:
             {
                 break;
@@ -41,7 +49,7 @@ public class JumpBooster : MonoBehaviour, IActivatable, INetworkObject
     void Awake()
     {
         net_comp = GetComponent<NetworkObject>();
-        rend = GetComponent<MeshRenderer>();
+        //rend = GetComponent<MeshRenderer>();
         
         audioSource = GetComponent<AudioSource>();
         
@@ -52,6 +60,37 @@ public class JumpBooster : MonoBehaviour, IActivatable, INetworkObject
         
         bounds = pressureBoxCollider.bounds;
         Destroy(pressureBoxCollider);
+    }
+    
+    void Start()
+    {
+        switch(state)
+        {
+            case(BoosterState.Ready):
+            {
+                int len = status_emissives.Length;
+                
+                for(int i = 0; i < len; i++)
+                {
+                    status_emissives[i].sharedMaterial = active_mat;
+                }
+                break;
+            }
+            case(BoosterState.Off):
+            {
+                int len = status_emissives.Length;
+                
+                for(int i = 0; i < len; i++)
+                {
+                    status_emissives[i].sharedMaterial = off_mat;
+                }
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        }
     }
     
     public Vector3 boostVelocity = new Vector3(0, 12, 0);
@@ -83,6 +122,11 @@ public class JumpBooster : MonoBehaviour, IActivatable, INetworkObject
         {
             bool isStandingOnNow = CheckPressure();
             
+            if(state == BoosterState.Off)
+            {
+                isStandingOnNow = false;
+            }
+            
             if(isStandingOnNow)
             {
                 if(!standingOn)
@@ -98,12 +142,12 @@ public class JumpBooster : MonoBehaviour, IActivatable, INetworkObject
                         {
                             Vector3 vel_in_localSpace = transform.TransformVector(boostVelocity);
                             player_on_booster.BoostVelocity(vel_in_localSpace);
-                            player_on_booster.secondJumpHappened = false;
                         }
                         else
                         {
                             player_on_booster.BoostVelocity(boostVelocity);
                         }
+                        player_on_booster.secondJumpHappened = false;
                             
                         
                         NetworkObjectsManager.Activate(net_comp.networkId, RpcTarget.All);
@@ -142,9 +186,20 @@ public class JumpBooster : MonoBehaviour, IActivatable, INetworkObject
     void SetState(BoosterState _state)
     {
         // InGameConsole.LogOrange(string.Format("Set state {0} on JumpBooster", state));
-        
+        if(_state == BoosterState.Ready)
+        {
+            int len = status_emissives.Length;
+            for(int i = 0; i < len; i++)
+            {
+                status_emissives[i].sharedMaterial = active_mat;
+            }
+        }
         state = _state;
     }
+    
+    public MeshRenderer[] status_emissives;
+    public Material active_mat;
+    public Material off_mat;
     
     public float active_y = 0;
     
@@ -215,13 +270,20 @@ public class JumpBooster : MonoBehaviour, IActivatable, INetworkObject
             }
             case BoosterState.Off:
             {
+                int len = status_emissives.Length;
+                
+                for(int i = 0; i < len; i++)
+                {
+                    status_emissives[i].sharedMaterial = off_mat;
+                }
+                
                 break;
             }
         }
     }
     
-    public Material mat1, mat2;
-    MeshRenderer rend;
+    //public Material mat1, mat2;
+    //MeshRenderer rend;
     
     public void Activate()
     {

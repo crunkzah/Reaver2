@@ -94,6 +94,8 @@ public class PostProcessingController2 : MonoBehaviour
     {
         if(Singleton() == null)
             return;
+            
+        //InGameConsole.LogOrange("KEK");
         
         Singleton()._SetState(_state);
     }
@@ -291,6 +293,6 @@ public class PostProcessingController2 : MonoBehaviour
         
         UpdatePostProcessing(dt);
         
-        DebugInput();
+        //DebugInput();
     }
 }

@@ -57,6 +57,9 @@ MonoBehaviour:
   sphere_radius: 0.1
   soundOnHit: 0
   max_reflects: 4
+  useGravity: 0
+  gravProjV: {x: 0, y: 0, z: 0}
+  gravityMultiplier: 1
   isShotByPlayer: 0
 --- !u!114 &4035255805648255087
 MonoBehaviour:
@@ -97,7 +100,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8119251194897059356}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.631}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1302352117761795575}
@@ -355,7 +358,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1.25
+      scalar: 1
       minScalar: 0.3
       maxCurve:
         serializedVersion: 2
@@ -4710,7 +4713,7 @@ ParticleSystem:
 --- !u!199 &6298539042323394809
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}

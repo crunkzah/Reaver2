@@ -503,9 +503,9 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
     void DropHealthCrystals()
     {
         HealthCrystal hc = ObjectPool.s().Get(ObjectPoolKey.HealthCrystal).GetComponent<HealthCrystal>();
-        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0));
+        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0), 10);
         hc = ObjectPool.s().Get(ObjectPoolKey.HealthCrystal).GetComponent<HealthCrystal>();
-        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0));
+        hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0), 10);
     }
     
     const int MaxHealth = 800;
@@ -1016,6 +1016,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                 Vector3 velDir = velocity.normalized;
                 
                 Vector3 capsulePBottom = GetCapsulePointBottom();
+                capsulePBottom.y += 0.05f;
                 Vector3 capsulePTop = GetCapsulePointTop();
                 
                 gizmoP1 = capsulePBottom;
@@ -1276,6 +1277,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                 Vector3 velDir = velocity.normalized;
                 
                 Vector3 capsulePBottom = GetCapsulePointBottom();
+                capsulePBottom.y += 0.05f;
                 Vector3 capsulePTop = GetCapsulePointTop();
                 
                 float capsuleRadius = col.radius;

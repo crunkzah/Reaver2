@@ -101,7 +101,7 @@ PrefabInstance:
     - target: {fileID: 4219788296332181691, guid: a06f05f52e40f9a43b8ebdf7f015497f,
         type: 3}
       propertyPath: boostVelocity.y
-      value: 24
+      value: 25.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a06f05f52e40f9a43b8ebdf7f015497f, type: 3}

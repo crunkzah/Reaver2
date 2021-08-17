@@ -133,8 +133,11 @@ public class Revolver : MonoBehaviour
         {
             shaking_mult_smoothed = shaking_mult;
         }
-        revolver_holder_fps.localPosition = Math.SmoothStepVector(revolver_holder_normalPos, revolver_holder_chargingPos, shaking_mult_smoothed);
-        revolver_sway.offsetRot.x = Mathf.SmoothStep(0f, 18f, shaking_mult_smoothed);
+        
+        float t_lerpVector = shaking_mult_smoothed * 2.5f;
+        
+        revolver_holder_fps.localPosition = Math.SmoothStepVector(revolver_holder_normalPos, revolver_holder_chargingPos, t_lerpVector);
+        revolver_sway.offsetRot.x = Mathf.SmoothStep(0f, 18f, t_lerpVector);
         //revolver_holder_fps.localPosition = Math.Lerp(revolver_holder_normalPos, revolver_holder_chargingPos, shaking_mult_smoothed);
         
         if(shaking_mult > 0f)

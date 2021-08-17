@@ -33,7 +33,7 @@ public class SafeLimiter : MonoBehaviour
             else
             {
                 
-                if(bounds.Contains(local_pc.GetGroundPosition()))
+                if(bounds.Contains(local_pc.GetHeadPosition()))
                 {
                     timer = 0.33f;
                     local_pc.TakeDamageNonLethal(25);

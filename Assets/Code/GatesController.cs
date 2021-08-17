@@ -50,6 +50,8 @@ public class GatesController : MonoBehaviour, INetworkObject
     public ParticleSystem locked_ps1;
     public ParticleSystem locked_ps2;
     
+    public int open_msgs_num = 1;
+    
     //public GameObject[] locks;
     
     NetworkObject net_comp;
@@ -60,7 +62,11 @@ public class GatesController : MonoBehaviour, INetworkObject
         {
             case(NetworkCommand.OpenGates):
             {
-                Open();
+                open_msgs_num--;
+                if(open_msgs_num <= 0)
+                {
+                    Open();
+                }
                 break;
             }
             case(NetworkCommand.LockGates):
