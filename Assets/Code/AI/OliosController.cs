@@ -263,18 +263,18 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject
         HitPoints = MaxHealth;
     }
     
-    const int MaxHealth = 5000;
+    const int MaxHealth = 7500;
     public int HitPoints = MaxHealth;
     
     float brainTimer = 0;
     float moveTimer = 0;
     
-    const float moveCooldown = 7F;
+    const float moveCooldown = 5F;
     const float dashRange = 7F;
     
     int strikeCount = 0;
-    const float strikeCooldown_minor = 2F;
-    const float strikeCooldown_major = 3F;
+    const float strikeCooldown_minor = 1.7F;
+    const float strikeCooldown_major = 2.5F;
     
     void UpdateBrain(float dt)
     {

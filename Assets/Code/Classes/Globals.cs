@@ -193,6 +193,13 @@ public static class Math
         return new Vector2(x1, x2);
     }
     
+    public static Vector3 RandomVector()
+    {
+        Vector3 result = new Vector3(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
+        
+        return result;
+    }
+    
     public static float Max(float a, float b)
     {
         return a > b ? a : b;

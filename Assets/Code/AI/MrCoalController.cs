@@ -134,21 +134,28 @@ public class MrCoalController : MonoBehaviour, INetworkObject, Interactable
                 }
                 break;
             }
-            case(NetworkCommand.Die):
+            case(NetworkCommand.Ability3):
             {
                 Die();
                 break;
             }
+            case(NetworkCommand.Die):
+            {
+                Invoke(nameof(Die), 2);
+                break;
+            }
             case(NetworkCommand.TakeDamage):
             {
-                if(PhotonNetwork.IsMasterClient)
-                {
-                    if(HitPoints == MaxHealth)
-                    {
-                        agent.speed = agent.speed * 2;
-                    }
+                if(agent.speed != 18)
+                    agent.speed = 18;
+                // if(PhotonNetwork.IsMasterClient)
+                // {
                     
-                }
+                    // if(HitPoints == MaxHealth)
+                    // {
+                    // }
+                    
+                // }
                 break;
             }
             default:
@@ -166,10 +173,40 @@ public class MrCoalController : MonoBehaviour, INetworkObject, Interactable
         agent.SetDestination(pos);
     }
     
+    public ParticleSystem ps_explode;
+    public ParticleSystem[] lasers_ps;
+    //public AudioSource audioSrc_explode;
+    
+    void OnDie()
+    {
+        Vector3 pos = thisTransform.position + new Vector3(0, 2, 0) + 1.5f * Math.RandomVector();
+        ParticlesManager.PlayPooled(ParticleType.hurt1_ps, thisTransform.position, new Vector3(0, 0, 1));
+        ObjectPool.s().Get(ObjectPoolKey.BloodSprayer, false).GetComponent<BloodStainSprayer>().MakeStains(thisTransform.position + new Vector3(0, 1, 0));
+    }
+    
     void Die()
     {
+        ps_explode.transform.SetParent(null);
+        ps_explode.Play();
+        ps_explode.GetComponent<AudioSource>().Play();
+        
+        Invoke(nameof(OnDie), 0.2f);
+        Invoke(nameof(OnDie), 0.4f);
+        Invoke(nameof(OnDie), 0.6f);
+        
+        if(lasers_ps != null)
+        {
+            for(int i = 0; i < lasers_ps.Length; i++)
+            {
+                lasers_ps[i].Play();
+            }
+        }
+        
+        meshRenderer.gameObject.SetActive(false);
+        skeleton_root.gameObject.SetActive(false);
         col.enabled = false;
-        agent.enabled = false;
+        agent.enabled = true;
+        Destroy(this.gameObject, 7f);
     }
     
     void SetState(MrCoalState _state)
@@ -273,28 +310,36 @@ public class MrCoalController : MonoBehaviour, INetworkObject, Interactable
             case(MrCoalState.Walking):
             {
                 
-                if(agent.remainingDistance < 0.1F)
+                if(agent.enabled && agent.remainingDistance < 0.1F)
                 {
-                    
                     if(canSendCommands)
                     {
                         if(nextPathIndex < path.Length - 1)
                         {
-                            if(nextPathIndex == path.Length - 3)
-                            {
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability1);    
-                            }
-                            else
-                            if(nextPathIndex == path.Length - 2)
-                            {
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability2);
-                            }
+                            // if(nextPathIndex == path.Length - 3)
+                            // {
+                            //     NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability1);    
+                            // }
+                            // else
+                            // if(nextPathIndex == path.Length - 2)
+                            // {
+                            //     NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability2);
+                            // }
                             
                             nextPathIndex++;
                             Vector3 nextWaypointPos = path[nextPathIndex];
                             
                             LockSendingCommands();
                             NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Move, nextWaypointPos);
+                        }
+                        else
+                        {
+                            Vector3 lastWaypointPos = path[nextPathIndex];
+                            if(Math.SqrDistance(thisTransform.localPosition, lastWaypointPos) < 0.12F * 0.12F)
+                            {
+                                LockSendingCommands();
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Die);
+                            }
                         }
                     }
                 }
@@ -318,7 +363,7 @@ public class MrCoalController : MonoBehaviour, INetworkObject, Interactable
             }
             case(MrCoalState.Walking):
             {
-                float currentSpeed = Math.Magnitude(agent.velocity);
+                float currentSpeed = Math.Magnitude(agent.velocity) / 4.7f;
                 anim.SetFloat(moveSpeedHash, currentSpeed, 0.1f, dt);
                 break;
             }

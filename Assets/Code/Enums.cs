@@ -90,6 +90,7 @@ public enum NetworkCommand : byte
      CloseGates,
      ExplodeAsCorpse,
      LockGates,
+     Ability3
 }
 
 //Object pool keys:

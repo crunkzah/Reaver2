@@ -77,6 +77,9 @@ public class Checkpoint : MonoBehaviour, INetworkObject
     
     public SlidingStructure[] sliding_structures_to_call_on_activate;
     
+    [Range(0, 100)]
+    public int checkPointPriority = 0;
+    public NetworkObjectAndCommand[] messages_on_load;
     public int activate_msgs_num = 1;
     
     int playersMask = -1;
@@ -92,6 +95,9 @@ public class Checkpoint : MonoBehaviour, INetworkObject
     {
         canSendCommands = true;
     }
+    
+    
+    //public int activate_msgs_num = 1;
     
     public void ReceiveCommand(NetworkCommand command, params object[] args)
     {

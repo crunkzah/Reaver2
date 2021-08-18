@@ -245,6 +245,8 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                     return;
                 }
                 
+                airbourneTimeStamp = Time.time;
+                
                 Vector3 launchPos = (Vector3)args[0];
                 Vector3 launchVel = (Vector3)args[1];
                 
@@ -934,6 +936,12 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 velocity.y = Math.Clamp(-GRAVITY_MAX, GRAVITY_MAX, velocity.y);
                 
                 
+                if(airbourneTimeStamp > airbourneTimeStamp + 15f)
+                {
+                    LockSendingCommands();
+                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.DieWithForce, new Vector3(0, 0, 0));
+                }
+                
                 RaycastHit hit;
                 
                 float velMag = Math.Magnitude(velocity);
@@ -1022,6 +1030,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     public Vector3 velocity;
     const float GRAVITY_Y = Globals.NPC_gravity;//-9.8F;
     const float GRAVITY_MAX = 50F;
+    float airbourneTimeStamp = 0;
     
   
     
