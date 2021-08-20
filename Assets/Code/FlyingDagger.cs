@@ -106,7 +106,7 @@ public class FlyingDagger : MonoBehaviour
     float blip_cd = 0;
     
     const float explosion_radius = 5;
-    const int explosion_damage = 25;
+    const int explosion_damage_to_player = 20;
     
     MeshRenderer rend;
     
@@ -149,29 +149,30 @@ public class FlyingDagger : MonoBehaviour
         
         
         //Apply damage to local player:
-        PlayerController local_pc;
-        local_pc = PhotonManager.GetLocalPlayer();
-        if(local_pc)
-        {
-            Vector3 playerPos = local_pc.controller.ClosestPoint(explode_pos);
-            if(Math.SqrDistance(playerPos, explode_pos) < explosion_radius * explosion_radius)
-            {
-                float distance = Vector3.Distance(playerPos, explode_pos);
-                Vector3 dir = (explode_pos - playerPos).normalized;
+        // PlayerController local_pc;
+        // local_pc = PhotonManager.GetLocalPlayer();
+        // if(local_pc)
+        // {
+        //     Vector3 playerPos = local_pc.controller.ClosestPoint(explode_pos);
+        //     if(Math.SqrDistance(playerPos, explode_pos) < explosion_radius * explosion_radius)
+        //     {
+        //         float distance = Vector3.Distance(playerPos, explode_pos);
+        //         Vector3 dir = (explode_pos - playerPos).normalized;
                 
-                // if(!Physics.Raycast(explode_pos, dir, distance))
-                // {
-                    local_pc.TakeDamage(explosion_damage);
-                    FollowingCamera.Singleton().ShakeXZ(1.5f);
-                // }
-            }
-        }
+        //         // if(!Physics.Raycast(explode_pos, dir, distance))
+        //         // {
+        //             local_pc.TakeDamage(explosion_damage);
+        //             FollowingCamera.Singleton().ShakeXZ(1.5f);
+        //         // }
+        //     }
+        // }
         
         GameObject obj = ObjectPool.s().Get(ObjectPoolKey.Kaboom1, false);
         
         bool isExplosionMine = PhotonNetwork.IsMasterClient;
         
-        obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, 6, 0.01f, 300, isExplosionMine);
+        
+        obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, 3, 10F, 0, isExplosionMine, true, explosion_damage_to_player);
         
         audio_src.loop = false;
         //InGameConsole.LogFancy("Explode dagger!");

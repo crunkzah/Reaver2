@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class FinishCheckpoint : MonoBehaviour
 {
     Vector3 worldPos;
-    float radius = 2;
+    public float radius = 2;
     
     void Awake()
     {

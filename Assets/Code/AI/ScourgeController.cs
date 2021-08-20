@@ -43,6 +43,10 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
     
     SpawnedObject spawnedObjectComp;
     
+    public SkinnedMeshRenderer smr;
+    public Material normalEyesMat;
+    public Material angryEyesMat;
+    
     void Awake()
     {
         spawnedObjectComp = GetComponent<SpawnedObject>();
@@ -362,6 +366,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
             return;
         }
         
+        smr.sharedMaterials[1] = normalEyesMat;
         
         switch(_state)
         {
@@ -378,7 +383,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
             case(ScourgeState.Chasing):
             {
                 distanceTravelledRunningSqr = 0;
-                brainTimer = 0;
+                brainTimer = 0.33f;
                 break;
             }
             case(ScourgeState.Fleeing):
@@ -389,7 +394,8 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
             case(ScourgeState.Shooting):
             {
                 eye_ps.Play();
-                brainTimer = 0.33F;
+                smr.sharedMaterials[1] = angryEyesMat;
+                brainTimer = 0.0F;
                 shotsPerformed = 0;
                 break;
             }
@@ -423,6 +429,11 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
         
         if(spawnedObjectComp)
             spawnedObjectComp.OnObjectDied();
+            
+        if(coat)
+        {
+            Destroy(coat);
+        }
         
         SetState(ScourgeState.Dead);
         
@@ -482,6 +493,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                 len = limbs.Length;
                 for(int i = 0; i < len; i++)
                 {
+                    limbs[i].MakeLimbDead();
                     if(limbs[i].limb_id == limb_to_destroy)
                     {
                         Vector3 f = force;
@@ -494,7 +506,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                         }
                         //limbs[i].AddForceToLimb(f);
                         
-                        break;
+                        //break;
                     }
                 }
             }
@@ -694,6 +706,8 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
     const float fleeingTimeout = 3F;
     const float fleeingComfortDistance = 12F;
     const float fleeingRange = 9F;
+    
+    public GameObject coat;
     
     void UpdateBrain(float dt)
     {

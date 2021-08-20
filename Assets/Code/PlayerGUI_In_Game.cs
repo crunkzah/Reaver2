@@ -52,7 +52,10 @@ public class PlayerGUI_In_Game : MonoBehaviour
         fpsCamera = _fpsCamera;
     }
     
-    
+    public void ReleasePlayerGUI()
+    {
+        localPlayer = null;
+    }
     
     void Update()
     {

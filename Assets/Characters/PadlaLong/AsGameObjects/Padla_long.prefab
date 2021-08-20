@@ -6292,7 +6292,7 @@ MonoBehaviour:
   joints: []
   react: 1
   isRootLimb: 0
-  isHeadshot: 0
+  isHeadshot: 1
   canBeDestroyed: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 7

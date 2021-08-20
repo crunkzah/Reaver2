@@ -24,7 +24,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _CloudsRamp:
-        m_Texture: {fileID: 2800000, guid: af492fd72fe40bb4ca88d6c49f976e8e, type: 3}
+        m_Texture: {fileID: 2800000, guid: 750e0cd3d64ae2a459c39cd94e19948c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _CloudsTexture:

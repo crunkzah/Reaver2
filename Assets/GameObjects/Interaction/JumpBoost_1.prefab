@@ -125,8 +125,6 @@ MonoBehaviour:
   active_mat: {fileID: 2100000, guid: a7106a32f9a403f43b73ce1392eed469, type: 2}
   off_mat: {fileID: 2100000, guid: fd59be4f5745e4d4e89279cca6496baa, type: 2}
   active_y: 0
-  mat1: {fileID: 2100000, guid: 49bea69ef29d24441bbed18f6b48a375, type: 2}
-  mat2: {fileID: 2100000, guid: db19f79c913b32943965fbad8679af25, type: 2}
   mask:
     serializedVersion: 2
     m_Bits: 4096
@@ -154,10 +152,10 @@ BoxCollider:
   m_GameObject: {fileID: 3023539518760686716}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 3.1299403, y: 1.5589526, z: 3.1299403}
-  m_Center: {x: 0, y: 0.1484389, z: 0}
+  m_Size: {x: 3.1299403, y: 1.1827856, z: 3.1299403}
+  m_Center: {x: 0, y: -0.03964454, z: 0}
 --- !u!82 &6038643900267325770
 AudioSource:
   m_ObjectHideFlags: 0

@@ -464,6 +464,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 len = limbs.Length;
                 for(int i = 0; i < len; i++)
                 {
+                    limbs[i].MakeLimbDead();
                     if(limbs[i].limb_id == limb_to_destroy)
                     {
                         Vector3 f = force;
@@ -476,7 +477,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                         }
                         //limbs[i].AddForceToLimb(f);
                         
-                        break;
+                        //break;
                     }
                 }
             }
@@ -793,6 +794,8 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             case(StepaState.Shooting):
             {
                 brainTimer += dt;
+                //WarpRemoteAgent();
+                
                 if(brainTimer >= shootingDuration)
                 {
                     if(canSendCommands)
@@ -1115,7 +1118,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                     if(distanceTravelledRunningSqr  > footStepDistance * footStepDistance)
                         distanceTravelledRunningSqr = 0;
                     
-                    audio_src.PlayOneShot(clipStep, 0.33F);
+                    //audio_src.PlayOneShot(clipStep, 0.33F);
                 }
                 
                 break;
@@ -1147,7 +1150,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                     if(distanceTravelledRunningSqr  > footStepDistance * footStepDistance)
                         distanceTravelledRunningSqr = 0;
                     
-                    audio_src.PlayOneShot(clipStep, 0.6F);
+                    //audio_src.PlayOneShot(clipStep, 0.6F);
                 }
                 
                 break;
@@ -1180,7 +1183,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                     if(distanceTravelledRunningSqr  > footStepDistance * footStepDistance)
                         distanceTravelledRunningSqr = 0;
                     
-                    audio_src.PlayOneShot(clipStep, 0.4f);
+                    //audio_src.PlayOneShot(clipStep, 0.4f);
                 }
                 
                 break;

@@ -11,6 +11,7 @@ public class Kaboom1 : MonoBehaviour
     
     
     static int enemyExplosionMask = -1;
+    static int limbExplosionMask = -1;
     
     void Awake()
     {
@@ -19,12 +20,13 @@ public class Kaboom1 : MonoBehaviour
         if(enemyExplosionMask == -1)
         {
             enemyExplosionMask = LayerMask.GetMask("NPC2");
+            limbExplosionMask = LayerMask.GetMask("NPC");
         }
     }
     
     public void Explode(Vector3 pos)
     {
-        DoExplosion(pos, radius, 10f);
+//        DoExplosion(pos, radius, 10f);
     }
     
     
@@ -45,36 +47,56 @@ public class Kaboom1 : MonoBehaviour
     
     bool isMine = false;
     
-    public void ExplodeDamageHostile(Vector3 pos, float radius, float force_magnitude, int dmg, bool _isMine)
+    public bool canDamageLocalPlayer = false;
+    public bool canDamageNPCs = true;
+    public int explosionPlayerDamage = 5;
+    
+    Collider[] limbs_to_explode = new Collider[128];
+    
+    public void ExplodeDamageHostile(Vector3 pos, float radius, float force_magnitude, int explosionDamage, bool _isMine, bool _canDamageLocalPlayer = false, int _playerExplosionDamage = 0)
     {
         float explosion_scale = radius * explosion_default_scale;
         ps.transform.localScale = new Vector3(explosion_scale, explosion_scale, explosion_scale);
         
+        canDamageLocalPlayer = _canDamageLocalPlayer;
+        explosionPlayerDamage = _playerExplosionDamage;
+        
         isMine = _isMine;
-        
-        // Debug.DrawRay(pos, Vector3.up * radius, Color.green, 3);
-        // Debug.DrawRay(pos, Vector3.right * radius, Color.red, 3);
-        // Debug.DrawRay(pos, Vector3.left * radius, Color.red, 3);
-        // Debug.DrawRay(pos, Vector3.down * radius, Color.green, 3);
-        // Debug.DrawRay(pos, Vector3.forward * radius, Color.cyan, 3);
-        // Debug.DrawRay(pos, Vector3.back * radius, Color.cyan, 3);
-        
-        // InGameConsole.LogOrange("Explosion_scale is <color=green>" + explosion_scale.ToString() + "</color>" + " : Radius is <color=green>" + radius.ToString("f") + "</color>");
-        
         ps.Clear();
         ps.Play();
-        //audioSource.Play();
-        audioSource.PlayOneShot(audioSource.clip);
-        
-        
-        
-        
+        float _pitch = 1;//Random.Range(0.7f, 1.4f);
+        AudioManager.MakeExplosionAt(pos, 1, _pitch);
         
         if(isMine)
         {
             InGameConsole.LogFancy("ExplodeDamageHostile is <color=green>Mine</color>");
             targetsHit = Physics.OverlapSphereNonAlloc(pos, radius, hits, enemyExplosionMask);
             targetsHit = Mathf.Min(targetsHit, hits.Length);
+            
+            int slammed_limbs_len = Physics.OverlapSphereNonAlloc(pos, radius * 0.66f, limbs_to_explode, limbExplosionMask);
+            for(int  j = 0; j < slammed_limbs_len; j++)
+            {
+                DamagableLimb limb = limbs_to_explode[j].GetComponent<DamagableLimb>();
+                if(limb && limb.CanBeStompedOn())
+                {
+                    limb.TakeDamageLimb(3500);
+                    InGameConsole.LogFancy("ExplodingLimb");
+                }
+            }
+            
+            slammed_limbs_len = Physics.OverlapSphereNonAlloc(pos, radius * 1.2f, limbs_to_explode, limbExplosionMask);
+            for(int  j = 0; j < slammed_limbs_len; j++)
+            {
+                Rigidbody rb;
+                rb = limbs_to_explode[j].GetComponent<Rigidbody>();
+                if(rb && rb.isKinematic == false)
+                {
+                    Vector3 dir = (rb.transform.position - pos).normalized;
+                    dir += new Vector3(0, 0.1f, 0);
+                    //InGameConsole.LogOrange("Trying to add force to rigidbody");
+                    rb.AddForce(dir * force_magnitude * 10, ForceMode.Impulse);
+                }
+            }
             
             
             if(targetsHit > 0)
@@ -84,7 +106,7 @@ public class Kaboom1 : MonoBehaviour
                 for(int i = 0; i < targetsHit; i++)
                 {
                     InGameConsole.LogFancy(string.Format("Target is {0}", hits[0].gameObject.name));
-                    if(isMine)
+                    if(isMine && canDamageNPCs)
                     {
                         NetworkObject net_comp = hits[i].GetComponent<NetworkObject>();
                         if(net_comp)
@@ -93,10 +115,11 @@ public class Kaboom1 : MonoBehaviour
                             IDamagableLocal idl = net_comp.GetComponent<IDamagableLocal>();
                             if(idl != null)
                             {
-                                if(idl.GetCurrentHP() - dmg <= 0)
+                                if(idl.GetCurrentHP() - explosionDamage <= 0)
                                 {
                                     Vector3 dieForce_dir = Math.Normalized(hits[i].ClosestPoint(pos) - pos);
-                                    NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.DieWithForce, dmg * dieForce_dir);
+                                    byte limb_id_rnd = (byte)Random.Range(1, 6);
+                                    NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.DieWithForce, 4 * explosionDamage * dieForce_dir, limb_id_rnd);
                                 }
                                 else
                                 {
@@ -105,7 +128,8 @@ public class Kaboom1 : MonoBehaviour
                                     //force.y += 5;
                                     Vector3 launchPos = hits[i].transform.position;
                                     NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.LaunchAirborne, launchPos, force);
-                                    NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.TakeDamage, dmg);
+                                    NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.TakeDamage, explosionDamage);
+                                    
                                     
                                      //NetworkObjectsManager.PackNetworkCommand(npc_net_id, NetworkCommand.LaunchAirborne, force);
                                     //  NetworkObjectsManager.PackNetworkCommand(npc_net_id, NetworkCommand.TakeDamage, dmg);
@@ -119,6 +143,9 @@ public class Kaboom1 : MonoBehaviour
                     {
                         limb_explosion.OnExplodeAffected();
                     }
+                    
+                    //int slammed_limbs_len = Physics.OverlapBoxNonAlloc(slamImpactPos, new Vector3(box_size_x, box_size_y, box_size_z), limbs_to_explode, thisTransform.localRotation, slamMask);
+            
                     
                   
                 }
@@ -151,6 +178,11 @@ public class Kaboom1 : MonoBehaviour
                 float x = Mathf.InverseLerp(0, radius, distance);
                 float trauma = Mathf.Lerp(1f, 3f, x);
                 CameraShaker.MakeTrauma(trauma);
+                
+                if(canDamageLocalPlayer)
+                {
+                    local_pc.TakeDamage(explosionPlayerDamage);
+                }
             }
         }
         
@@ -160,38 +192,38 @@ public class Kaboom1 : MonoBehaviour
     
     const float explosion_default_scale = 1F;
     
-    void DoExplosion(Vector3 pos, float radius, float force_magnitude)
-    {
-        float explosion_scale = radius * explosion_default_scale;
-        ps.transform.localScale = new Vector3(explosion_scale, explosion_scale, explosion_scale);
+    // void DoExplosion(Vector3 pos, float radius, float force_magnitude)
+    // {
+    //     float explosion_scale = radius * explosion_default_scale;
+    //     ps.transform.localScale = new Vector3(explosion_scale, explosion_scale, explosion_scale);
         
-        ps.Clear();
-        ps.Play();
-        // audioSource.Stop();
-        audioSource.PlayOneShot(audioSource.clip);
+    //     ps.Clear();
+    //     ps.Play();
+    //     // audioSource.Stop();
+    //     audioSource.PlayOneShot(audioSource.clip);
         
-        transform.localPosition = pos;
+    //     transform.localPosition = pos;
         
-        PlayerController localPlayer = PhotonManager.Singleton().local_controller;
-        if(localPlayer)
-        {
-            Vector3 localFPSPosition = localPlayer.GetFPSPosition();
-            float distance = Vector3.Distance(localFPSPosition, pos);
-            if(distance < radius)
-            {
-                localPlayer.TakeDamageOnline(1);
-                Vector3 dir = localFPSPosition - pos;
-                dir.y = 0;
-                dir = Math.Normalized(dir);
+    //     PlayerController localPlayer = PhotonManager.Singleton().local_controller;
+    //     if(localPlayer)
+    //     {
+    //         Vector3 localFPSPosition = localPlayer.GetFPSPosition();
+    //         float distance = Vector3.Distance(localFPSPosition, pos);
+    //         if(distance < radius)
+    //         {
+    //             localPlayer.TakeDamageOnline(1);
+    //             Vector3 dir = localFPSPosition - pos;
+    //             dir.y = 0;
+    //             dir = Math.Normalized(dir);
                 
-                Vector3 force = dir * force_magnitude;
+    //             Vector3 force = dir * force_magnitude;
                 
-                FollowingCamera.Singleton().ShakeXZ(1.5f);
+    //             FollowingCamera.Singleton().ShakeXZ(1.5f);
                 
-                localPlayer.BoostVelocity(force);
-            }
-        }
-    }
+    //             localPlayer.BoostVelocity(force);
+    //         }
+    //     }
+    // }
     
     
 #if false && UNITY_EDITOR

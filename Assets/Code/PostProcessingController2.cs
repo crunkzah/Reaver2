@@ -10,7 +10,7 @@ public struct PostProcessingControls
     public float saturation;
     public float contrast;
     public float chromaticAberration;
-    
+    //public Vector3 redChannel;
 }
 
 public enum PostProcessingState
@@ -65,6 +65,7 @@ public class PostProcessingController2 : MonoBehaviour
         colorGradingSettings_active.basic.contrast = ppc_active.contrast;
         colorGradingSettings_active.basic.saturation = ppc_active.saturation;
         colorGradingSettings_active.basic.postExposure = ppc_active.postExposure;
+        //colorGradingSettings_active.channelMixer.red = ppc_active.redChannel;
         
         profile_active.colorGrading.settings = colorGradingSettings_active;
         

@@ -346,7 +346,7 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 100
+  Priority: 232
   DopplerLevel: 1
   MinDistance: 2
   MaxDistance: 12
@@ -557,6 +557,7 @@ MonoBehaviour:
   isRootLimb: 1
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 1
   adjacentLimbs: []
@@ -755,6 +756,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 2
   adjacentLimbs: []
@@ -918,6 +920,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 4
   adjacentLimbs: []
@@ -1051,6 +1054,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 6
   adjacentLimbs: []
@@ -1184,6 +1188,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 4848814676054898576}
   limb_id: 3
   adjacentLimbs: []
@@ -1317,6 +1322,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 1635240522946099590}
   limb_id: 5
   adjacentLimbs: []
@@ -1420,6 +1426,7 @@ MonoBehaviour:
   remoteAgent_prefab: {fileID: 1946857202707002727, guid: 1fd4cafed85eaa148877fb6ceb5a4cbc,
     type: 3}
   audio_src: {fileID: 0}
+  limbs: []
   trail_spine: {fileID: 6320656908697318067}
   canSendCommands: 1
   HitPoints: 300
@@ -1508,7 +1515,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 922ac1b66467a8142a190c0acfc8c6cb, type: 2}
+  - {fileID: 2100000, guid: b5faa22cd2339434d94466e00b1968cd, type: 2}
   - {fileID: 2100000, guid: fc5c00f7995f9de4fa6c4fbe30095b19, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -1685,6 +1692,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 9
   adjacentLimbs: []
@@ -1818,6 +1826,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 12
   adjacentLimbs: []
@@ -1951,6 +1960,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 8
   adjacentLimbs: []
@@ -2084,6 +2094,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 11
   adjacentLimbs: []
@@ -2246,6 +2257,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 1
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 6382572809956517159}
   limb_id: 7
   adjacentLimbs: []

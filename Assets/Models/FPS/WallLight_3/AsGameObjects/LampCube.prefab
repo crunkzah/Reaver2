@@ -222,13 +222,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: 77fabe44ba288994882ea464ce92c210, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 7e8c16dc6833a6442a0871f4fee7fc64, type: 2}
+    - target: {fileID: 2300000, guid: 77fabe44ba288994882ea464ce92c210, type: 3}
       propertyPath: m_ScaleInLightmap
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2300000, guid: 77fabe44ba288994882ea464ce92c210, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 5c73b69c5ffe2544c9a122587677c071, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 77fabe44ba288994882ea464ce92c210, type: 3}
 --- !u!4 &8337642860689502176 stripped

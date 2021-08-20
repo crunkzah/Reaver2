@@ -23,7 +23,39 @@ public class DamagableLimb : MonoBehaviour
     public bool isRootLimb = false;
     public bool isHeadshot = false;
     public bool canBeDestroyed = false;
+    [SerializeField]bool isMasterAlive = true;
+    float timeStampWhenDead = -1;
     
+    
+    public void MakeLimbDead()
+    {
+        //InGameConsole.LogFancy(string.Format("MakeLimbDead <color=yellow>({0})</color>", this.transform.name));
+        isMasterAlive = false;
+        timeStampWhenDead = Time.time;
+    }
+    
+    public bool CanBeStompedOn()
+    {
+        if(!canBeDestroyed)
+        {
+            return false;
+        }
+        
+        if(isMasterAlive)
+        {
+            //InGameConsole.LogFancy(string.Format("<color=red>Can't be stomped on</color> case 1, limb: <color=yellow>{0}</color>", this.transform.name));
+            return false;
+        }
+        
+        if(Time.time > timeStampWhenDead + 0.1f)
+        {
+            //InGameConsole.LogFancy("<color=green>Can be stomped on</color>");   
+            return true;
+        }
+        
+        //InGameConsole.LogFancy("<color=red>Can't be stomped on</color> case 2");
+        return false;
+    }
     
     
     
@@ -135,6 +167,7 @@ public class DamagableLimb : MonoBehaviour
         {
             deadLimb_ps.Play();
         }
+        
         
         canBeDestroyed = false;
         

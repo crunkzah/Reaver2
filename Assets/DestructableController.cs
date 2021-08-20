@@ -46,6 +46,7 @@ public class DestructableController : MonoBehaviour, INetworkObject
     public Vector3 offsetToPlaceBeforeBlowUp = new Vector3(240, 0, 0);
     
     public FloorDestructable999[] premadeDestructables;
+    public GameObject[] object_to_setActive_after_destruction;
         
     void Start()
     {
@@ -67,6 +68,14 @@ public class DestructableController : MonoBehaviour, INetworkObject
                 premadeDestructables[i].transform.localPosition += offsetToPlaceBeforeBlowUp;
             }
             
+        }
+        
+        if(object_to_setActive_after_destruction != null)
+        {
+            for(int i = 0; i < object_to_setActive_after_destruction.Length; i++)
+            {
+                object_to_setActive_after_destruction[i].SetActive(false);
+            }
         }
     }
     
@@ -125,6 +134,14 @@ public class DestructableController : MonoBehaviour, INetworkObject
             for(int i = 0; i < objects_to_set_active.Length; i++)
             {
                 objects_to_set_active[i].SetActive(true);
+            }
+        }
+        
+        if(object_to_setActive_after_destruction != null)
+        {
+            for(int i = 0; i < object_to_setActive_after_destruction.Length; i++)
+            {
+                object_to_setActive_after_destruction[i].SetActive(true);
             }
         }
         

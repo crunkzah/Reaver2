@@ -101,6 +101,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
             LockCursor();
             wind_audioSource.enabled = true;
             
+            windPsUp_main = windPsUp.main;
+            windPsDown_main = windPsDown.main;
             //Physics.M
             
             player_renderer.enabled = false;
@@ -231,6 +233,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
         {
             SetFPSCameraToPlayer();
             PostProcessingController2.SetState(PostProcessingState.Normal);  
+            OrthoCamera.Hide();
+            DeadGUI.Hide();
                
             //playerCamera.GetComponent<FollowingCamera>().SetTarget(this.transform);
         }
@@ -1017,19 +1021,43 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     //public float slam_delay = 0.120F;
     
+    Collider[] slam_pounded_limbs = new Collider[64];
+    //const float slam_pound_limbs_radius = 2.5F;
+    
+    const float box_size_x = 1.1F;
+    const float box_size_y = 0.33F;
+    const float box_size_z = 1.1F;
+    
     [PunRPC]
     void OnGroundSlammed(Vector3 slamImpactPos)
     {
         Vector3 slamFXDir = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
         ParticlesManager.PlayPooled(ParticleType.groundSlam1_ps, slamImpactPos, slamFXDir);
         AudioManager.Play3D(SoundType.Explosion_1, slamImpactPos, 0.5f);
+        
+        int slammed_limbs_len = Physics.OverlapBoxNonAlloc(slamImpactPos, new Vector3(box_size_x, box_size_y, box_size_z), slam_pounded_limbs, thisTransform.localRotation, slamMask);
+            
+        for(int  i = 0; i < slammed_limbs_len; i++)
+        {
+            DamagableLimb limb = slam_pounded_limbs[i].GetComponent<DamagableLimb>();
+            if(limb && limb.CanBeStompedOn())
+            {
+                limb.TakeDamageLimb(3500);
+                //InGameConsole.LogFancy("DoingDamageToLimb");
+            }
+        }
+        
         //InGameConsole.LogOrange("<color=red><b>OnGroundSlammed()</b></color>");
         
         Vector3 slam_pos = slamImpactPos + new Vector3(0, 0.05f, 0);
         
         GameObject groundSlam_go = ObjectPool.s().Get(ObjectPoolKey.DeferredGroundSlam, false);
         DeferredGroundSlam deferredSlam = groundSlam_go.GetComponent<DeferredGroundSlam>();
-        deferredSlam.DoDeferredSlam(slam_pos, (float)UberManager.GetPhotonTimeDelayedBy(GetGroundSlamDelay()), 16, pv.IsMine);
+        
+        float _slamForce = Math.Abs(groundSlamStartPos.y - slamImpactPos.y);// Globals.NPC_gravity;
+        _slamForce = Mathf.Max(16f, _slamForce);
+        _slamForce *= 1.1F;
+        deferredSlam.DoDeferredSlam(slam_pos, (float)UberManager.GetPhotonTimeDelayedBy(GetGroundSlamDelay()), _slamForce, pv.IsMine);
         
         if(pv.IsMine)
         {
@@ -1695,6 +1723,12 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     public AudioSource wind_audioSource;
     
+    public ParticleSystem windPsUp;
+    public ParticleSystem windPsDown;
+    
+    ParticleSystem.MainModule windPsUp_main;
+    ParticleSystem.MainModule windPsDown_main;
+    
     void WindTick()
     {
         float vol = 0;
@@ -1703,6 +1737,30 @@ public class PlayerController : MonoBehaviour, IPunObservable
         vol = Mathf.Lerp(0f, 1f, vol_t);
         
         wind_audioSource.volume = vol;
+        
+        if(fpsVelocity.y > 30)
+        {
+            windPsDown.Stop(); 
+            if(!windPsUp.isPlaying)
+            {
+                windPsUp.Play();
+            }
+            else
+            {
+                //
+                windPsUp_main.simulationSpeed = 3 * Mathf.InverseLerp(30f, 50f, fpsVelocity.y);
+            }
+        }
+        else if(fpsVelocity.y < -30)
+        {
+           windPsUp.Stop(); 
+           windPsDown_main.simulationSpeed = 3 * Mathf.InverseLerp(-30f, -50f, fpsVelocity.y);
+        }
+        else
+        {
+           windPsUp.Stop();
+           windPsDown.Stop(); 
+        }
     }
     
     void Update()
@@ -1843,7 +1901,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     }
     
     [Header("Stats:")]
-    const int MaxHealth = 100;
+    const int MaxHealth = 10000;
     public int HitPoints;
     const float MaxStamina = 100;
     public float Stamina;
@@ -2140,7 +2198,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
         if(pv.IsMine)
         {
+            PlayerGUI_In_Game.Singleton().ReleasePlayerGUI();
             PostProcessingController2.SetState(PostProcessingState.PlayerDead);
+            OrthoCamera.Show();
+            DeadGUI.Show();
             Transform _camTr = FollowingCamera.Singleton().transform;
             Rigidbody _camRb = _camTr.gameObject.AddComponent<Rigidbody>();
             

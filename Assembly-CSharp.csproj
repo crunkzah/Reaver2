@@ -63,6 +63,7 @@
      <Compile Include="Assets\Code\AI\MrCoalController.cs" />
      <Compile Include="Assets\Code\AI\OliosController.cs" />
      <Compile Include="Assets\Code\AI\PadlaController.cs" />
+     <Compile Include="Assets\Code\AI\PadlaHangingController.cs" />
      <Compile Include="Assets\Code\AI\PadlaLongController.cs" />
      <Compile Include="Assets\Code\AI\PlayerInventory.cs" />
      <Compile Include="Assets\Code\AI\ScourgeController.cs" />
@@ -118,6 +119,7 @@
      <Compile Include="Assets\Code\AudioCode\AudioManager.cs" />
      <Compile Include="Assets\Code\AudioCode\AudioReact.cs" />
      <Compile Include="Assets\Code\AudioCode\AudioReactBands.cs" />
+     <Compile Include="Assets\Code\AudioEffectController.cs" />
      <Compile Include="Assets\Code\AudioTriggerEventReceiver.cs" />
      <Compile Include="Assets\Code\AxeTrap.cs" />
      <Compile Include="Assets\Code\BackButtonGUI.cs" />
@@ -125,6 +127,7 @@
      <Compile Include="Assets\Code\BigGatesRotating.cs" />
      <Compile Include="Assets\Code\Billboard3D.cs" />
      <Compile Include="Assets\Code\BlinkSphere.cs" />
+     <Compile Include="Assets\Code\BloodHealing.cs" />
      <Compile Include="Assets\Code\BloodStainSprayer.cs" />
      <Compile Include="Assets\Code\Bomb1.cs" />
      <Compile Include="Assets\Code\Bullet.cs" />
@@ -152,6 +155,7 @@
      <Compile Include="Assets\Code\CrossbowBoltController.cs" />
      <Compile Include="Assets\Code\CrosshairController.cs" />
      <Compile Include="Assets\Code\DamagableLimb.cs" />
+     <Compile Include="Assets\Code\DeadGUI.cs" />
      <Compile Include="Assets\Code\DeferredGroundSlam.cs" />
      <Compile Include="Assets\Code\DeferredShooter.cs" />
      <Compile Include="Assets\Code\DeferredStrike.cs" />
@@ -247,6 +251,7 @@
      <Compile Include="Assets\Code\ObjectSpawner.cs" />
      <Compile Include="Assets\Code\ObjectsSwitcher.cs" />
      <Compile Include="Assets\Code\OnDamageTakenEffects.cs" />
+     <Compile Include="Assets\Code\OrthoCamera.cs" />
      <Compile Include="Assets\Code\OverrideLightSettings.cs" />
      <Compile Include="Assets\Code\OverrideSunSettings.cs" />
      <Compile Include="Assets\Code\ParticlesManager.cs" />
@@ -399,6 +404,7 @@
      <None Include="Assets\Models\Materials\Good Materials\Standard_Triplanar.shader" />
      <None Include="Assets\PostProcessing\Resources\Shaders\MotionBlur.cginc" />
      <None Include="Assets\PostProcessing\Resources\Shaders\Fog.shader" />
+     <None Include="Assets\Models\Materials\Good Materials\RimLighting_surfUnlitAnimated.shader" />
      <None Include="Assets\PostProcessing\Editor Resources\Monitors\ParadeRender.shader" />
      <None Include="Assets\PostProcessing\Resources\Shaders\LutGen.shader" />
      <None Include="Assets\Photon\PhotonUnityNetworking\link.xml" />
@@ -519,6 +525,7 @@
      <None Include="Assets\Photon\PhotonUnityNetworking\changelog.txt" />
      <None Include="Assets\Kino\Binary\Shader\Binary.shader" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface.shader" />
+     <None Include="Assets\Models\Materials\Good Materials\RimLighting_surfUnlit.shader" />
      <None Include="Assets\PSX_Shaders\Shaders\Trasparent\psx-trasparent-vertexlit.shader" />
  <Reference Include="Unity.BuildReportInspector.Editor">
  <HintPath>X:/UnityProjects_ssd/Reaver2/Library/ScriptAssemblies/Unity.BuildReportInspector.Editor.dll</HintPath>

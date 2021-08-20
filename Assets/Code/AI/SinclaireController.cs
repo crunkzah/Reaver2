@@ -320,6 +320,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
         
         SetState(SinclaireState.Dead);
         
+        
         HitPoints = -1;
         
         sword.Drop();
@@ -382,6 +383,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                 len = limbs.Length;
                 for(int i = 0; i < len; i++)
                 {
+                    limbs[i].MakeLimbDead();
                     if(limbs[i].limb_id == limb_to_destroy)
                     {
                         Vector3 f = force;
@@ -394,7 +396,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                             limbs[i].TakeDamageLimb(2500);
                         }
                         
-                        break;
+                        //break;
                     }
                 }
             }
@@ -977,12 +979,13 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     }
     
     
-    const int MaxHealth = 4250;
-    [SerializeField] int HitPoints = MaxHealth;
+    const int MaxHealth = 2500;
+    int HitPoints = MaxHealth;
     
     void TakeDamage(int dmg)
     {
         HitPoints -= dmg;
+        //InGameConsole.LogFancy("DMG taken: " + dmg.ToString() + "HP: " + HitPoints.ToString());
         // if(HitPoints <= 0)
         // {
         //    Die(Vector3.zero);

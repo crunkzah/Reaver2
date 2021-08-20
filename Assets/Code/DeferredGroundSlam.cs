@@ -58,7 +58,7 @@ public class DeferredGroundSlam : MonoBehaviour
         }
     }
     
-    const float slamPhysicsForce = 60;
+    const float slamPhysicsForce = 2;
     
     const float box_size_x = 4.5F;
     const float box_size_y = 0.5F;
@@ -68,7 +68,7 @@ public class DeferredGroundSlam : MonoBehaviour
     {
         Vector3 slam_pos = thisTransform.localPosition;
         
-        int slammed_rbs_len = Physics.OverlapBoxNonAlloc(slam_pos, new Vector3(box_size_x, box_size_y, box_size_z), slammed_cols_rb, thisTransform.localRotation, slamMask);
+        int slammed_rbs_len = Physics.OverlapBoxNonAlloc(slam_pos, new Vector3(box_size_x * 1.25f, box_size_y, box_size_z * 1.25f), slammed_cols_rb, thisTransform.localRotation, slamMask);
             
         for(int  i = 0; i < slammed_rbs_len; i++)
         {
@@ -77,7 +77,7 @@ public class DeferredGroundSlam : MonoBehaviour
             if(rb && rb.isKinematic == false)
             {
                 //InGameConsole.LogOrange("Trying to add force to rigidbody");
-                rb.AddForce(Vector3.up * slamPhysicsForce, ForceMode.Impulse);
+                rb.AddForce(Vector3.up * slamPhysicsForce * force, ForceMode.Impulse);
             }
         }
         

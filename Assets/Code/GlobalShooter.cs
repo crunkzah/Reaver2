@@ -131,7 +131,7 @@ public class GlobalShooter : MonoBehaviour, INetworkObject
         // AudioManager.PlayClip(SoundType.Explosion_1, 0.8f, 1);
         
         GameObject obj = ObjectPool.s().Get(ObjectPoolKey.Kaboom1, false);
-        obj.GetComponent<Kaboom1>().Explode(pos);
+        //obj.GetComponent<Kaboom1>().Explode(pos);
         // FollowingCamera.ShakeY(Random.Range(6.5f, 8f));
         FollowingCamera.ShakeY(14f);
     }

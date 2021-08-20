@@ -158,6 +158,46 @@ public class AudioManager : MonoBehaviour
     
     public ClipAndType[] clipsAndTypes;
     
+    [Header("Explosions:")]
+    public GameObject explosion_pooled_prefab;
+    int pooled_explosions_num = 2;
+    int current_pooled_explosion = 0;
+    public AudioSource[] explosionsPooled;
+    
+    void InitExplosionsPool()
+    {
+        explosionsPooled = new AudioSource[pooled_explosions_num];
+        
+        for(int i = 0; i < pooled_explosions_num; i++)
+        {
+            GameObject g = Instantiate(explosion_pooled_prefab, new Vector3(2000, 2000, 2000), Quaternion.identity, this.transform);
+            AudioSource a = g.GetComponent<AudioSource>();
+            
+            explosionsPooled[i] = a;
+        }
+    }
+    
+    public static void MakeExplosionAt(Vector3 pos, float vol, float pitch)
+    {
+        Singleton()._MakeExplosionAt(pos, vol, pitch);
+    }
+    
+    void _MakeExplosionAt(Vector3 pos, float vol, float pitch)
+    {
+        AudioSource explosion_audio = explosionsPooled[current_pooled_explosion];
+        
+        explosion_audio.transform.localPosition = pos;
+        
+        explosion_audio.volume = vol;
+        explosion_audio.pitch = pitch;
+        
+        explosion_audio.Play();
+        current_pooled_explosion++;
+        if(current_pooled_explosion >= pooled_explosions_num)
+        {
+            current_pooled_explosion = 0;
+        }
+    }
         
     Dictionary<int, AudioClip> audioLib = new Dictionary<int, AudioClip>();
     
@@ -201,6 +241,7 @@ public class AudioManager : MonoBehaviour
             
             InitAudioLib();
             InitAudioPool();
+            InitExplosionsPool();
         }
     }
     
@@ -399,6 +440,19 @@ public class AudioManager : MonoBehaviour
             }
         }
         state = _state;
+    }
+    
+    public static void PlayHeadshotSmall()
+    {
+        Singleton()._PlayHeadshotSmall();
+    }
+    
+    public AudioClip headShotClip_small;
+    public AudioSource audio2D;
+    
+    void _PlayHeadshotSmall()
+    {
+        audio2D.PlayOneShot(headShotClip_small, 1);
     }
     
     public float[] samples = new float[512];
@@ -686,5 +740,6 @@ public enum SoundType : int
     bullet_reflect_sound,
     ui_blip1,
     checkpoint_sound,
-    shoot2
+    shoot2,
+    spawn_npc_2_sound
 }

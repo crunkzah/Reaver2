@@ -413,6 +413,7 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
                 len = limbs.Length;
                 for(int i = 0; i < len; i++)
                 {
+                    limbs[i].MakeLimbDead();
                     if(limbs[i].limb_id == limb_to_destroy)
                     {
                         Vector3 f = force;
@@ -425,7 +426,7 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
                         }
                         //limbs[i].AddForceToLimb(f);
                         
-                        break;
+                        //break;
                     }
                 }
             }

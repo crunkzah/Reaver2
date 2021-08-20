@@ -263,8 +263,8 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject
         HitPoints = MaxHealth;
     }
     
-    const int MaxHealth = 7500;
-    public int HitPoints = MaxHealth;
+    const int MaxHealth = 2500;
+    int HitPoints = MaxHealth;
     
     float brainTimer = 0;
     float moveTimer = 0;
@@ -630,13 +630,20 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject
     {
         GameObject projectile = ObjectPool2.s().Get(ObjectPoolKey.Olios_direct_projectile);
         BulletController bullet = projectile.GetComponent<BulletController>();
+        
         DoLight(pos);
         
         ParticlesManager.PlayPooled(ParticleType.shotStar_ps, pos + dir * 0.9f, dir);
         
         bool isMine = PhotonNetwork.IsMasterClient;
         
-        bullet.LaunchAsSphere(pos, dir, 0.1F, directMask, projectile_direct_speed, 40, isMine);
+        bullet.LaunchAsSphere(pos, dir, 0.2f, normalBulletsMask, projectile_direct_speed, 40, isMine);
+        bullet.explosionCanDamageLocalPlayer = true;
+        bullet.explosionPlayerDamage = 25;
+        bullet.explosionDamage = 400;
+        bullet.explosionCanDamageNPCs = false;
+        bullet.explosionForce = 24;
+        bullet.explosionRadius = 6;
     }
     
     void Strike_Hor(Vector3 pos, Vector3 dir, Vector3 upDir)

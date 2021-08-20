@@ -673,7 +673,13 @@ MonoBehaviour:
   - {fileID: 5984435350451646320}
   - {fileID: 3125511003484073969}
   closed_mat: {fileID: 2100000, guid: 8c1e53ef826cb7d40a67594e952e386f, type: 2}
+  orange_mat: {fileID: 2100000, guid: b54a74fdf19f28c4797521a2c8a4416b, type: 2}
   locked_mat: {fileID: 2100000, guid: 9a493f0d1ba16254294c6b9eb2c23ead, type: 2}
+  locked_ps1: {fileID: 0}
+  locked_ps2: {fileID: 0}
+  open_msgs_num: 1
+  checkPointPriority: 0
+  messages_on_load: []
   unlock_clip: {fileID: 8300000, guid: b4b6981870dd33a428cad649380c4bea, type: 3}
   lock_clip: {fileID: 8300000, guid: 3baac09071cdc9b41ad7a3d25d09d16c, type: 3}
   radius: 9

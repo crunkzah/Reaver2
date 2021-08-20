@@ -37,7 +37,14 @@ public class BulletController : MonoBehaviour, IPooledObject
     
     public BulletOnDieBehaviour on_die_behave = BulletOnDieBehaviour.Default;
     
-    int damage = 0;    
+    int damage = 0;
+    
+    public bool explosionCanDamageNPCs = true;
+    public bool explosionCanDamageLocalPlayer = false;
+    public int explosionDamage;
+    public int explosionPlayerDamage;
+    public float explosionRadius;
+    public float explosionForce;
 
     //public Vector3 prevPosition;
     public float time_to_be_alive;
@@ -148,6 +155,8 @@ public class BulletController : MonoBehaviour, IPooledObject
     {
         pierced_cols.Clear();
         pierced_networkObjects.Clear();
+        
+        
         
         this.pierced_num = 0;
         this.damage = _damage;
@@ -287,7 +296,8 @@ public class BulletController : MonoBehaviour, IPooledObject
         bool shouldDie = (on_die_behave == BulletOnDieBehaviour.Reflect ? false : true);
         bool shouldPlayFXonHit = true;
         
-        // InGameConsole.LogFancy("OnHit()");
+        // if(col != null)
+        //     InGameConsole.LogFancy("OnHit()" + col.name);
         
         
         if(on_die_behave == BulletOnDieBehaviour.Hurtless)
@@ -300,14 +310,16 @@ public class BulletController : MonoBehaviour, IPooledObject
         
         if(on_die_behave == BulletOnDieBehaviour.Explode_1)
         {
+            GameObject obj = ObjectPool.s().Get(ObjectPoolKey.Kaboom1, false);
+            float _radius = explosionRadius;
+            //if(explosionCanDama)
+            obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, explosionRadius, explosionForce, explosionDamage, isMine, explosionCanDamageLocalPlayer, explosionPlayerDamage);
             // if(PhotonNetwork.IsMasterClient)
             // {
-                GameObject obj = ObjectPool.s().Get(ObjectPoolKey.Kaboom1, false);
                 
                 // float _radius = Random.Range(2, 7);
-                float _radius = 6;
                 
-                obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, _radius, 33F, 300, isMine);
+                
             // }
             
             //FollowingCamera.ShakeY(13f);
@@ -358,7 +370,7 @@ public class BulletController : MonoBehaviour, IPooledObject
                     {
                         shouldPlayFXonHit = false;
                         idl.TakeDamageLocally(damage, point, fly_direction);
-                        if(isMine)
+                        if(isMine && explosionCanDamageNPCs)
                         {
                             
                             int target_hp = idl.GetCurrentHP();

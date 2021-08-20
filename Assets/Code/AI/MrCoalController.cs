@@ -182,7 +182,11 @@ public class MrCoalController : MonoBehaviour, INetworkObject, Interactable
         Vector3 pos = thisTransform.position + new Vector3(0, 2, 0) + 1.5f * Math.RandomVector();
         ParticlesManager.PlayPooled(ParticleType.hurt1_ps, thisTransform.position, new Vector3(0, 0, 1));
         ObjectPool.s().Get(ObjectPoolKey.BloodSprayer, false).GetComponent<BloodStainSprayer>().MakeStains(thisTransform.position + new Vector3(0, 1, 0));
+        audioSrc.Stop();
     }
+    
+    public NetworkObjectAndCommand[] onDieMessages;
+    
     
     void Die()
     {
@@ -193,12 +197,25 @@ public class MrCoalController : MonoBehaviour, INetworkObject, Interactable
         Invoke(nameof(OnDie), 0.2f);
         Invoke(nameof(OnDie), 0.4f);
         Invoke(nameof(OnDie), 0.6f);
+        Invoke(nameof(OnDie), 1f);
+        Invoke(nameof(OnDie), 1.2f);
         
         if(lasers_ps != null)
         {
             for(int i = 0; i < lasers_ps.Length; i++)
             {
                 lasers_ps[i].Play();
+            }
+        }
+        
+        if(PhotonNetwork.IsMasterClient)
+        {
+            if(onDieMessages != null)
+            {
+                for(int i = 0; i < onDieMessages.Length; i++)
+                {
+                    NetworkObjectsManager.CallNetworkFunction(onDieMessages[i].net_comp.networkId, onDieMessages[i].command);
+                }
             }
         }
         

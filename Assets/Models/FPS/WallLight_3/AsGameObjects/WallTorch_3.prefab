@@ -4846,7 +4846,7 @@ ParticleSystem:
 --- !u!199 &2973538438482783552
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -4963,7 +4963,7 @@ PrefabInstance:
     - target: {fileID: 2300000, guid: 4d0c79ece234fd549b02859415989204, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: c80f470a2aff72f4ab92b068bac62f81, type: 2}
+      objectReference: {fileID: 2100000, guid: 83876362ae972c844bfc84817dcc6917, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d0c79ece234fd549b02859415989204, type: 3}
 --- !u!4 &2173728823837485953 stripped

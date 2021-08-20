@@ -19,7 +19,7 @@ TagManager:
   - Projectile
   - Player
   - Damagable
-  - ItemsOnGround
+  - OtrhoLayer
   - InvisibleCollider
   - Detection
   - Fadable

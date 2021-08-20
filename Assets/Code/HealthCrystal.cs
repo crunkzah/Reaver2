@@ -79,7 +79,12 @@ public class HealthCrystal : MonoBehaviour, IPooledObject
             Vector3 playerPos = PhotonManager.Singleton().local_controller.GetGroundPosition();
             playerPos.y += 1.15F;
             
-            if(lifeTimer < LifeTime - 0.25f && Math.SqrDistance(thisTransform.localPosition, playerPos) < 0.8F * 0.8F)
+            if(Math.SqrDistance(thisTransform.localPosition, playerPos) < 0.9F * 0.9F)
+            {
+                currentSpeed = 100f;
+            }
+            
+            if(lifeTimer < LifeTime - 0.25f && Math.SqrDistance(thisTransform.localPosition, playerPos) < 0.4F * 0.4F)
             {
                 PhotonManager.Singleton().local_controller.Heal(hp);
                 EndLife();

@@ -67,7 +67,7 @@ public class FPSGunController : MonoBehaviour
     const float ARFireRateSlowest = 0.135F;
     
     const int mp5_dmg = 70;
-    const float mp5FireRate = 0.1F;
+    const float mp5FireRate = 0.12F;
     const int mp5_alt_dmg = 700;
     const float mp5_alt_force = 14f;
     const float mp5FireRate_alt = 1.0f;
@@ -653,6 +653,10 @@ public class FPSGunController : MonoBehaviour
             if(limb.isHeadshot)
             {
                 damage *= 2;
+                if(pv.IsMine)
+                {
+                    CrosshairController.MakeHeadShot();
+                }
             }
             limb.React(point, damageDirection);
         }
@@ -678,6 +682,7 @@ public class FPSGunController : MonoBehaviour
                             limb.TakeDamageLimb(damage);
                             float __pitch = Random.Range(0.95f, 1.05f);
                             AudioManager.Play3D(SoundType.punch_impact1, point, __pitch, 0.7f);
+                            
                         }
                         return;
                     }
@@ -973,7 +978,7 @@ public class FPSGunController : MonoBehaviour
         {
             return;
         }
-        gunTimer = shotgunFireRate * 1.25f;
+        gunTimer = fireRateMultiplier * shotgunFireRate * 1.25f;
         
         // Ray shotgunRay = pController.GetFPSRay();
         Ray shotgunRay = pController.GetLowerFPSRay();
@@ -2243,6 +2248,9 @@ public class FPSGunController : MonoBehaviour
         gunAudio2.PlayOneShot(revolverShotClip, 1);
         
         Ray ray = new Ray(shotPos, hitScanDirection);
+        
+        int ult_dmg = revolverDmg_ult;
+        
         if(pv.IsMine)
         {
             CameraShaker.MakeTrauma(0.6f);
@@ -2255,6 +2263,11 @@ public class FPSGunController : MonoBehaviour
             revolverFX_stronger_ps.Play();
             
             pController.BoostVelocity(-ray.direction * 24.0F);
+            
+            if(Math.Abs(pController.velocity.y) > 2f)
+            {
+                ult_dmg = revolverDmg_ult + revolverDmg_ult / 4;
+            }
         }
         RaycastHit hit;
         
@@ -2294,7 +2307,8 @@ public class FPSGunController : MonoBehaviour
                 if(!hits_scanned.Contains(limb_net_id))
                 {
                     hits_scanned.Add(limb_net_id);
-                    OnHitScan(hits[i].point, hitScanDirection, hit.normal, revolverDmg_ult, hits[i].collider, null, 2.6f);
+                    
+                    OnHitScan(hits[i].point, hitScanDirection, hit.normal, ult_dmg, hits[i].collider, null, 2.6f);
                 }
             }
         }
@@ -2677,6 +2691,11 @@ public class FPSGunController : MonoBehaviour
         bool isMine = pv.IsMine;
         bulletController.LaunchAsSphere(shotPos, direction, 0.15F, bulletMask, 46, rocketLauncherDmg, isMine);
         bulletController.on_die_behave = BulletOnDieBehaviour.Explode_1;
+        bulletController.explosionRadius = 4.5f;
+        bulletController.explosionForce = 28;
+        bulletController.explosionDamage = 400;
+        bulletController.explosionCanDamageLocalPlayer = false;
+        bulletController.explosionCanDamageNPCs = true;
     }
     
     void ShootRocketLauncher_Alt(Vector3 shotPos, Vector3 shotDir, Vector3 upDir)
@@ -2911,7 +2930,6 @@ public class FPSGunController : MonoBehaviour
     {
         GameObject bullet = ObjectPool2.s().Get(ObjectPoolKey.mp5_grenade);
                 
-        BulletController bulletController = bullet.GetComponent<BulletController>();
         
         if(pv.IsMine)
         {
@@ -2925,6 +2943,7 @@ public class FPSGunController : MonoBehaviour
         }
         
         //rocketLauncher_FX.Play();
+        BulletController bulletController = bullet.GetComponent<BulletController>();
         bool isMine = pv.IsMine;
         float grenade_speed = 30;
         bulletController.LaunchAsSphere(shotPos, direction, 0.15F, bulletMask, grenade_speed, mp5_alt_dmg, isMine);
@@ -2932,6 +2951,13 @@ public class FPSGunController : MonoBehaviour
         bulletController.useGravity = true;
         bulletController.gravityMultiplier = 2;
         bulletController.on_die_behave = BulletOnDieBehaviour.Explode_1;
+        
+        bulletController.explosionRadius = 4.5f;
+        bulletController.explosionForce = 28;
+        bulletController.explosionDamage = 400;
+        
+        bulletController.explosionCanDamageLocalPlayer = false;
+        bulletController.explosionCanDamageNPCs = true;
     }
     
     
@@ -2951,6 +2977,7 @@ public class FPSGunController : MonoBehaviour
                 if(limb.isHeadshot)
                 {
                     damage = (int)((float)damage * headshotDmgMult);
+                    //PlayHeadshotSmall
                     //InGameConsole.LogFancy("Headshot damage is " + dmg.ToString());
                 }
                 limb.React(point, damageDirection);
@@ -2968,6 +2995,11 @@ public class FPSGunController : MonoBehaviour
                     if(pv.IsMine)
                     {
                         int target_hp = idl.GetCurrentHP();
+                        
+                        if(limb.isHeadshot && headshotDmgMult > 1.1f)
+                        {
+                            CrosshairController.MakeHeadShot();
+                        }
                         
                         if(target_hp <= 0)
                         {

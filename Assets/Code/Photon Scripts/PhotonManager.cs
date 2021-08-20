@@ -413,6 +413,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
                     SpawnMyPlayer();
                 else
                 {
+                    OrthoCamera.Hide();
+                    DeadGUI.Hide();
                     DestroyMyPlayer();      
                 }
             }

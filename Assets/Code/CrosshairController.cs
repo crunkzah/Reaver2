@@ -73,18 +73,60 @@ public class CrosshairController : MonoBehaviour
         }
     }
     
-    const float trauma_scale = 2;
+    
+    [Header("Headshot crosshair")]
+    public CanvasGroup headshotCrosshair;
+    
+    public static void MakeHeadShot()
+    {
+        AudioManager.PlayHeadshotSmall();
+        Singleton()._MakeHeadShot();
+    }
+    
+    const float headshotMaxAlpha = 0.8f;
+    
+    void Start()
+    {
+        headshotCrosshair.alpha = 0;
+    }
+    
+    void _MakeHeadShot()
+    {
+        headCrossHairAlpha = headshotMaxAlpha;
+        
+        headshotCrosshair.alpha = headCrossHairAlpha;
+        
+        headshotCrosshair.enabled = true;
+    }
+    
+    float headCrossHairAlpha = 0;
+    float headCrossHairSpeed = 1.25f;
+    
+    void HeadShotCrosshairTick(float dt)
+    {
+        headCrossHairAlpha -= headCrossHairSpeed * dt;
+        if(headCrossHairAlpha <= 0)
+        {
+            headCrossHairAlpha = 0;
+        }
+        
+        headshotCrosshair.alpha = headCrossHairAlpha;
+    }
+    
+    const float trauma_scale = 2.5f;
     
     float trauma_deriv;
     
-    void TraumaTick()
+    void TraumaTick(float dt)
     {
-        trauma = Mathf.SmoothDamp(trauma, 0, ref trauma_deriv, smoothTime);
+        trauma = Mathf.SmoothDamp(trauma, 0, ref trauma_deriv, smoothTime, 1000f, dt);
     }
     
     void Update()
     {
-        TraumaTick();
+        float dt = UberManager.DeltaTime();
+        TraumaTick(dt);
+        HeadShotCrosshairTick(dt);
         
         float trauma_scaled = trauma * trauma_scale;
         

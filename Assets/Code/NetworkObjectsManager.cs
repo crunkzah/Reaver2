@@ -46,6 +46,8 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
     {
         // REMEMBER RUNTIMEPOOL NOT SERIALIZED IN EDITOR !
         //runtimePool.Clear();
+        PhotonMessageInfo info;
+        
         lastStaticNetId = 0;
     }
 
@@ -825,11 +827,14 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
         NPCType npc = (NPCType)_npc;
         GameObject npc_original = null;
         
+        SoundType spawn_soundType = SoundType.spawn_npc_1_sound;
+        
         switch(npc)
         {
             case(NPCType.Sinclaire):
             {
                 npc_original = Sinclaire_npc;
+                spawn_soundType = SoundType.spawn_npc_2_sound;
                 break;
             }
             case(NPCType.Padla):
@@ -855,11 +860,13 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
             case(NPCType.Olios):
             {
                 npc_original = Olios_npc;
+                spawn_soundType = SoundType.spawn_npc_2_sound;
                 break;
             }
             case(NPCType.PadlaLong):
             {
                 npc_original = PadlaLong_npc;
+                spawn_soundType = SoundType.spawn_npc_2_sound;
                 break;
             }
             case(NPCType.Scourge):
@@ -870,6 +877,7 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
             case(NPCType.ScourgeCool):
             {
                 npc_original = ScourgeCool_npc;
+                spawn_soundType = SoundType.spawn_npc_2_sound;
                 break;
             }
             default:
@@ -891,7 +899,7 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
         ParticlesManager.PlayPooled(ParticleType.npc_spawned_1_ps, pos, forward);
         LightOnSpawn(pos);
         float spawn_pitch = Random.Range(0.9f, 1.05f);
-        AudioManager.Play3D(SoundType.spawn_npc_1_sound, pos, spawn_pitch, 1f);
+        AudioManager.Play3D(spawn_soundType, pos, spawn_pitch, 1f);
         
         if(net_comp)
         {

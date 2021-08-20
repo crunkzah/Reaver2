@@ -40,7 +40,7 @@ public class ButtonText : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         {
             if(onPointerEnterAudioClip)    
             {
-                AudioManager.Singleton().source2.PlayOneShot(onPointerEnterAudioClip, 0.3f);
+                AudioManager.Singleton().source2.PlayOneShot(onPointerEnterAudioClip, 0.1f);
             }
             tmp.color = selectedColor;
             transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
