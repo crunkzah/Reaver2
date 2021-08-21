@@ -236,7 +236,7 @@ public class Checkpoint : MonoBehaviour, INetworkObject
         activated_ps.Play();
         static_ps.Stop();
         
-        thisTransform.localScale = new Vector3(0.2f, 0.5f, 0.5f) * 0.7f;
+        //thisTransform.localScale = new Vector3(0.2f, 0.5f, 0.5f) * 0.7f;
         
         label_tmp.CrossFadeColor(new Color(0, 0, 0, 0.33f), 0.5f, false, true);
     }
@@ -315,7 +315,7 @@ public class Checkpoint : MonoBehaviour, INetworkObject
             
             static_ps.Play();
             
-            thisTransform.localScale = new Vector3(0.2f, 0.5f, 0.5f);
+            //thisTransform.localScale = new Vector3(0.2f, 0.5f, 0.5f);
             
             for(int i = 0; i < gears_renders.Length; i++)
             {

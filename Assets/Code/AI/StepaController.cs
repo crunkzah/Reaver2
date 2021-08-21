@@ -939,7 +939,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 velocity.y = Math.Clamp(-GRAVITY_MAX, GRAVITY_MAX, velocity.y);
                 
                 
-                if(airbourneTimeStamp > airbourneTimeStamp + 15f)
+                if(Time.time > airbourneTimeStamp + 15f && canSendCommands)
                 {
                     LockSendingCommands();
                     NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.DieWithForce, new Vector3(0, 0, 0));
