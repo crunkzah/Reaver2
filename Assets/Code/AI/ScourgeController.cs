@@ -324,7 +324,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
         }
     }
     
-    const float projectileSpeed = 55F;
+    const float projectileSpeed = 45F;
     const float projectileRadius = 0.25F;
     const int projectileDamage = 8;
     const int shotsPerRound = 3;
@@ -751,7 +751,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                     
                     if(!canShootFromDestination)
                     {
-                        InGameConsole.LogFancy("Scourge: Can't shoot from this position");
+                        //InGameConsole.LogFancy("Scourge: Can't shoot from this position");
                         UpdateRemoteAgentDestination(targetGroundPos);
                         if(shootingChasingTimer > shootingChasingCooldown * 0.5F)
                         {
@@ -1025,7 +1025,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                 velocity.y += GRAVITY_Y * dt;
                 velocity.y = Math.Clamp(-GRAVITY_MAX, GRAVITY_MAX, velocity.y);
                 
-                if(Time.time > airbourneTimeStamp + 15f && canSendCommands)
+                if(thisTransform.localPosition.y < -500 && canSendCommands)
                 {
                     LockSendingCommands();
                     NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.DieWithForce, new Vector3(0, 0, 0));
@@ -1059,7 +1059,21 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                             if(Physics.CapsuleCast(capsulePBottom, capsulePTop, capsuleRadius, velDir, velMag * dt, groundMask))
                             {
                                 velocity.x = velocity.y = velocity.z = 0;
-                                InGameConsole.LogFancy(string.Format("{0}: Double capsule cast hit!", this.gameObject.name));
+                                NavMeshHit _navMeshHit;
+                                Vector3 samplePos = thisTransform.localPosition;
+                                if(NavMesh.SamplePosition(samplePos, out _navMeshHit, 0.66f, NavMesh.AllAreas))
+                                {
+                                    if(canSendCommands)
+                                    {
+                                        LockSendingCommands();
+                                      //  InGameConsole.LogOrange("<color=green>Sending LandOnGround() </color>");
+                                        NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.LandOnGround, _navMeshHit.position);
+                                    }    
+                                }
+                                else
+                                {
+                                    InGameConsole.LogFancy(string.Format("{0}: Double capsule cast hit!", this.gameObject.name));
+                                }
                             }
                         }
                         else

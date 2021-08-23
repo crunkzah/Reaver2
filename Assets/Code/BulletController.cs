@@ -83,12 +83,19 @@ public class BulletController : MonoBehaviour, IPooledObject
     public const float gravity_Y = -9.8F;
     public float gravityMultiplier = 1f;
     
+    public int uniqueID;
     
     
     
+    static int playerLayer = -1;
 
     void Awake()
     {
+        if(playerLayer == -1)
+        {
+            playerLayer = LayerMask.NameToLayer("Player");
+        }
+        
         thisTransform = transform;
         netObjectOwner = GetComponent<NetObjectOwner>();
         if(ps == null)
@@ -112,6 +119,22 @@ public class BulletController : MonoBehaviour, IPooledObject
         currentSpeed = 6;
         //on_die_behave = BulletOnDieBehaviour.Default;
     }
+    
+    
+    static HashSet<BulletController> uniqueBullets = new HashSet<BulletController>();
+    
+    
+    
+    public static void RegisterUniqueBullet(BulletController _bullet)
+    {
+        if(!uniqueBullets.Contains(_bullet))
+        {
+            uniqueBullets.Add(_bullet);
+        }
+    }
+    
+    
+    
     
     void ClearEffects()
     {
@@ -210,7 +233,15 @@ public class BulletController : MonoBehaviour, IPooledObject
             
             if(Physics.SphereCast(thisTransform.localPosition, sphere_radius, gravProjV_dir, out hit, distanceThisFrame, collisionMask))
             {
-                OnHit(hit.point, gravProjV_dir, hit.normal, hit.collider);
+                DamagableLimb hitLimb = hit.collider.GetComponent<DamagableLimb>();
+                if(hitLimb && !hitLimb.isMasterAlive)
+                {
+                    hitLimb.TakeDamageLimb(1000);                    
+                }
+                else
+                {
+                    OnHit(hit.point, gravProjV_dir, hit.normal, hit.collider);
+                }
             }
             
             thisTransform.localPosition = thisTransform.localPosition + gravProjV * dt;
@@ -223,7 +254,15 @@ public class BulletController : MonoBehaviour, IPooledObject
             
             if(Physics.SphereCast(thisTransform.localPosition, sphere_radius, fly_direction, out hit, distanceThisFrame, collisionMask))
             {
-                OnHit(hit.point, fly_direction, hit.normal, hit.collider);
+                DamagableLimb hitLimb = hit.collider.GetComponent<DamagableLimb>();
+                if(hitLimb && !hitLimb.isMasterAlive)
+                {
+                    hitLimb.TakeDamageLimb(1000);                    
+                }
+                else
+                {
+                    OnHit(hit.point, fly_direction, hit.normal, hit.collider);
+                }
             }
 
     // #if UNITY_EDITOR
@@ -313,6 +352,10 @@ public class BulletController : MonoBehaviour, IPooledObject
             GameObject obj = ObjectPool.s().Get(ObjectPoolKey.Kaboom1, false);
             float _radius = explosionRadius;
             //if(explosionCanDama)
+            if(!explosionCanDamageNPCs)
+            {
+                explosionDamage = 0;
+            }
             obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, explosionRadius, explosionForce, explosionDamage, isMine, explosionCanDamageLocalPlayer, explosionPlayerDamage);
             // if(PhotonNetwork.IsMasterClient)
             // {
@@ -491,7 +534,16 @@ public class BulletController : MonoBehaviour, IPooledObject
         
         if(shouldDie)
         {
+            if(uniqueBullets.Contains(this))
+            {
+                uniqueBullets.Remove(this);
+            }
             StopEffects();
+            if(col.gameObject.layer == playerLayer)
+            {
+                shouldPlayFXonHit = false;
+            }
+                        
             if(shouldPlayFXonHit)
             {
                 switch(bulletOnDieEffects)

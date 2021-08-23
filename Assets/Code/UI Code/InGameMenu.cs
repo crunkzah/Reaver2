@@ -59,7 +59,7 @@ public class InGameMenu : MonoBehaviour
     void _ShowInGameMenu()
     {
         InGameConsole.LogFancy("ShowInGameMenu");
-        
+        UberManager.PauseGame();
         
         
         if(!canBeShown)
@@ -93,12 +93,14 @@ public class InGameMenu : MonoBehaviour
     public void RestartCurrentLevelButton()
     {
         Hide();
+        UberManager.SetSavePointPriority(-1);
         UberManager.Singleton().ReloadLevel();
     }
     
     void _HideInGameMenu()
     {
         InGameConsole.LogFancy("HideInGameMenu");
+        UberManager.ResumeGame();
         
         if(PhotonManager.GetLocalPlayer() != null)
         {
@@ -162,6 +164,11 @@ public class InGameMenu : MonoBehaviour
     {
         if(GetEscapeKeyDown())
         {
+            int level_index = UberManager.GetCurrentLevelIndex();
+            if(level_index == 0 || level_index == 1)
+            {
+                return;
+            }
             // switch(state)
             // {
             //     case(InGameMenuState.Hidden):

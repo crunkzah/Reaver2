@@ -69,7 +69,11 @@ public class EnemySpawner : MonoBehaviour, Interactable
 	public SingleWave[] waves_to_spawn;
 	
 	int waves_spawned;
-	int enemies_spawned;
+	//int enemies_spawned;
+	int currentSingleSpawnIndex;
+	int enemies_spawned_fromSingleWave;
+	int enemies_killed;
+	int enemies_to_be_killed_from_single_wave;
 	
 	void SpawnOneEnemyFromWave(ref SingleSpawn _singleSpawn)
 	{
@@ -87,8 +91,17 @@ public class EnemySpawner : MonoBehaviour, Interactable
 		// {
 		// 	InGameConsole.LogOrange("Couldn't spawn <color=green>NPC</color> because couldn't hit NavMesh - <color=yellow>DebugSpawnOnClick()</color>");
 		// }
+		
+		currentSingleSpawnIndex++;
+		if(currentSingleSpawnIndex >= waves_to_spawn[waves_spawned].singleSpawn.Length)
+		{
+			currentSingleSpawnIndex = 0;
+			OnOneWaveSpawned();
+		}
 		NPCType npc_type =  _singleSpawn.npc_to_spawn;
-		enemies_spawned++;
+		//enemies_spawned++;
+		//enemies_spawned_fromSingleWave++;
+		
 		NetworkObjectsManager.Singleton().SpawnNPC_Spawner((byte)(npc_type), pos, dir, this.instance_key);
 	}
 	
@@ -117,7 +130,7 @@ public class EnemySpawner : MonoBehaviour, Interactable
 	{
 		if(state == EnemySpawnerState.Disabled)
 		{
-			
+			enemies_to_be_killed_from_single_wave = waves_to_spawn[currentSingleSpawnIndex].singleSpawn.Length;
 			state = EnemySpawnerState.Spawning;
 		}
 		
@@ -135,7 +148,8 @@ public class EnemySpawner : MonoBehaviour, Interactable
 	void OnOneWaveSpawned()
 	{
 		//enemies_spawned = 0;
-		waves_spawned++;
+		//waves_spawned++;
+		
 		
 		state = EnemySpawnerState.WaitingForNextWave;
 	}
@@ -145,6 +159,9 @@ public class EnemySpawner : MonoBehaviour, Interactable
 	public void SetStateSpawning()
 	{
 		state = EnemySpawnerState.Spawning;
+		enemies_killed = 0;
+		enemies_to_be_killed_from_single_wave = waves_to_spawn[waves_spawned].singleSpawn.Length;
+		//if(waves_spawned < waves_to_spawn[waves_spawned].singleSpawn.Length)
 	}
 	
 	public void OnSpawnedChildDied()
@@ -154,12 +171,13 @@ public class EnemySpawner : MonoBehaviour, Interactable
 			return;
 		}
 		
-		enemies_spawned--;
+		enemies_killed++;
 		//InGameConsole.LogFancy("OnSpawnedChildDied() count is " + enemies_spawned.ToString());
-		if(enemies_spawned <= 0)
+		//if(enemies_spawned <= 0)
+		if(enemies_killed >= enemies_to_be_killed_from_single_wave)
 		{
-			enemies_spawned = 0;
-			
+			//enemies_spawned = 0;
+			waves_spawned++;
 			if(waves_spawned >= waves_to_spawn.Length)
 			{
 				OnAllWavesKilled();
@@ -201,24 +219,17 @@ public class EnemySpawner : MonoBehaviour, Interactable
 			}
 			case(EnemySpawnerState.Spawning):
 			{
-				
 				float dt = UberManager.DeltaTime();
 				timer += dt;
 				if(timer >= single_spawn_delay)
 				{
-					// int len = waves_to_spawn[waves_spawned].singleSpawn.Length;
-					// if(enemies_spawned >= waves_to_spawn[waves_spawned].singleSpawn.Length)
-					// {
-					// 	InGameConsole.LogFancy(string.Format("enemies_spawned >= singleSpawn.Length, {0} >= {1}", enemies_spawned, len));
-					// }
-					
-					SpawnOneEnemyFromWave(ref waves_to_spawn[waves_spawned].singleSpawn[enemies_spawned]);
+					SpawnOneEnemyFromWave(ref waves_to_spawn[waves_spawned].singleSpawn[currentSingleSpawnIndex]);
 					timer = 0;
 					
-					if(enemies_spawned >= waves_to_spawn[waves_spawned].singleSpawn.Length)
-					{
-						OnOneWaveSpawned();
-					}
+					// if(enemies_spawned >= waves_to_spawn[waves_spawned].singleSpawn.Length)
+					// {
+					// 	OnOneWaveSpawned();
+					// }
 				}
 				
 				break;

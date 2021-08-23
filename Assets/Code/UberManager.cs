@@ -37,6 +37,12 @@ public enum Language : int
     Russian
 }
 
+public enum InGameTimerState : int
+{
+    NotCounting,
+    Working
+}
+
 public class UberManager : MonoBehaviour
 {
     public static UberManager instance;
@@ -183,6 +189,52 @@ public class UberManager : MonoBehaviour
             return commandsDelay;
         }
     }
+    static bool isGamePaused = false;
+    
+    public static void PauseGame()
+    {
+        if(PhotonNetwork.OfflineMode)
+            isGamePaused = true;
+        else
+            isGamePaused = false;
+            
+        Time.timeScale = 0;
+        
+        // PlayerController local_pc = PhotonManager.GetLocalPlayer();
+        // if(local_pc)
+        // {
+        //     local_pc.ReleaseCursor();
+        // }
+    }
+    
+    public static void ResumeGame()
+    {
+        isGamePaused = false;
+        Time.timeScale = 1;
+        
+        PlayerController local_pc = PhotonManager.GetLocalPlayer();
+        // if(local_pc)
+        // {
+        //     local_pc.LockCursor();
+        // }
+    }
+    
+    public static float UnscaledDeltaTime()
+    {
+        return Time.unscaledDeltaTime;
+        // if(!isDeltaTimeUpdated)
+        // {
+        //     deltaTime = Time.deltaTime;
+        //     isDeltaTimeUpdated = true;
+        // }
+        
+        // if(isGamePaused)
+        // {
+        //     return 0;
+        // }
+        
+        // return deltaTime;
+    }
     
     public static float DeltaTime()
     {
@@ -190,6 +242,11 @@ public class UberManager : MonoBehaviour
         {
             deltaTime = Time.deltaTime;
             isDeltaTimeUpdated = true;
+        }
+        
+        if(isGamePaused)
+        {
+            return 0;
         }
         
         return deltaTime;
@@ -236,6 +293,29 @@ public class UberManager : MonoBehaviour
         Singleton().LoadLevel(level_index);
     }
     
+    public int currentSavePointPriorityLevel = -1;
+    
+    public static void SetSavePointPriority(int priority)
+    {
+        Singleton()._SetSavePointPriority(priority);
+    }
+    
+    void _SetSavePointPriority(int priority)
+    {
+        currentSavePointPriorityLevel = priority;
+    }
+    
+    public static int GetSavePointPriority()
+    {
+        return Singleton()._GetSavePointPriority();
+    }
+    
+    int _GetSavePointPriority()
+    {
+        return currentSavePointPriorityLevel;
+    }
+    
+    
     public void LoadLevel(int level_index)
     {
         if(PhotonNetwork.IsMasterClient == false)
@@ -249,11 +329,16 @@ public class UberManager : MonoBehaviour
             
             LoadingScreen.SetOn(level_index);
             System.GC.Collect();
+            
+            if(SceneManager.GetActiveScene().buildIndex == level_index)
+            {
+                //This means we are reloading current level
+            }
             PhotonNetwork.LoadLevel(level_index);
         }
         else
         {
-            InGameConsole.LogFancy("Can't switch level, we are <color=red>not</color> done with previous <color=green>LoadLevel()</color> command.");
+            InGameConsole.LogFancy("<color=yellow>Can't switch level</color>, we are <color=red>not</color> done with previous <color=green>LoadLevel()</color> command.");
         }
     }
     
@@ -349,9 +434,19 @@ public class UberManager : MonoBehaviour
         style.alignment = TextAnchor.MiddleCenter;
         // style.alignment = TextAnchor.MiddleCenter;
         
-        // string text = string.Format("Time: <color=blue>{0}</color>", TimeSession.ToString("f"));
-        string text = string.Format("<color=yellow>Spawn NPC: <color=green>{0}</color></color>", spawn_npcs[spawn_index]);
         float rectWidth = 200;
+        string restartsString = string.Format("<color=cyan>Restarts:<color=yellow><b>{0}</b></color></color>", this.RestartsOnThisLevel);
+        GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 100, rectWidth, 50), restartsString,style);
+        
+        string inGameTimerString = string.Format("<color=cyan>IGT:<color=yellow><b>{0}</b></color></color>", this.InGameTimer.ToString("f"));
+        GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 75, rectWidth, 50), inGameTimerString, style);
+        
+        // string text_currentSavePriority = string.Format("<color=cyan>currentSavePriority:<color=green>{0}</color></color>", this.currentSavePointPriorityLevel);
+        // float rectWidth = 200;
+        // GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 72, rectWidth, 50), text_currentSavePriority, style);
+        
+        string text = string.Format("<color=yellow>Spawn NPC: <color=green>{0}</color></color>", spawn_npcs[spawn_index]);
+        rectWidth = 200;
         GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 52, rectWidth, 50), text, style);
         
     }
@@ -430,10 +525,77 @@ public class UberManager : MonoBehaviour
         }
     }
     
+    public float InGameTimer        = 0;
+    public int RestartsOnThisLevel  = 0;
+    public InGameTimerState timerState = InGameTimerState.NotCounting;
+    
+    public static void ResetRestartsCount()
+    {
+        Singleton().RestartsOnThisLevel = 0;
+    }
+    
+    public static void AddRestartCount()
+    {
+        Singleton().RestartsOnThisLevel++;
+    }
+    
+    
+    public static void ResetInGameTimer()
+    {
+        ResetRestartsCount();
+        Singleton()._ResetInGameTimer();
+    }
+    
+    public static void StartInGameTimer()
+    {
+        Singleton()._StartInGameTimer();
+    }
+    
+    public static void StopInGameTimer()
+    {
+        Singleton()._StopInGameTimer();
+    }
+    
+    void _ResetInGameTimer()
+    {
+        InGameTimer = 0;
+        timerState = InGameTimerState.NotCounting;
+    }
+    
+    void _StartInGameTimer()
+    {
+        timerState = InGameTimerState.Working;
+    }
+    
+    void _StopInGameTimer()
+    {
+        timerState = InGameTimerState.NotCounting;
+    }
+    
+    void InGameTimerTick(float dt)
+    {
+        switch(timerState)
+        {
+            case(InGameTimerState.NotCounting):
+            {
+            break;
+            }
+            case(InGameTimerState.Working):
+            {
+                InGameTimer += dt;
+            break;
+            }
+        }
+    }
     
     void Update()
     {
         // HandlePlayerList();
+        if(PhotonNetwork.IsMasterClient)
+        {
+            float dt = UberManager.DeltaTime();
+            InGameTimerTick(dt);
+        }
         
         isTimeUpdated       = false;
         isDeltaTimeUpdated  = false;

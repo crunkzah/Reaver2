@@ -115,24 +115,29 @@ public class Kaboom1 : MonoBehaviour
                             IDamagableLocal idl = net_comp.GetComponent<IDamagableLocal>();
                             if(idl != null)
                             {
-                                if(idl.GetCurrentHP() - explosionDamage <= 0)
+                                if(explosionDamage > 0)
                                 {
-                                    Vector3 dieForce_dir = Math.Normalized(hits[i].ClosestPoint(pos) - pos);
-                                    byte limb_id_rnd = (byte)Random.Range(1, 6);
-                                    NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.DieWithForce, 4 * explosionDamage * dieForce_dir, limb_id_rnd);
-                                }
-                                else
-                                {
-                                    Vector3 force = Math.Normalized(hits[i].transform.position + new Vector3(0, 2, 0) - pos) * 14;
-                                    // force.x = force.z = 0;
-                                    //force.y += 5;
-                                    Vector3 launchPos = hits[i].transform.position;
-                                    NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.LaunchAirborne, launchPos, force);
-                                    NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.TakeDamage, explosionDamage);
-                                    
-                                    
-                                     //NetworkObjectsManager.PackNetworkCommand(npc_net_id, NetworkCommand.LaunchAirborne, force);
-                                    //  NetworkObjectsManager.PackNetworkCommand(npc_net_id, NetworkCommand.TakeDamage, dmg);
+                                    if(idl.GetCurrentHP() - explosionDamage <= 0)
+                                    {
+                                        Vector3 dieForce_dir = Math.Normalized(hits[i].ClosestPoint(pos) - pos);
+                                        byte limb_id_rnd = (byte)Random.Range(1, 6);
+                                        NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.DieWithForce, 4 * explosionDamage * dieForce_dir, limb_id_rnd);
+                                    }
+                                    else
+                                    {
+                                        Vector3 force = Math.Normalized(hits[i].transform.position + new Vector3(0, 2, 0) - pos) * 14;
+                                        // force.x = force.z = 0;
+                                        //force.y += 5;
+                                        Vector3 launchPos = hits[i].transform.position;
+                                        // ILaunchableAirbourne ila = 
+                                        // if(ILaunchableAirbourne)
+                                        NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.LaunchAirborne, launchPos, force);
+                                        NetworkObjectsManager.CallNetworkFunction(npc_net_id, NetworkCommand.TakeDamage, explosionDamage);
+                                        
+                                        
+                                        //NetworkObjectsManager.PackNetworkCommand(npc_net_id, NetworkCommand.LaunchAirborne, force);
+                                        //  NetworkObjectsManager.PackNetworkCommand(npc_net_id, NetworkCommand.TakeDamage, dmg);
+                                    }
                                 }
                             }
                         }

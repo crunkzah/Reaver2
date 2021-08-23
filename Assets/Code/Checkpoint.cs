@@ -82,6 +82,35 @@ public class Checkpoint : MonoBehaviour, INetworkObject
     public NetworkObjectAndCommand[] messages_on_load;
     public int activate_msgs_num = 1;
     
+    
+    
+    public void LoadToThisSavePoint()
+    {
+        Checkpoint[] all_checkPoints = FindObjectsOfType<Checkpoint>();
+        
+        int len = all_checkPoints.Length;
+        for(int i = 0; i < len; i++)
+        {
+            if(all_checkPoints[i].checkPointPriority < this.checkPointPriority)
+            {
+                all_checkPoints[i].gameObject.SetActive(false);//GetComponent<NetworkObject>();
+            }
+            //NetworkObjectsManager.CallNetworkFunction(net.networkId, D)
+        }
+        
+        if(PhotonNetwork.IsMasterClient)
+        {
+            if(messages_on_load != null)
+            {
+                for(int i = 0; i < messages_on_load.Length; i++)
+                {
+                    NetworkObjectsManager.CallNetworkFunction(messages_on_load[i].net_comp.networkId, messages_on_load[i].command);
+                }
+            }
+        }
+        InGameConsole.LogFancy("LoadToThisSavePoint()");
+    }
+    
     int playersMask = -1;
     
     bool canSendCommands = true;
@@ -96,6 +125,13 @@ public class Checkpoint : MonoBehaviour, INetworkObject
         canSendCommands = true;
     }
     
+    // CheckPointSpawnPlace;
+    
+    public Vector3 GetSavePointSpawnPlace()
+    {
+        return transform.position;
+    }
+    
     
     //public int activate_msgs_num = 1;
     
@@ -107,6 +143,11 @@ public class Checkpoint : MonoBehaviour, INetworkObject
             {
                 UnlockSendingCommands();
                 Activate();
+                
+                if(IsSavePoint)
+                {
+                    UberManager.SetSavePointPriority(this.checkPointPriority);
+                }
                 
                 break;
             }

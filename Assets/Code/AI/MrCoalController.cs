@@ -182,6 +182,11 @@ public class MrCoalController : MonoBehaviour, INetworkObject, Interactable
         Vector3 pos = thisTransform.position + new Vector3(0, 2, 0) + 1.5f * Math.RandomVector();
         ParticlesManager.PlayPooled(ParticleType.hurt1_ps, thisTransform.position, new Vector3(0, 0, 1));
         ObjectPool.s().Get(ObjectPoolKey.BloodSprayer, false).GetComponent<BloodStainSprayer>().MakeStains(thisTransform.position + new Vector3(0, 1, 0));
+        
+        
+        
+        ParticlesManager.PlayPooled(ParticleType.gibs1_ps, pos, Vector3.forward);
+        ParticlesManager.PlayPooled(ParticleType.hurt1_ps, pos, Vector3.forward);
         audioSrc.Stop();
     }
     
@@ -194,11 +199,11 @@ public class MrCoalController : MonoBehaviour, INetworkObject, Interactable
         ps_explode.Play();
         ps_explode.GetComponent<AudioSource>().Play();
         
-        Invoke(nameof(OnDie), 0.2f);
         Invoke(nameof(OnDie), 0.4f);
         Invoke(nameof(OnDie), 0.6f);
-        Invoke(nameof(OnDie), 1f);
+        Invoke(nameof(OnDie), 0.8f);
         Invoke(nameof(OnDie), 1.2f);
+        Invoke(nameof(OnDie), 1.4f);
         
         if(lasers_ps != null)
         {

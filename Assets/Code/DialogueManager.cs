@@ -33,7 +33,7 @@ public class DialogueManager : MonoBehaviour
     public TextMeshProUGUI text_tmp;
     
     const float shown_height = 250;
-    const float shutter_speed = 450;
+    const float shutter_speed = 700;
     
     static DialogueManager _instance;
     

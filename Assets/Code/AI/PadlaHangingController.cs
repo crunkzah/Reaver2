@@ -14,7 +14,7 @@ using Photon.Pun;
 //     Dead
 // }
 
-public class PadlaHangingController : MonoBehaviour, INetworkObject, IDamagableLocal, ILaunchableAirbourne
+public class PadlaHangingController : MonoBehaviour, INetworkObject, IDamagableLocal
 {
     //public GameObject remoteAgent_prefab;
     //NavMeshAgent remoteAgent;
@@ -246,68 +246,6 @@ public class PadlaHangingController : MonoBehaviour, INetworkObject, IDamagableL
                 
                 break;
             }
-            case(NetworkCommand.LaunchAirborne):
-            {
-                UnlockSendingCommands();
-                
-                if(state == PadlaState.Dead)
-                {
-                    return;
-                }
-                
-                airbourneTimeStamp = Time.time;
-                
-                Vector3 launchPos = (Vector3)args[0];
-                Vector3 launchVel = (Vector3)args[1];
-                
-                if(args.Length > 2)
-                {
-                    //We receive a damage also:
-                    int incomingDamage = (int)args[2];
-                    TakeDamage(incomingDamage);
-                }
-                    
-                velocity = launchVel * Globals.NPC_airbourne_force_mult;
-                audio_src.PlayOneShot(clipLaunchedAirborne);
-                thisTransform.localPosition = launchPos;
-                SetState(PadlaState.Airbourne);
-                    
-                break;
-            }
-            case(NetworkCommand.LaunchAirborneUp):
-            {
-                UnlockSendingCommands();
-                
-                if(state != PadlaState.Airbourne)
-                {
-                    Vector3 launchPos = (Vector3)args[0];
-                    float upForce = (float)args[1];
-                    
-                    velocity = new Vector3(0, upForce, 0);
-                    audio_src.PlayOneShot(clipLaunchedAirborne);
-                    thisTransform.localPosition = launchPos;
-                    SetState(PadlaState.Airbourne);
-                    
-                }
-                
-                break;
-            }
-            case(NetworkCommand.LandOnGround):
-            {
-                UnlockSendingCommands();
-                
-                Vector3 landPos = (Vector3)args[0];
-                
-                SetMovePos(landPos);
-                
-                
-                anim.Play("Base.Idle", 0, 0);
-                
-                SetState(PadlaState.Idle);
-                
-                
-                break;
-            }
             default:
             {
                 break;
@@ -533,29 +471,6 @@ public class PadlaHangingController : MonoBehaviour, INetworkObject, IDamagableL
     
     PlayerController target_pc;
     
-    public bool CanBeLaunchedUp()
-    {
-        return false;
-        
-        if(state == PadlaState.Dead || state == PadlaState.Airbourne)
-        {
-            return false;
-        }
-        
-        return true;
-    }
-    
-    public bool CanBeLaunched()
-    {
-        return false;
-        
-        return true;
-    }
-    
-    public bool IsCurrentlyAirborne()
-    {
-        return state == PadlaState.Airbourne;
-    }
     
     void SetTarget(PlayerController target)
     {

@@ -42,7 +42,7 @@ public class FPSGunController : MonoBehaviour
     public AudioSource gunAudio;
     
     const int revolverDmg = 300;
-    const int revolverDmg_reflect = 120;
+    const int revolverDmg_reflect = 150;
     const int revolverDmg_ult = 550;//530;
     const float revolverFireRate = 0.325F * 2;
     const float revolverPump_Rate = 0.365F / 1.0f;
@@ -145,6 +145,9 @@ public class FPSGunController : MonoBehaviour
     static int staticObjectsMask = -1;
     static int interactablesMask = -1;
     
+    
+    bool touchedGroundAfterSpawn = false;
+    
     void Awake()
     {
         interactablesMask = LayerMask.GetMask("Interactable");
@@ -223,7 +226,7 @@ public class FPSGunController : MonoBehaviour
         {
             // FPSEffectsSetup();
             WieldGunFPS();
-            
+            OnBeforeTouchedGround();
         }
         else
         {
@@ -234,7 +237,7 @@ public class FPSGunController : MonoBehaviour
         }
     }
     
-    void DestroyFPSGuns()
+    public void DestroyFPSGuns()
     {
         Destroy(revolver_fps.gameObject);
         Destroy(shotgun_fps.gameObject);
@@ -440,9 +443,9 @@ public class FPSGunController : MonoBehaviour
     const float ARSpreadDecreaseRate = 1f;
     const float ARSpreadMult = 0.1f;
     
-    const float punchDistance = 2.3F;
+    const float punchDistance = 2.45F;
     
-    const int punchDamage = 275;
+    const int punchDamage = 300;
     const int punchDamage_Ult = 600;
     
     public void Punch_Ult()
@@ -1011,17 +1014,17 @@ public class FPSGunController : MonoBehaviour
         {
             BerserkPowerUp();
             AudioManager.PlayClip(SoundType.gun_pick_up, 0.8f, 1f);
-            Invoke("rofl1", 0.150f);
+            //Invoke("rofl1", 0.150f);
             // Invoke("rofl2", 0.150f);
             // Invoke("rofl3", 0.150f);
         }
-        InGameConsole.LogFancy("OnInject()");
+        //InGameConsole.LogFancy("OnInject()");
     }
     
-    public void rofl1()
-    {
-        AudioManager.PlayClip(SoundType.gun_pick_up, 0.6f, 1.1f);
-    }
+    // public void rofl1()
+    // {
+    //     AudioManager.PlayClip(SoundType.gun_pick_up, 0.6f, 1.1f);
+    // }
     
     // public void rofl2()
     // {
@@ -1106,10 +1109,46 @@ public class FPSGunController : MonoBehaviour
         }
     }
     
+    public GameObject[] onFirstTouchedGroundObjectsToActivate;
+    
+    void OnBeforeTouchedGround()
+    {
+        if(onFirstTouchedGroundObjectsToActivate != null)
+        {
+            int len = onFirstTouchedGroundObjectsToActivate.Length;
+            for(int i = 0; i < len; i++)
+            {
+                onFirstTouchedGroundObjectsToActivate[i].SetActive(false);
+            }
+        }
+    }
+    
+    void OnFirstTouchedGround()
+    {
+        if(onFirstTouchedGroundObjectsToActivate != null)
+        {
+            int len = onFirstTouchedGroundObjectsToActivate.Length;
+            for(int i = 0; i < len; i++)
+            {
+                onFirstTouchedGroundObjectsToActivate[i].SetActive(true);
+            }
+        }
+    }
+    
     void Update()
     {
         if(pv.IsMine == false)
         {
+            return;
+        }
+        
+        if(!touchedGroundAfterSpawn)
+        {
+            if(pController.IsGrounded())
+            {
+                touchedGroundAfterSpawn = true;
+                OnFirstTouchedGround();
+            }
             return;
         }
         
@@ -1739,7 +1778,7 @@ public class FPSGunController : MonoBehaviour
         
         if(ARGhostTimer <= 0)
         {
-            if(!hasARGhost && AR_ghost_fps.gameObject.activeSelf)
+            if(!hasARGhost && (AR_ghost_fps != null) && AR_ghost_fps.gameObject.activeSelf)
             {
                 UnequipARGhost();
             }
@@ -2692,7 +2731,7 @@ public class FPSGunController : MonoBehaviour
         bulletController.LaunchAsSphere(shotPos, direction, 0.15F, bulletMask, 46, rocketLauncherDmg, isMine);
         bulletController.on_die_behave = BulletOnDieBehaviour.Explode_1;
         bulletController.explosionRadius = 4.5f;
-        bulletController.explosionForce = 28;
+        bulletController.explosionForce = 36;
         bulletController.explosionDamage = 400;
         bulletController.explosionCanDamageLocalPlayer = false;
         bulletController.explosionCanDamageNPCs = true;
@@ -2953,8 +2992,9 @@ public class FPSGunController : MonoBehaviour
         bulletController.on_die_behave = BulletOnDieBehaviour.Explode_1;
         
         bulletController.explosionRadius = 4.5f;
-        bulletController.explosionForce = 28;
+        bulletController.explosionForce = 36;
         bulletController.explosionDamage = 400;
+        bulletController.uniqueID = Random.Range(0, 256);
         
         bulletController.explosionCanDamageLocalPlayer = false;
         bulletController.explosionCanDamageNPCs = true;

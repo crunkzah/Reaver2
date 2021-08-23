@@ -8,6 +8,13 @@ public enum GateState : int
     Locked,
 }
 
+public enum StopWatchBehaviour : byte
+{
+    None,
+    Start,
+    Finish
+}
+
 public enum GateDetectionMode : int
 {
     Old,
@@ -55,6 +62,8 @@ public class GatesController : MonoBehaviour, INetworkObject
     [Range(0, 100)]
     public int checkPointPriority = 0;
     public NetworkObjectAndCommand[] messages_on_load;
+    
+    public StopWatchBehaviour stopWatch;
     
     
     //public GameObject[] locks;
@@ -285,9 +294,30 @@ public class GatesController : MonoBehaviour, INetworkObject
             {
                 if(state == GateState.Closed)
                 {
+                    
                     //Open:
                     // targetPosLeftLocal = openPosLeftLocal;
                     // targetPosRightLocal = openPosRightLocal;
+                    
+                    switch(stopWatch)
+                    {
+                        case(StopWatchBehaviour.None):
+                        {
+                            break;
+                        }
+                        case(StopWatchBehaviour.Start):
+                        {
+                            UberManager.StartInGameTimer();
+                            stopWatch = StopWatchBehaviour.None;
+                            break;
+                        }
+                        case(StopWatchBehaviour.Finish):
+                        {
+                            UberManager.StopInGameTimer();
+                            stopWatch = StopWatchBehaviour.None;
+                            break;
+                        }
+                    }
                     
                     Open();
                     ProcessStatusLight(state);

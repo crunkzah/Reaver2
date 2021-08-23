@@ -169,6 +169,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
             case(NetworkCommand.Attack):
             {
                 UnlockSendingCommands();
+                
                 Vector3 attackPosEnd = (Vector3)args[0];
                 
                 brainTimer = 0;
@@ -196,6 +197,8 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                 canFire = true;
                 // anim.SetTrigger("FireTrigger");
                 anim.Play("Base.Fire", 0, 0);
+                
+                shotsNumber++;
                 
                 SetMovePos(shootPos);
                 UpdateRemoteAgentDestination(shootPos);
@@ -284,6 +287,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
             case(SinclaireState.Chasing):
             {
                 distanceTravelledRunningSqr = 0;
+                brainTimer = path_update_cd;
                 //anim.SetLayerWeight(1, 1);
                 break;
             }
@@ -475,7 +479,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     bool canDoMeleeDamageToLocalPlayer = true;
     const float sword_attack1_duration = 4.2F / 3.5f;
     
-    const float sword_attack1_damageTimingStart = 0.27F / 3;
+    const float sword_attack1_damageTimingStart = 0.29F / 3;
     //const float sword_attack1_damageTimingEnd = 1.1F / 4;
     
     //const float sword_attack1_distance = 2F;
@@ -486,8 +490,8 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     const float firing_duration = 2 / 2;
     const int firing_damage_per_proj = 25;
     const float firing_timing = 1F / 2;
-    const float firing_cooldown = 3.5F;
-    const float firing_distance = 72F;
+    const float firing_cooldown = 4.5F;
+    const float firing_distance = 144F;
     
     public float firing_masterTimer;
     
@@ -550,7 +554,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     
     const float daggerSpeed = 36;
     
-    public void Shoot(Vector3 shootPos, Vector3 shootDir)
+    public void ShootTriple(Vector3 shootPos, Vector3 shootDir)
     {
         //shooterHelper.localRotation = Quaternion.LookRotation(shootDir, Vector3.up);
         
@@ -591,6 +595,42 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
         dagger = dagger_go.GetComponent<FlyingDagger>();
         dagger.LaunchSinclaireDagger(shootPos, leftDir, daggerSpeed, 0.45f, daggerDamage, isMine, owner_id);
         dagger.nailedExplosionDelay = 2.5f;
+        
+        ParticlesManager.PlayPooled(ParticleType.daggerShot_ps, shootPos + shootDir*1.0f, forwardDir);
+    }
+    
+    int shotsNumber = 0;
+    
+    public void ShootSingle(Vector3 shootPos, Vector3 shootDir)
+    {
+        //shooterHelper.localRotation = Quaternion.LookRotation(shootDir, Vector3.up);
+        
+        audio_src.PlayOneShot(clipFireShot);
+        
+        shooterHelper.forward = shootDir;
+        
+        Vector3 forwardDir = shootDir;
+        Vector3 rightDir = forwardDir + shooterHelper.right * 0.15f;
+        rightDir.Normalize();
+        Vector3 leftDir = forwardDir - shooterHelper.right * 0.15f;
+        leftDir.Normalize();
+        
+        //rightDir = shooterHelper.InverseTransformDirection(rightDir);
+        //leftDir = shooterHelper.InverseTransformDirection(leftDir);
+        
+        GameObject dagger_go;
+        FlyingDagger dagger;
+        
+        bool isMine = PhotonNetwork.IsMasterClient;
+        
+        dagger_go = ObjectPool2.s().Get(ObjectPoolKey.FlyingDagger1, false);
+        
+        int owner_id = col.GetInstanceID();
+        
+        dagger = dagger_go.GetComponent<FlyingDagger>();
+        dagger.LaunchSinclaireDagger(shootPos, forwardDir, daggerSpeed, 0.45f, daggerDamage, isMine, owner_id);
+        dagger.nailedExplosionDelay = 2.25f;
+        
         
         ParticlesManager.PlayPooled(ParticleType.daggerShot_ps, shootPos + shootDir*1.0f, forwardDir);
     }
@@ -964,8 +1004,10 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                         canFire = false;
                         Vector3 shootPosOffsetted = currentDestination + new Vector3(0, 2f, 0);
                         Vector3 _shootDir = (pos_to_fire_at - shootPosOffsetted).normalized; 
-                        
-                        Shoot(shootPosOffsetted, _shootDir);
+                        if(shotsNumber % 2 == 0)
+                            ShootTriple(shootPosOffsetted, _shootDir);
+                        else
+                            ShootSingle(shootPosOffsetted, _shootDir);
                     }
                 }
                 

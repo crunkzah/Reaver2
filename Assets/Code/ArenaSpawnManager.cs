@@ -64,7 +64,7 @@ public class ArenaSpawnManager : MonoBehaviour
             }
             else
             {
-                if(PhotonManager.Singleton().LocalDwarf)
+                if(PhotonManager.Singleton().local_player_gameObject)
                 {
                     StartArena();
                 }

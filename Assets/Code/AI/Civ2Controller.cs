@@ -106,6 +106,10 @@ public class Civ2Controller : MonoBehaviour, INetworkObject
     float maxDotValue = 0.45f;
     public float currentDot = 0;
     
+    public ParticleSystem revolver_holding_ps;
+    public ParticleSystem revolver_burst_ps;
+    public AudioSource audio_src;
+    
     public void SetState(Civ2State _state)
     {
         state = _state;
@@ -121,14 +125,37 @@ public class Civ2Controller : MonoBehaviour, INetworkObject
             {
                 anim.SetTrigger("Idle");
                 DoLight(revolver_holding.transform.position);
-                revolver_holding.gameObject.SetActive(false);
+                Vector3 lightPos = revolver_holding.position;
+                GameObject g = ObjectPool2.s().Get(ObjectPoolKey.LightPooled, false);
+                LightPooled light = g.GetComponent<LightPooled>();
+                Color color = new Color(1f, 0.2f, 0f, 1f);
+                audio_src.Stop();
                 
-                for(int i = 0; i < gates_to_open.Length; i++)
-                {
-                    gates_to_open[i].Unlock();
-                }
+                float decay_speed = 8 / 0.33f;
+                light.DoLight(lightPos, color, 2f, 8, 8, decay_speed);
+                revolver_holding.gameObject.SetActive(false);
+                //ParticleSystem.EmissionModule module = revolver_holding_ps.emission;
+                revolver_holding_ps.loop = false;
+                revolver_holding_ps.GetComponent<Light>().enabled = false;
+                revolver_burst_ps.Play();
+               // module.rateOverTime = 0;
+                
+                
+                // for(int i = 0; i < gates_to_open.Length; i++)
+                // {
+                //     gates_to_open[i].Unlock();
+                // }
+                Invoke(nameof(RevolverGiven_OpenGates), 1.0f);
                 break;
             }
+        }
+    }
+    
+    public void RevolverGiven_OpenGates()
+    {
+        for(int i = 0; i < gates_to_open.Length; i++)
+        {
+            gates_to_open[i].Unlock();
         }
     }
     

@@ -726,6 +726,8 @@ MonoBehaviour:
   GunLowerPoint_FPS: {fileID: 0}
   GunMiddlePoint_FPS: {fileID: 0}
   wind_audioSource: {fileID: 0}
+  windPsUp: {fileID: 0}
+  windPsDown: {fileID: 0}
   platformMask:
     serializedVersion: 2
     m_Bits: 0

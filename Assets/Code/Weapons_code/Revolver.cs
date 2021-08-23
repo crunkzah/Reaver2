@@ -116,8 +116,8 @@ public class Revolver : MonoBehaviour
         float dt = UberManager.DeltaTime();
         
         
-        float offsetX = Random.Range(-1f, 1f) * 0.01F;
-        float offsetY = Random.Range(-1f, 1f) * 0.01F;
+        float offsetX = Random.Range(-1f, 1f) * 0.005F;
+        float offsetY = Random.Range(-1f, 1f) * 0.005F;
         
         offsetX *= shaking_mult;
         offsetY *= shaking_mult;

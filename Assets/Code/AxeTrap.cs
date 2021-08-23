@@ -20,6 +20,8 @@ public class AxeTrap : MonoBehaviour, INetworkObject
     const float constantSpeed = 420f;
     public float dir = 1;
     
+    RotationAnimator[] rotationAnimators;
+    
     
     public float delay = 0f;
     
@@ -73,6 +75,8 @@ public class AxeTrap : MonoBehaviour, INetworkObject
         speed = 0;
         angle = dir * apexAngle;
         dir = -dir;
+        for(int i = 0; i < rotationAnimators.Length; i++)
+            rotationAnimators[i].enabled = true;
         //audioSrc.PlayOneShot(swingClip, 0.7f);
         audioSrc.PlayOneShot(launchClip);
     }
@@ -84,6 +88,7 @@ public class AxeTrap : MonoBehaviour, INetworkObject
     {
         thisTransform = transform;
         net_comp = GetComponent<NetworkObject>();
+        rotationAnimators = GetComponentsInChildren<RotationAnimator>();
     }
 
 
@@ -127,6 +132,8 @@ public class AxeTrap : MonoBehaviour, INetworkObject
                     if(Math.Abs(angle) >= Math.Abs(dir * apexAngle * 0.99f))
                     {
                         state = AxeTrapState.Enabled;
+                        for(int i = 0; i < rotationAnimators.Length; i++)
+                            rotationAnimators[i].enabled = false;
                         speed = 0;
                         
                         // if(PhotonNetwork.IsMasterClient && canSendCommands)

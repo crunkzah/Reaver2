@@ -306,7 +306,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
         }
     }
     
-    const float projectileSpeed = 45F;
+    const float projectileSpeed = 38F;
     const float projectileRadius = 0.4F;
     const int projectileDamage = 20;
     
@@ -794,7 +794,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             case(StepaState.Shooting):
             {
                 brainTimer += dt;
-                //WarpRemoteAgent();
+                WarpRemoteAgent(thisTransform.localPosition);
                 
                 if(brainTimer >= shootingDuration)
                 {
@@ -939,7 +939,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 velocity.y = Math.Clamp(-GRAVITY_MAX, GRAVITY_MAX, velocity.y);
                 
                 
-                if(Time.time > airbourneTimeStamp + 15f && canSendCommands)
+                if(thisTransform.localPosition.y < -500 && canSendCommands)
                 {
                     LockSendingCommands();
                     NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.DieWithForce, new Vector3(0, 0, 0));
@@ -972,7 +972,21 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                             if(Physics.CapsuleCast(capsulePBottom, capsulePTop, capsuleRadius, velDir, velMag * dt, groundMask))
                             {
                                 velocity.x = velocity.y = velocity.z = 0;
-                                InGameConsole.LogFancy(string.Format("{0}: Double capsule cast hit!", this.gameObject.name));
+                                NavMeshHit _navMeshHit;
+                                Vector3 samplePos = thisTransform.localPosition;
+                                if(NavMesh.SamplePosition(samplePos, out _navMeshHit, 0.66f, NavMesh.AllAreas))
+                                {
+                                    if(canSendCommands)
+                                    {
+                                        LockSendingCommands();
+                                      //  InGameConsole.LogOrange("<color=green>Sending LandOnGround() </color>");
+                                        NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.LandOnGround, _navMeshHit.position);
+                                    }    
+                                }
+                                else
+                                {
+                                    InGameConsole.LogFancy(string.Format("{0}: Double capsule cast hit!", this.gameObject.name));
+                                }
                             }
                         }
                         else

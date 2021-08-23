@@ -113,6 +113,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             mainMaterial = player_renderer.sharedMaterial;
             
             AudioManager.PlayClip(SoundType.PlayerSpawn, 0.2f, 1);
+            PlayerGUI_In_Game.HidePlayerGUI();
         }
         else
         {
@@ -229,6 +230,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     void Revive()
     {
+        PhotonManager.wasFirstPlayerSpawned = true;
+        
         if(pv.IsMine)
         {
             SetFPSCameraToPlayer();
@@ -440,6 +443,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
                     Destroy(_camCol);
             }
             
+            //_camTr.position = Vector3.zero;
+            //_camTr.rotation = Quaternion.identity;
+            
             _camTr.SetParent(fpsCameraPlace);
             _camTr.localPosition = Vector3.zero;
             _camTr.transform.localRotation = Quaternion.identity;
@@ -570,8 +576,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
     }
     
-    float slideControllerHeight = 1;//1f;
-    float normalControllerHeight = 2.2f;
+    float slideControllerHeight = 0.9f;//1f;
+    float normalControllerHeight = 2.4f;
     
     //public AudioSource slidingAudioClip;
     public AudioSource playerAudioSource_sliding;
@@ -582,7 +588,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         slidingPs.Play();
         
         controller.height = slideControllerHeight;
-        controller.center = new Vector3(0, 0.5f, 0);
+        controller.center = new Vector3(0, slideControllerHeight / 2f, 0);
         
         if(pv.IsMine)
         {
@@ -786,7 +792,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     }
     
     
-    int SlamDirectDamage = 420;
+    int SlamDirectDamage = 320;
     const float slamVelocityY = MAX_NEGATIVE_GRAVITY;//-39;
     
     public AudioClip noStaminaClip;
@@ -956,7 +962,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         p2.y += 0.1f;
         
         RaycastHit hit;
-        if(Physics.CapsuleCast(p1, p2, controller.radius * 2.0f, Vector3.down, out hit, dt * Math.Abs(slamVelocityY), npc2Mask))
+        if(Physics.CapsuleCast(p1, p2, controller.radius * 1.1f, Vector3.down, out hit, dt * Math.Abs(slamVelocityY), npc2Mask))
         {
             NetworkObject npc_net_comp = hit.collider.GetComponent<NetworkObject>();
             if(npc_net_comp != null)
@@ -968,13 +974,13 @@ public class PlayerController : MonoBehaviour, IPunObservable
                     LimbForExplosions lfe = npc_net_comp.GetComponent<LimbForExplosions>();
                     lfe.OnExplodeAffected();
                     
-                    //InGameConsole.Log("<color=red>DOING DAMAGE </color>");
                     if(npc_hp - SlamDirectDamage <= 0)
                     {
                         Physics.IgnoreCollision(controller, hit.collider, true);
                         idl.TakeDamageLocally(SlamDirectDamage, thisTransform.localPosition, Vector3.down);
                         byte limb_to_destroy = (byte)Random.Range(1, 4);
                         NetworkObjectsManager.CallNetworkFunction(npc_net_comp.networkId, NetworkCommand.DieWithForce, Vector3.down * 250, limb_to_destroy);                       
+                        InGameConsole.Log("<color=green>DOING SLAM DIRECT DAMAGE 1</color>");
                     }
                     else
                     {
@@ -987,7 +993,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
                         PlayDirSlam();
                         
                         pv.RPC("PlayDirSlam", RpcTarget.Others);
-                        
+                        InGameConsole.Log("<color=yellow>DOING SLAM DIRECT DAMAGE 2</color>");
                         //Vector3 randomOffset = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
                         //Vector3 playerBoostDir = 0.5f * randomOffset + hit.normal;
                         //playerBoostDir.Normalize();
@@ -1007,7 +1013,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     }
     
     float groundSlammed_timeStamp;
-    const float slamJumpTimeWindow = 0.7f;
+    const float slamJumpTimeWindow = 1.15f;
     
     float GetGroundSlamDelay()
     {
@@ -1024,9 +1030,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
     Collider[] slam_pounded_limbs = new Collider[64];
     //const float slam_pound_limbs_radius = 2.5F;
     
-    const float box_size_x = 1.1F;
+    const float box_size_x = 1.0F;
     const float box_size_y = 0.33F;
-    const float box_size_z = 1.1F;
+    const float box_size_z = 1.0F;
     
     [PunRPC]
     void OnGroundSlammed(Vector3 slamImpactPos)
@@ -1082,9 +1088,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
         {
             return false;
         }
-        
-        
-        
         
         if(canControlPlayer)
         {
@@ -1447,7 +1450,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             if(Physics.Raycast(ray, out slamHit, Math.Abs(slamVelocityY) * dt, groundAndNPCMask))
             {
                 bool isKeyPressed = Inputs.GetSlamAndSlide_Key();
-                if(isKeyPressed && timeInAir > 0.2f)
+                if(isKeyPressed && timeInAir > 0.125f)
                 {
                     pv.RPC("OnGroundSlammed", RpcTarget.All, slamHit.point);
                 }
@@ -1495,22 +1498,24 @@ public class PlayerController : MonoBehaviour, IPunObservable
             // }
             
             
-            if(Time.time > groundSlammed_timeStamp + slamJumpTimeWindow)
+            if((Math.Abs(Time.time  - groundSlammed_timeStamp) > slamJumpTimeWindow))
             {
                 fpsVelocity.y = fpsJumpForce;
             }
             else
             {
-                // if(thisTransform.localPosition.y < groundSlamStartPos.y)
+                // if((velocityBeforeGrounded.y <= MAX_NEGATIVE_GRAVITY))
                 // {
-                //     float height_travelled = Math.Abs(thisTransform.localPosition.y - groundSlamStartPos.y);
-                //     slamLaunchForce = fpsGravity * 0.5f * 0.5f + height_travelled / 0.5f;
-                // }
-                float slamLaunchForce = fpsJumpForce * 2f * moveSpeedMultiplier;
-                
+                    float slamLaunchForce = Math.Max(fpsJumpForce * 2.5f * moveSpeedMultiplier, 28f);
+                    fpsVelocity.y = slamLaunchForce;
+                    slamLaunch_ps.Play();
                     
-                fpsVelocity.y = slamLaunchForce;
-                slamLaunch_ps.Play();
+                    // if(thisTransform.localPosition.y < groundSlamStartPos.y)
+                    // {
+                    //     float height_travelled = Math.Abs(thisTransform.localPosition.y - groundSlamStartPos.y);
+                    //     slamLaunchForce = fpsGravity * 0.5f * 0.5f + height_travelled / 0.5f;
+                    // }
+                // }
             }
             playerAudioSource.PlayOneShot(jumpLocalClip, 0.275f);
         }
@@ -1763,19 +1768,32 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
     }
     
+    bool touchedGroundAfterSpawn = false;
+    
     void Update()
     {
         float dt = UberManager.DeltaTime();
         SyncRTTWithMaster(dt);
         
-        damageImmuneTimer -= dt;
-        if(damageImmuneTimer < 0)
-        {
-            damageImmuneTimer = 0;
-        }
         
         if(pv.IsMine)
         {
+            damageImmuneTimer -= dt;
+            if(damageImmuneTimer < 0)
+            {
+                damageImmuneTimer = 0;
+            }
+            
+            if(!touchedGroundAfterSpawn)
+            {
+                if(IsGrounded())
+                {
+                    PlayerGUI_In_Game.ShowPlayerGUI();
+                    touchedGroundAfterSpawn = true;
+                }
+            }
+            
+            
             CheckOutOfBounds();
             WindTick();
             switch(aliveState)
@@ -1901,7 +1919,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     }
     
     [Header("Stats:")]
-    const int MaxHealth = 10000;
+    const int MaxHealth = 100;
     public int HitPoints;
     const float MaxStamina = 100;
     public float Stamina;
@@ -1959,11 +1977,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     
     float TimeWhenTookDamage = 0;
-    const float takeDamageImmunityDuration = 0.2F;
+    const float takeDamageImmunityDuration = 0.15F;
     
     public bool CanTakeDamageFromProjectile()
     {
-        if(Time.time < TimeWhenTookDamage + takeDamageImmunityDuration)
+        if(Math.Abs(Time.time - TimeWhenTookDamage) < takeDamageImmunityDuration)
         {
             return false;
         }
@@ -2198,6 +2216,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
         if(pv.IsMine)
         {
+            gunController.DestroyFPSGuns();
             PlayerGUI_In_Game.Singleton().ReleasePlayerGUI();
             PostProcessingController2.SetState(PostProcessingState.PlayerDead);
             OrthoCamera.Show();

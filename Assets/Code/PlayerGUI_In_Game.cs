@@ -134,6 +134,18 @@ public class PlayerGUI_In_Game : MonoBehaviour
         staminaText.SetText((stamina_int).ToString());
     }
     
+    public CanvasGroup gui_canvasGroup; 
+    
+    public static void HidePlayerGUI()
+    {
+        Singleton().gui_canvasGroup.alpha = 0;
+    }
+    
+    public static void ShowPlayerGUI()
+    {
+        Singleton().gui_canvasGroup.alpha = 1;
+    }
+    
     public void Hide()
     {
         transform.parent.gameObject.SetActive(false);

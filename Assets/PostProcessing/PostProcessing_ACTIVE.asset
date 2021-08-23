@@ -41,11 +41,11 @@ MonoBehaviour:
         stationaryBlending: 0.95
         motionBlending: 0.85
   ambientOcclusion:
-    m_Enabled: 0
+    m_Enabled: 1
     m_Settings:
-      intensity: 64
-      radius: 0.2
-      sampleCount: 6
+      intensity: 38
+      radius: 0.005
+      sampleCount: 3
       downsampling: 0
       forceForwardCompatibility: 0
       ambientOnly: 0
@@ -121,12 +121,12 @@ MonoBehaviour:
         neutralWhiteLevel: 7.2
         neutralWhiteClip: 7.89
       basic:
-        postExposure: 0.19999981
+        postExposure: 0.2000002
         temperature: 1e-44
         tint: 0
         hueShift: 0
-        saturation: 1.0999991
-        contrast: 0.90000075
+        saturation: 1.1000007
+        contrast: 0.9000007
       channelMixer:
         red: {x: 1, y: 0, z: 0}
         green: {x: 0, y: 1, z: 0}

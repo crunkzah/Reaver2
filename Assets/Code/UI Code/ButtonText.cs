@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
@@ -53,6 +53,7 @@ public class ButtonText : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     
     public void OnPointerExit(PointerEventData eventData)
     {
+        
         if(tmp)
         {
             tmp.color = unselectedColor;

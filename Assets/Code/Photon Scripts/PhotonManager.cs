@@ -205,6 +205,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         InGameConsole.LogFancy("CreateRoom() " + roomNameToCreateOrJoin);
         
         RoomOptions roomOptions = new RoomOptions();
+        
         roomOptions.MaxPlayers = 4;
         roomOptions.IsOpen = true;
         roomOptions.IsVisible = false;
@@ -237,7 +238,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
     
     int spawnPlaceIndex = 0;
 
-    public GameObject LocalDwarf;
+    public GameObject local_player_gameObject;
     public PlayerController local_controller;
     
     bool wantGoSingleplayer = false;
@@ -284,7 +285,68 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         if(sceneIndex == 0 || sceneIndex == 1)
             return;
         
-        if(LocalDwarf != null)
+        if(local_player_gameObject != null)
+            return;
+            
+        if(PhotonNetwork.InRoom)
+        {
+            InGameConsole.Log("<color=#B7C231>Spawning local player !</color>");
+            
+            SpawnPlace[] spawns = FindObjectsOfType<SpawnPlace>();
+            
+            if(spawns != null)
+            {
+                if(!usingSavePoints)
+                {
+                    // spawnPlace = spawns.transform;
+                    spawnPlaceIndex++;
+                    if(spawnPlaceIndex >= spawns.Length)
+                    {
+                        spawnPlaceIndex = 0;
+                    }
+                    
+                    spawnPlace = spawns[spawnPlaceIndex].transform;
+                }
+                else
+                {
+                    for(int i = 0; i < spawns.Length; i++)
+                    {
+                        spawnPlace = spawns[i].transform;
+                        if(spawns[i].isMainSpawn)
+                        {
+                            spawnPlace = spawns[i].transform;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            
+            Vector3 playerSpawnPosition = (spawnPlace == null) ? new Vector3(3.38f, 1.16f, -8f) : spawnPlace.position;
+            
+            local_player_gameObject = PhotonNetwork.Instantiate(playerPrefabName, playerSpawnPosition, Quaternion.identity);
+            //local_player_gameObject = PhotonNetwork.Instantiate(playerPrefabName, playerSpawnPosition, spawnPlace.rotation);
+            
+            local_controller = local_player_gameObject.GetComponent<PlayerController>();
+            
+            
+            PlayerManager.Singleton().SetLocalPlayer(local_player_gameObject);
+            local_player_gameObject.name = "Local_Player";
+            
+            //FollowingCamera.Singleton().transform.position = playerSpawnPosition;
+            StartUpScreen.Singleton().FadeIn(1.5f);
+            //AudioManager.PlayClip(SoundType.PlayerSpawn, 0.5f, Random.Range(0.2f, 0.25f));
+        }
+    }
+    
+    public void SpawnMyPlayerAt(Vector3 spawnPos)
+    {
+        int sceneIndex = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
+        
+        if(sceneIndex == 0 || sceneIndex == 1)
+            return;
+        
+        if(local_player_gameObject != null)
             return;
             
         if(PhotonNetwork.InRoom)
@@ -306,16 +368,16 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
             }
             
             
-            Vector3 playerSpawnPosition = (spawnPlace == null) ? new Vector3(3.38f, 1.16f, -8f) : spawnPlace.position;
+            Vector3 playerSpawnPosition = spawnPos;
             
-            LocalDwarf = PhotonNetwork.Instantiate(playerPrefabName, playerSpawnPosition, Quaternion.identity);
-            //LocalDwarf = PhotonNetwork.Instantiate(playerPrefabName, playerSpawnPosition, spawnPlace.rotation);
+            local_player_gameObject = PhotonNetwork.Instantiate(playerPrefabName, playerSpawnPosition, Quaternion.identity);
+            //local_player_gameObject = PhotonNetwork.Instantiate(playerPrefabName, playerSpawnPosition, spawnPlace.rotation);
             
-            local_controller = LocalDwarf.GetComponent<PlayerController>();
+            local_controller = local_player_gameObject.GetComponent<PlayerController>();
             
             
-            PlayerManager.Singleton().SetLocalPlayer(LocalDwarf);
-            LocalDwarf.name = "Local_Dwarf";
+            PlayerManager.Singleton().SetLocalPlayer(local_player_gameObject);
+            local_player_gameObject.name = "Local_Player";
             
             //FollowingCamera.Singleton().transform.position = playerSpawnPosition;
             StartUpScreen.Singleton().FadeIn(1.5f);
@@ -327,6 +389,10 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         
     public bool shouldSync = false;
     public double timeWhenToSync;
+    
+    int prevSceneIndex = -1;
+    
+    public static bool wasFirstPlayerSpawned = false;
     
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
@@ -350,6 +416,24 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
             }
         }
         
+        //OrthoCamera.Hide();
+        DeadGUI.Hide();
+        
+        
+        wasFirstPlayerSpawned = false;
+        PostProcessingController2.SetState(PostProcessingState.Normal);
+        
+        
+        if(prevSceneIndex != scene.buildIndex)
+        {
+            UberManager.SetSavePointPriority(-1);
+            
+        }
+        
+        canSpawnPlayer_offlineMode = true;
+        
+        prevSceneIndex = scene.buildIndex;
+        
         spawnPlaceIndex = 0;
         
         InGameConsole.Log(string.Format("Level '{0}' loaded!", scene.name));
@@ -358,6 +442,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         //sceneObjectsToSynchronize.Clear();
         
         UberManager.Singleton().readyToSwitchLevel = true;
+        UberManager.ResumeGame();
         
         ObjectPool.s().ResetPool();
         ObjectPool2.s().ResetPool();
@@ -378,6 +463,48 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
     
     public Photon.Realtime.ClientState networkClientState;
     
+    static bool usingSavePoints = true;
+    
+    void OnLoadedOnSavePoint()
+    {
+        
+        int savePointPriority = UberManager.GetSavePointPriority();
+        if(savePointPriority != -1)
+        {
+            UberManager.AddRestartCount();
+            Checkpoint[] all_checkPoints = FindObjectsOfType<Checkpoint>();
+
+            Vector3 savePointSpawnPos = Vector3.zero + new Vector3(0, 200, 0);
+            
+            int len = all_checkPoints.Length;
+            for(int i = 0; i < len; i++)
+            {
+                if(all_checkPoints[i].checkPointPriority == savePointPriority)
+                {
+                    savePointSpawnPos = all_checkPoints[i].GetSavePointSpawnPlace();
+                    all_checkPoints[i].LoadToThisSavePoint();
+                }
+            }
+            
+            SpawnMyPlayerAt(savePointSpawnPos);
+            // if(PhotonNetwork.IsMasterClient)
+            // {
+            //     if(messages_on_load != null)
+            //     {
+            //         for(int i = 0; i < messages_on_load.Length; i++)
+            //         {
+            //             NetworkObjectsManager.CallNetworkFunction(messages_on_load[i].net_comp.networkId, messages_on_load[i].command);
+            //         }
+            //     }
+            // }
+        }
+        else
+        {
+            SpawnMyPlayer();
+        }
+    }
+    
+    bool canSpawnPlayer_offlineMode = true;
 
     void Update()
     {
@@ -407,20 +534,92 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         
         if(Input.GetKeyDown(KeyCode.V))
         {
-            if(!InGameMenu.IsVisible())
+            if(!usingSavePoints)
             {
-                if(LocalDwarf == null)
-                    SpawnMyPlayer();
+                if(!InGameMenu.IsVisible())
+                {
+                    if(local_player_gameObject == null)
+                        SpawnMyPlayer();
+                    else
+                    {
+                        OrthoCamera.Hide();
+                        DeadGUI.Hide();
+                        // if(PhotonNetwork.OfflineMode)
+                        // {
+                        //     canSpawnPlayer_offlineMode = false;    
+                        // }
+                        DestroyMyPlayer();      
+                    }
+                }
                 else
                 {
-                    OrthoCamera.Hide();
-                    DeadGUI.Hide();
-                    DestroyMyPlayer();      
+                    Debug.Log("<color=yellow>Can't spawn player!</color>");
                 }
             }
             else
             {
-                Debug.Log("<color=yellow>Can't spawn player!</color>");
+                if(local_controller)
+                {
+                    if(local_controller.isAlive)
+                    {
+                        
+                    }
+                    else
+                    {
+                        OrthoCamera.Hide();
+                        DeadGUI.Hide();
+                        DestroyMyPlayer(); 
+                        if(PhotonNetwork.OfflineMode)
+                        {
+                            canSpawnPlayer_offlineMode = false;  
+                            int savePointPriority = UberManager.GetSavePointPriority();
+                            int currentLevelIndex = UberManager.GetCurrentLevelIndex();
+                            level_delayed_to_load = currentLevelIndex; 
+                            SetSavePointPriority(savePointPriority);
+                            Invoke(nameof(LoadLevel_Delayed), 0.1f);
+                        }
+                        //RestartFromSavePoint();
+                    }
+                }
+                else
+                {
+                    if(!PhotonNetwork.OfflineMode && (PhotonNetwork.CurrentRoom.MaxPlayers != PhotonNetwork.CurrentRoom.PlayerCount))
+                    {
+                        InGameConsole.LogOrange("Can't spawn local player because <color=red>not all</color> players have joined !!!");
+                        InGameConsole.LogOrange(string.Format("Players in room: <color=yellow>{0}</color>, maxPlayers: <color=green>{1}</color>", PhotonNetwork.CurrentRoom.PlayerCount, PhotonNetwork.CurrentRoom.MaxPlayers));
+                        return;
+                    }
+                    
+                    if(canSpawnPlayer_offlineMode == false)
+                    {
+                        int savePointPriority = UberManager.GetSavePointPriority();
+                        if(PhotonNetwork.IsMasterClient)
+                        {
+                            int currentLevelIndex = UberManager.GetCurrentLevelIndex();
+                            level_delayed_to_load = currentLevelIndex;
+                            
+                            if(PhotonNetwork.OfflineMode)
+                            {
+                                SetSavePointPriority(savePointPriority);
+                                Invoke(nameof(LoadLevel_Delayed), 0.1f);
+                            }
+                            else
+                            {
+                                photonView.RPC(nameof(SetSavePointPriority), RpcTarget.Others, savePointPriority);
+                                Invoke(nameof(LoadLevel_Delayed), 0.33f);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(UberManager.GetSavePointPriority() == -1)
+                        {
+                            UberManager.ResetInGameTimer();
+                        }
+                        OnLoadedOnSavePoint();
+                    }
+                }
+                
             }
         }
         
@@ -428,6 +627,65 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         // {
         //     photonView.RPC("SetTimeToSyncScene", RpcTarget.AllViaServer, PhotonNetwork.Time + 3d);
         // }
+    }
+    
+    void RestartFromSavePoint()
+    {
+        if(!PhotonNetwork.OfflineMode && (PhotonNetwork.CurrentRoom.MaxPlayers != PhotonNetwork.CurrentRoom.PlayerCount))
+        {
+            InGameConsole.LogOrange("Can't spawn local player because <color=red>not all</color> players have joined !!!");
+            InGameConsole.LogOrange(string.Format("Players in room: <color=yellow>{0}</color>, maxPlayers: <color=green>{1}</color>", PhotonNetwork.CurrentRoom.PlayerCount, PhotonNetwork.CurrentRoom.MaxPlayers));
+            return;
+        }
+        
+        if(canSpawnPlayer_offlineMode == false)
+        {
+            int savePointPriority = UberManager.GetSavePointPriority();
+            if(PhotonNetwork.IsMasterClient)
+            {
+                int currentLevelIndex = UberManager.GetCurrentLevelIndex();
+                level_delayed_to_load = currentLevelIndex;
+                
+                if(PhotonNetwork.OfflineMode)
+                {
+                    SetSavePointPriority(savePointPriority);
+                    Invoke(nameof(LoadLevel_Delayed), 0.1f);
+                }
+                else
+                {
+                    photonView.RPC(nameof(SetSavePointPriority), RpcTarget.Others, savePointPriority);
+                    Invoke(nameof(LoadLevel_Delayed), 0.33f);
+                }
+            }
+        }
+        else
+        {
+            OnLoadedOnSavePoint();
+        }
+    }
+    
+    [PunRPC]
+    public void OnPlayerSpawned()
+    {
+        if(PhotonNetwork.IsMasterClient)
+        {
+            
+        }
+    }
+    
+    [PunRPC]
+    public void SetSavePointPriority(int priority)
+    {
+        UberManager.SetSavePointPriority(priority);
+    }
+    
+    int level_delayed_to_load = -1;
+    public void LoadLevel_Delayed()
+    {
+        if(PhotonNetwork.IsMasterClient)
+        {
+            UberManager.Load_Level(level_delayed_to_load);
+        }
     }
     
     
@@ -441,23 +699,32 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
     
     public void DestroyMyPlayer()
     {
-        if(LocalDwarf)
+        if(local_player_gameObject)
         {
-            LocalDwarf.GetComponent<PlayerController>().OnDestroyCustom();
-            PhotonNetwork.Destroy(LocalDwarf.GetComponent<PhotonView>());
+            local_player_gameObject.GetComponent<PlayerController>().OnDestroyCustom();
+            PhotonNetwork.Destroy(local_player_gameObject.GetComponent<PhotonView>());
         }
     }
 
     void OnGUI()
     {
-        string text = string.Format("<color=blue>{0}</color>", networkClientState.ToString());
+        string text = string.Format("<color=green>CanSpawnPlayer_OfflineMode:</color> <color=yellow>{0}</color>", canSpawnPlayer_offlineMode.ToString());
         GUIStyle style = GUIStyle.none;
         
         style.alignment = TextAnchor.MiddleCenter;
         
-        float rectWidth = 250;
+        float rectWidth = 350;
         
-        GUI.Label(new Rect((Screen.width - rectWidth)/2, Screen.height - 34, rectWidth, 50), text, style);
+        GUI.Label(new Rect((Screen.width)/2 - rectWidth/2, Screen.height - 85, rectWidth, 50), text, style);
+        
+        // string text = string.Format("<color=blue>{0}</color>", networkClientState.ToString());
+        // GUIStyle style = GUIStyle.none;
+        
+        // style.alignment = TextAnchor.MiddleCenter;
+        
+        // float rectWidth = 250;
+        
+        // GUI.Label(new Rect((Screen.width - rectWidth)/2, Screen.height - 34, rectWidth, 50), text, style);
     }
 
     public override void OnCreatedRoom()

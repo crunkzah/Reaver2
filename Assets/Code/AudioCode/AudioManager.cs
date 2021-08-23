@@ -74,8 +74,22 @@ public class AudioManager : MonoBehaviour
         return audioLib[key];
     }
     
+    float gibTimeStamp = 0;
+    
     void _Play3D(SoundType type, Vector3 pos, float pitch, float vol, float doppler)
     {
+        if(type == SoundType.limb_gib1)
+        {
+            float diff = Math.Abs(Time.time - gibTimeStamp);
+            if(diff < 0.033f)
+            {
+                
+                InGameConsole.LogFancy(string.Format("TOO MUCH GIB AUDIO, diff: <color=yellow>{0}</color>", diff));
+                return;
+            }
+            
+            gibTimeStamp = Time.time;
+        }
         // InGameConsole.LogFancy("Play3D");
         audio_pool[audioPoolIndex].tr.localPosition = pos;
         audio_pool[audioPoolIndex].src.pitch = pitch;
@@ -188,7 +202,7 @@ public class AudioManager : MonoBehaviour
         
         explosion_audio.transform.localPosition = pos;
         
-        explosion_audio.volume = vol;
+        explosion_audio.volume = vol / 4;
         explosion_audio.pitch = pitch;
         
         explosion_audio.Play();

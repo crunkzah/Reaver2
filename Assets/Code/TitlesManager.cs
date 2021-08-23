@@ -8,7 +8,7 @@ public enum Title
     Undefined,
     Undercity,
     The_Machinery,
-    Arena_I,
+    Prologue,
     Arena_II
 }
 
@@ -56,11 +56,11 @@ public class TitlesManager : MonoBehaviour
         canvas = GetComponent<Canvas>();
     }
     
-    static string[] titles = {"Undefined", "Undercity", "The Machinery", "Arena I", "Arena II"};
+    static string[] titles = {"Undefined", "Undercity", "The Machinery", "Prologue", "Arena II"};
     
     //Top title:
     public TextMeshProUGUI topTitle;
-    const float topTitle_timeToBeVisible = 6F;
+    const float topTitle_timeToBeVisible = 9F;
     const float fadeSpeed = 0.75F;
     const float topTitle_alphaDelay = -0.5F;
     const float charTypeSpeed = 0.1F * 0.45F;

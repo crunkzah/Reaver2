@@ -253,7 +253,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                     return;
                 }
                 
-                airbourneTimeStamp = Time.time;
+                //airbourneTimeStamp = Time.time;
                 
                 Vector3 launchPos = (Vector3)args[0];
                 Vector3 launchVel = (Vector3)args[1];
@@ -321,7 +321,6 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             return;
         }
         
-        
         switch(_state)
         {
             case(PadlaState.Attacking1):
@@ -343,6 +342,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             case(PadlaState.Chasing):
             {
                 distanceTravelledRunningSqr = 0;
+                brainTimer = path_update_cd;
                 break;
             }
             default:
@@ -592,9 +592,9 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     
     const float punch1_cooldown = 5F;
     const float punch1_distance = 2F;
-    const float punch1_radius = 1.55F;
-    const int punch1_dmg = 20;
-    const float punch1_dashDistance = 3f;
+    const float punch1_radius = 1.85F;
+    const int punch1_dmg = 25;
+    const float punch1_dashDistance = 4f;
     
     int numberOfPunchesPerformed = 0;
     
@@ -742,9 +742,10 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 velocity.y += GRAVITY_Y * dt;
                 velocity.y = Math.Clamp(-GRAVITY_MAX, GRAVITY_MAX, velocity.y);
                 
-                if(Time.time > airbourneTimeStamp + 15f && canSendCommands)
+                if(thisTransform.localPosition.y < -500 && canSendCommands)
                 {
                     LockSendingCommands();
+                    InGameConsole.LogOrange("Padla airbourne timeout!!!!!!!!");
                     NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.DieWithForce, new Vector3(0, 0, 0));
                 }
                 
@@ -775,7 +776,22 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                             if(Physics.CapsuleCast(capsulePBottom, capsulePTop, capsuleRadius, velDir, velMag * dt, groundMask))
                             {
                                 velocity.x = velocity.y = velocity.z = 0;
-                                InGameConsole.LogFancy(string.Format("{0}: Double capsule cast hit!", this.gameObject.name));
+                                
+                                NavMeshHit _navMeshHit;
+                                Vector3 samplePos = thisTransform.localPosition;
+                                if(NavMesh.SamplePosition(samplePos, out _navMeshHit, 0.66f, NavMesh.AllAreas))
+                                {
+                                    if(canSendCommands)
+                                    {
+                                        LockSendingCommands();
+                                      //  InGameConsole.LogOrange("<color=green>Sending LandOnGround() </color>");
+                                        NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.LandOnGround, _navMeshHit.position);
+                                    }    
+                                }
+                                else
+                                {
+                                    InGameConsole.LogFancy(string.Format("{0}: Double capsule cast hit!", this.gameObject.name));
+                                }
                             }
                         }
                         else
@@ -856,7 +872,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     public Vector3 velocity;
     const float GRAVITY_Y = Globals.NPC_gravity;//-9.8F;
     const float GRAVITY_MAX = 50F;
-    float airbourneTimeStamp = 0;
+    //float airbourneTimeStamp = 0;
     
     void Punch1_L()
     {

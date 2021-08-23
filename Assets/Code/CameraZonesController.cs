@@ -108,9 +108,9 @@ public class CameraZonesController : MonoBehaviour
         else
         {
             
-            if(PhotonManager.Singleton() && PhotonManager.Singleton().LocalDwarf != null)
+            if(PhotonManager.Singleton() && PhotonManager.Singleton().local_player_gameObject != null)
             {
-                localPlayer = PhotonManager.Singleton().LocalDwarf.transform;
+                localPlayer = PhotonManager.Singleton().local_player_gameObject.transform;
             }
         }
 #endif

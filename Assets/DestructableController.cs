@@ -36,6 +36,14 @@ public class DestructableController : MonoBehaviour, INetworkObject
                 }
                 break;
             }
+            case(NetworkCommand.Ability1):
+            {
+                if(isAlive)
+                {
+                    SilentDestroy();
+                }
+                break;
+            }
             default:
             {
                 break;
@@ -82,6 +90,71 @@ public class DestructableController : MonoBehaviour, INetworkObject
     bool isAlive = true;
     
     public Vector3 boostVelocity = new Vector3(0, 45f, 0);
+    
+    void SilentDestroy()
+    {
+        if(navObstacle)
+        {
+            navObstacle.enabled = true;
+            navObstacle.carving = true;
+        }
+        isAlive = false;
+        
+        floor_col.enabled = false;
+        
+        //audio_src.Play();
+        
+        // if(ps_destructable_floor_static)
+        //     ps_destructable_floor_static.Play();
+        // ps_destructable_blowUp.Play();
+        
+        // PlayerController local_pc = PhotonManager.GetLocalPlayer();
+        // if(local_pc)
+        // {
+        //     if(Math.SqrMagnitude(boostVelocity) > 0)
+        //     {
+        //         local_pc.BoostVelocity(boostVelocity);
+        //     }
+        // }
+        
+        int len = 0;
+        
+        if(floors != null)
+        {
+            len = floors.Length;
+            for(int i = 0; i < len; i++)
+            {
+                floors[i].gameObject.SetActive(false);
+            }
+        }
+        
+        if(premadeDestructables != null)
+        {
+            // len = premadeDestructables.Length;
+            for(int i = 0; i < premadeDestructables.Length; i++)
+            {
+                premadeDestructables[i].gameObject.SetActive(false);
+            }
+        }
+        
+        if(objects_to_set_active != null)
+        {
+            for(int i = 0; i < objects_to_set_active.Length; i++)
+            {
+                objects_to_set_active[i].SetActive(true);
+            }
+        }
+        
+        if(object_to_setActive_after_destruction != null)
+        {
+            for(int i = 0; i < object_to_setActive_after_destruction.Length; i++)
+            {
+                object_to_setActive_after_destruction[i].SetActive(true);
+            }
+        }
+        
+        //InGameConsole.LogOrange("<color=red>Destroying destructables()</color>");
+    }
     
     void BlowUpAndDestroy()
     {

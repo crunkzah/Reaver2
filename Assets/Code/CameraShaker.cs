@@ -105,6 +105,7 @@ public class CameraShaker : MonoBehaviour
     
     void LateUpdate()
     {
+        //return;
         // if(Input.GetKeyDown(KeyCode.V))
         // {
         //     ShakeY(shakeYAmount);
@@ -116,7 +117,7 @@ public class CameraShaker : MonoBehaviour
         float offsetX = trauma * shakeMult * Random.Range(-1f, 1f) * horizontalMult;
         float offsetY = trauma * shakeMult * Random.Range(-1f, 1f) * verticalMult;
         
-        trauma = Mathf.SmoothDamp(trauma, 0, ref v, damping);
+        trauma = Mathf.SmoothDamp(trauma, 0, ref v, damping, 1000, dt);
         
         Vector3 duckOffset = isDucking ? duckCameraPlacePosition : normalCameraPlacePosition;
         

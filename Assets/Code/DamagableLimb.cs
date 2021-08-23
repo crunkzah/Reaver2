@@ -23,7 +23,7 @@ public class DamagableLimb : MonoBehaviour
     public bool isRootLimb = false;
     public bool isHeadshot = false;
     public bool canBeDestroyed = false;
-    [SerializeField]bool isMasterAlive = true;
+    public bool isMasterAlive = true;
     float timeStampWhenDead = -1;
     
     
