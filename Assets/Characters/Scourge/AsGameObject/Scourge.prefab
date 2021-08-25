@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8419442648611582852}
   - component: {fileID: 1537225072783043007}
   - component: {fileID: 7629255702750304584}
-  m_Layer: 29
+  m_Layer: 19
   m_Name: CoatCapsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10003,6 +10003,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 9
   adjacentLimbs: []
@@ -10136,6 +10137,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 11
   adjacentLimbs: []
@@ -10224,6 +10226,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 1
   adjacentLimbs: []
@@ -10527,6 +10530,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 1
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 7
   adjacentLimbs: []
@@ -10660,6 +10664,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 8
   adjacentLimbs: []
@@ -10793,6 +10798,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 10
   adjacentLimbs: []
@@ -10930,6 +10936,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 2
   adjacentLimbs: []
@@ -11154,6 +11161,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 3
   adjacentLimbs: []
@@ -11287,6 +11295,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 5
   adjacentLimbs: []
@@ -11420,6 +11429,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 4
   adjacentLimbs: []
@@ -11553,6 +11563,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 1
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 6
   adjacentLimbs: []

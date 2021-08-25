@@ -117,7 +117,8 @@ public class EnemySpawner : MonoBehaviour, Interactable
 				{
 					for(int i = 0; i < messages_on_init_spawn.Length; i++)
 					{
-						NetworkObjectsManager.CallNetworkFunction(messages_on_init_spawn[i].net_comp.networkId, messages_on_init_spawn[i].command);
+						if(messages_on_init_spawn[i].net_comp)
+							NetworkObjectsManager.CallNetworkFunction(messages_on_init_spawn[i].net_comp.networkId, messages_on_init_spawn[i].command);
 					}
 				}
 			}
@@ -192,15 +193,15 @@ public class EnemySpawner : MonoBehaviour, Interactable
 	
 	void OnAllWavesKilled()
 	{
-		InGameConsole.LogFancy("<color=yellow>OnAllWavesKilled()</color>");
+		InGameConsole.LogFancy(string.Format("<color=yellow>OnAllWavesKilled() <color=green>{0}</color></color>", this.gameObject.name));
 		state = EnemySpawnerState.Finished;
 		CancelInvoke();
 		
 		int len = things_to_call.Length;
 		for(int i = 0; i < things_to_call.Length; i++)
 		{
-			
-			NetworkObjectsManager.CallNetworkFunction(things_to_call[i].net_comp.networkId, things_to_call[i].command);
+			if(things_to_call[i].net_comp)
+				NetworkObjectsManager.CallNetworkFunction(things_to_call[i].net_comp.networkId, things_to_call[i].command);
 		}
 	}
 	

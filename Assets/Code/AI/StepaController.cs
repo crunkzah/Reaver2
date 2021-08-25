@@ -11,6 +11,7 @@ public enum StepaState : byte
     Shooting,
     Airbourne,
     Fleeing,
+    Aiming,
     Dead
 }
 

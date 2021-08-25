@@ -170,6 +170,7 @@
      <Compile Include="Assets\Code\DialogueManager.cs" />
      <Compile Include="Assets\Code\Dialogues.cs" />
      <Compile Include="Assets\Code\DirectionalLightController.cs" />
+     <Compile Include="Assets\Code\DisableAccordingByPlayers.cs" />
      <Compile Include="Assets\Code\DisableOnDistance.cs" />
      <Compile Include="Assets\Code\DisableOnPlay.cs" />
      <Compile Include="Assets\Code\DismemberedCharacter.cs" />

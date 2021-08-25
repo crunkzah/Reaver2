@@ -104,7 +104,8 @@ public class Checkpoint : MonoBehaviour, INetworkObject
             {
                 for(int i = 0; i < messages_on_load.Length; i++)
                 {
-                    NetworkObjectsManager.CallNetworkFunction(messages_on_load[i].net_comp.networkId, messages_on_load[i].command);
+                    if(messages_on_load[i].net_comp)
+                        NetworkObjectsManager.CallNetworkFunction(messages_on_load[i].net_comp.networkId, messages_on_load[i].command);
                 }
             }
         }
@@ -357,7 +358,8 @@ public class Checkpoint : MonoBehaviour, INetworkObject
                 
                 for(int i = 0; i < messages_on_send.Length; i++)
                 {
-                    NetworkObjectsManager.CallNetworkFunction(messages_on_send[i].net_comp.networkId, messages_on_send[i].command);
+                    if(messages_on_send[i].net_comp)
+                        NetworkObjectsManager.CallNetworkFunction(messages_on_send[i].net_comp.networkId, messages_on_send[i].command);
                 }
             }
         }

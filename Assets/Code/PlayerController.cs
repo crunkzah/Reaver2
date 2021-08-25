@@ -2031,7 +2031,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
         
         TimeWhenTookDamage = Time.time;
-        // dmg = 1;
+        dmg = 0;
         HitPoints -= dmg;
         if(HitPoints <= 0)
         {
