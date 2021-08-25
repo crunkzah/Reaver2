@@ -904,11 +904,16 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     public AudioClip dashAudioClip;
     
+    public void MakeImmuneForDamageForXTime(float x)
+    {
+        damageImmuneTimer = x;
+    }
+    
     [PunRPC]
     void FPSDashFX()
     {
         playerAudioSource.PlayOneShot(dashAudioClip, 0.5f);
-        damageImmuneTimer = dashDamageImmune;
+        MakeImmuneForDamageForXTime(dashDamageImmune);
     }
     
     Vector3 GetTopCapsuleP()
@@ -1977,7 +1982,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     
     float TimeWhenTookDamage = 0;
-    const float takeDamageImmunityDuration = 0.15F;
+    const float takeDamageImmunityDuration = 0.2F;
     
     public bool CanTakeDamageFromProjectile()
     {
@@ -2013,13 +2018,15 @@ public class PlayerController : MonoBehaviour, IPunObservable
     [PunRPC]
     public void TakeDamage(int dmg)
     {
-        if(Time.time < TimeWhenTookDamage + takeDamageImmunityDuration)
+        if(Math.Abs(Time.time - TimeWhenTookDamage) < takeDamageImmunityDuration)
         {
+            //InGameConsole.LogFancy("DAMAGE WAS IGNORED");
             return;
         }
         
         if(damageImmuneTimer > 0)
         {
+            //InGameConsole.LogFancy("IMMUNE TO DAMAGE");
             return;
         }
         

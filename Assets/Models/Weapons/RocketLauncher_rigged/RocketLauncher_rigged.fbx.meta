@@ -16,6 +16,7 @@ ModelImporter:
     7400000: RocketLauncher_armature|Fire
     7400002: RocketLauncher_armature|Idle
     7400004: RocketLauncher_armature|Wield
+    7400006: RocketLauncher_armature|_Bolts_T_Pose
     9500000: //RootNode
     13700000: RocketLauncer
   externalObjects: {}

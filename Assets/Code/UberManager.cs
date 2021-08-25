@@ -94,6 +94,70 @@ public class UberManager : MonoBehaviour
     
     
     
+    [Header("QTS prefab:")]
+    public GameObject qts_prefab;
+    static readonly Quaternion qZero = Quaternion.identity;
+    static HashSet<int> qts_ids = new HashSet<int>();
+    
+    public static bool CanMakeQTS(int qts_caller_id)
+    {
+        if(!useQTS)
+        {
+            return false;
+        }
+        
+        if(qts_ids.Contains(qts_caller_id))
+        {
+            //InGameConsole.LogOrange("CanMakeQTS() Can't! caller_id: " + qts_caller_id);
+            return false;
+        }
+        return true;
+    }
+    
+    public static void RemoveQTSFromHashSet(int qts_caller_id)
+    {
+        
+        
+        if(qts_ids.Remove(qts_caller_id))
+        {
+            //InGameConsole.LogOrange("<color=green>RemoveQTSFromHashSet()</color> " + qts_caller_id);
+        }
+        //if(qts_ids.Contains())
+    }
+    
+    static bool useQTS  = true;
+    
+    public static QuickTimeSphere MakeQTS(int _caller_id, Transform _parent, Vector3 pos, QuickTimeType _type, float _radius, int _damage, float _time_to_be_alive)
+    {
+        if(!useQTS)
+        {
+            return null;
+        }
+        
+        if(qts_ids.Contains(_caller_id))
+        {
+            InGameConsole.LogFancy("Contains " + _caller_id);
+            return null;
+        }
+        
+        
+        qts_ids.Add(_caller_id);
+        
+        GameObject qts_go = Instantiate(Singleton().qts_prefab, pos, qZero, _parent);
+        //qts_go.transform.position = pos;
+        QuickTimeSphere qts = qts_go.GetComponent<QuickTimeSphere>();
+        
+        qts.caller_id           = _caller_id;
+        qts.type                = _type;
+        qts.qts_col_radius      = _radius;
+        qts.col.radius          = _radius;
+        qts.damage              = _damage;
+        qts.lifeTimer           = _time_to_be_alive;
+        
+        qts.OnAppearance();
+        
+        return qts;
+    }
     
       
     void Awake()
@@ -422,7 +486,10 @@ public class UberManager : MonoBehaviour
             }
         }
     }
-
+    
+    
+    //const bool DEBUG_Show_remoteAgents;
+    
     void OnGUI()
     {
         if(!PhotonNetwork.IsMasterClient)
@@ -641,4 +708,6 @@ public class UberManager : MonoBehaviour
             InGameConsole.Log("<color=blue>ScreenCaptured</color>");
         }
     }
+    
+    
 }

@@ -7,7 +7,10 @@ using Photon.Realtime;
 //using Photon.Pun;
 using ExitGames.Client.Photon;
 
-
+public enum GlobalCommand : byte
+{
+    Explode_QTS
+}
 
 [System.Serializable]
 public struct NetObjectPrefab
@@ -767,7 +770,7 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
     {
         if(networkId != -1)
         {
-            Singleton().photonView.RPC("CallFuncRPC", RpcTarget.AllViaServer, networkId, command, PhotonNetwork.Time, values);
+            Singleton().photonView.RPC("CallFuncRPC", RpcTarget.AllViaServer, networkId, command, values);
         }
         else
         {
@@ -1034,7 +1037,7 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
     }
 
     [PunRPC]
-    void CallFuncRPC(int networkId, NetworkCommand command, double timeStamp, params object[] values)
+    void CallFuncRPC(int networkId, NetworkCommand command, params object[] values)
     {
         if(Singleton().runtimePool.ContainsKey(networkId))
         {
@@ -1052,6 +1055,40 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
         else
         {
             //InGameConsole.LogWarning("runtimePool doesn't contain " + networkId + " key; Command: " + command);
+        }
+    }
+    
+    public static void CallGlobalCommand(GlobalCommand command, RpcTarget rpcTarget, params object[] args)
+    {
+        PhotonMessageInfo info;
+        
+        byte command_byte = (byte)command;
+        Singleton().photonView.RPC(nameof(GC_RPC), rpcTarget, command_byte, args);
+    }
+    
+    [PunRPC]
+    public void GC_RPC(byte global_command_byte, params object[] args)
+    {
+        GlobalCommand global_command  = (GlobalCommand)global_command_byte;
+        
+        switch(global_command)
+        {
+            case(GlobalCommand.Explode_QTS):
+            {
+                GameObject obj = ObjectPool.s().Get(ObjectPoolKey.Kaboom1, false);
+                float explosionRadius = 6;
+                float explosionForce = 40;
+                int explosionDamage = 1200;
+                bool isMine = false;
+                
+                obj.GetComponent<Kaboom1>().ExplodeDamageHostile(transform.localPosition, explosionRadius, explosionForce, explosionDamage, isMine, false, 0);
+                
+                break;
+            }
+            default:
+            {
+                break;
+            }
         }
     }
 }

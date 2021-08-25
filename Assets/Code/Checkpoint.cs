@@ -161,6 +161,28 @@ public class Checkpoint : MonoBehaviour, INetworkObject
                 }
                 break;
             }
+            case(NetworkCommand.Ability3):
+            {
+                UnlockSendingCommands();
+                
+                activate_msgs_num--;
+                if(activate_msgs_num <= 0)
+                {
+                    state = CheckpointState.Waiting;
+                    if(mode == CheckpointMode.Invisible)
+                    {
+                        mode = CheckpointMode.Visible;
+                        Renderer[] rends = GetComponentsInChildren<Renderer>();
+                        for(int i = 0; i < rends.Length; i++)
+                        {
+                            rends[i].enabled = true;
+                        }
+                        audio_src.enabled = true;
+                    }
+                }
+                
+                break;
+            }
             default:
             {
                 break;

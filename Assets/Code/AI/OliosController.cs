@@ -40,6 +40,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject
     void Awake()
     {
         InitJoints();
+        instance_id = this.GetInstanceID();
         net_comp = GetComponent<NetworkObject>();
         anim = GetComponent<Animator>();
         col = GetComponent<CapsuleCollider>();
@@ -550,6 +551,16 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject
         parentTransform.localPosition = updatedPos;    
     }
     
+    int instance_id;
+    
+    public void QTS()
+    {
+        if(UberManager.CanMakeQTS(instance_id))
+        {
+            UberManager.MakeQTS(instance_id, thisTransform, qts_transform.position, QuickTimeType.Default, 1.5f, 900, 0.33f);
+        }
+    }
+    
     void UpdateBrainLocally(float dt)
     {
         switch(state)
@@ -625,6 +636,8 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject
         float decay_speed = 4 / 0.5f * 2.6f;
         light.DoLight(pos, color, 0.5f, 14, 4, decay_speed);
     }
+    
+    public Transform qts_transform;
     
     void Strike_direct(Vector3 pos, Vector3 dir)
     {
@@ -751,7 +764,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject
     
     public void D()
     {
-        InGameConsole.LogFancy("D(): " + current_limb_to_destroy.ToString());
+        //InGameConsole.LogFancy("D(): " + current_limb_to_destroy.ToString());
         int len = limbs.Length; 
         for(int i = 0; i < len; i++)
         {
@@ -813,7 +826,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject
                     death_ps.Play(true);
                 }
                 
-                Destroy(parentTransform.gameObject, 3);
+                Destroy(parentTransform.gameObject, 4);
                 break;                
             }
             
@@ -846,7 +859,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject
         sun_symbol.GetComponent<Rigidbody>().isKinematic = false;
         sun_symbol.GetComponent<Rigidbody>().AddForce(Random.onUnitSphere * 6, ForceMode.Impulse);
         sun_symbol.GetComponent<MeshCollider>().enabled = true;
-        Destroy(sun_symbol, 4F);
+        Destroy(sun_symbol, 4.5F);
         
         
         Invoke("D", 1.2f);

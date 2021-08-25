@@ -534,6 +534,10 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         
         if(Input.GetKeyDown(KeyCode.V))
         {
+            if(UberManager.GetCurrentLevelIndex() <= 1)
+            {
+                return;
+            }
             if(!usingSavePoints)
             {
                 if(!InGameMenu.IsVisible())

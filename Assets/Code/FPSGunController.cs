@@ -45,6 +45,7 @@ public class FPSGunController : MonoBehaviour
     const int revolverDmg_reflect = 150;
     const int revolverDmg_ult = 550;//530;
     const float revolverFireRate = 0.325F * 2;
+    const float revolverParryRate = 0.9f;
     const float revolverPump_Rate = 0.365F / 1.0f;
     
     const int shotgunDmgPellet = 60;
@@ -55,7 +56,7 @@ public class FPSGunController : MonoBehaviour
     const int shotgunPelletCount_Alt = 7;
     
     const int rocketLauncherDmg = 200;
-    const float rocketLauncherFireRate = 0.75F;
+    const float rocketLauncherFireRate = 0.4F;
     
     const int swordAttackDmg = 125;
     const float swordAttackRate = 0.2F;
@@ -97,7 +98,6 @@ public class FPSGunController : MonoBehaviour
     public Transform rocketLauncher_fps;
     public RocketLauncher rocketLauncher;
     public ParticleSystem rocketLauncher_FX;
-        
     public Transform gunPoint_rocketLauncher_fps;
     public Animator rocketLauncher_animatorFPS;
     public Animator rocketLauncher_alt_animatorFPS;
@@ -144,27 +144,28 @@ public class FPSGunController : MonoBehaviour
     static int npcMask = -1;
     static int staticObjectsMask = -1;
     static int interactablesMask = -1;
+    static int QTSLayer = -1;
     
     
     bool touchedGroundAfterSpawn = false;
     
     void Awake()
     {
-        interactablesMask = LayerMask.GetMask("Interactable");
+        if(bulletMask == -1)
+        {
+            bulletMask          = LayerMask.GetMask("Ground", "NPC", "Ceiling");
+            npcMask2            = LayerMask.GetMask("NPC2");
+            npcMask             = LayerMask.NameToLayer("NPC");
+            staticObjectsMask   = LayerMask.GetMask("Ground", "Ceiling");
+            interactablesMask   = LayerMask.GetMask("Interactable");
+            QTSLayer            = LayerMask.GetMask("QTS");
+        }
+        
         BaseFire1_hash = Animator.StringToHash("Base.Fire1");
-        npcMask = LayerMask.NameToLayer("NPC");
-        bulletMask = LayerMask.GetMask("Ground", "NPC", "Ceiling");
-        staticObjectsMask = LayerMask.GetMask("Ground", "Ceiling");
-        npcMask2 = LayerMask.GetMask("NPC2");
         pController = GetComponent<PlayerController>();
         pv = GetComponent<PhotonView>();
         
         ReadPlayerInventory();
-        
-        // slots[0] = GunType.Revolver;
-        // slots[1] = GunType.Shotgun;
-        // slots[2] = GunType.RocketLauncher;
-        // slots[3] = GunType.AR;
     }
     
     public void ReadPlayerInventory()
@@ -835,6 +836,17 @@ public class FPSGunController : MonoBehaviour
                         FPSCommand(fpsCommand);
                         pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand);
                         
+                        Ray punchQtsRay = pController.GetFPSRay();
+                        RaycastHit qts_hit;
+                        
+                        if(Physics.Raycast(punchQtsRay, out qts_hit, punchDistance, QTSLayer))
+                        {
+                            InGameConsole.LogFancy("Calling QTS from PUNCH");
+                            QuickTimeSphere qts = qts_hit.collider.GetComponent<QuickTimeSphere>();
+                            qts.OnHit();
+                            pController.MakeImmuneForDamageForXTime(0.150F);
+                        }
+                        
                         // if(arm1_overcharged)
                         // {
                         //     arm1_overcharged = false;
@@ -1125,6 +1137,7 @@ public class FPSGunController : MonoBehaviour
     
     void OnFirstTouchedGround()
     {
+        gunAudio.PlayOneShot(switchWeaponClip);
         if(onFirstTouchedGroundObjectsToActivate != null)
         {
             int len = onFirstTouchedGroundObjectsToActivate.Length;
@@ -1134,6 +1147,8 @@ public class FPSGunController : MonoBehaviour
             }
         }
     }
+    
+    
     
     void Update()
     {
@@ -1156,6 +1171,8 @@ public class FPSGunController : MonoBehaviour
         
         Arm_Tick(dt);
         Ability_R_Tick(dt);
+        rocketLauncher.CooldownsTick(dt);
+        
         
         
         TickWeaponCooldowns(dt);
@@ -1310,6 +1327,20 @@ public class FPSGunController : MonoBehaviour
                                 byte fpsCommand = (byte)FPS_Func.Shoot_revolver;
                                 FPSCommand(fpsCommand, revolverRay.origin, revolverRay.direction);
                                 pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand, revolverRay.origin, revolverRay.direction);
+                                
+                                RaycastHit qts_hit;
+                                //InGameConsole.LogFancy("Trying to call qts!!!!!");
+                                if(Physics.Raycast(revolverRay, out qts_hit, 200f, QTSLayer))
+                                {
+                                    //InGameConsole.LogFancy("Calling qts!!!!!");
+                                    CameraShaker.MakeTrauma(0.15f);
+                                    revolver_fps.anim.Play("Base.Parry", 0, 0);
+                                    arm_right_animator.Play("Base.Parry", 0, 0);
+                                    gunTimer  = revolverParryRate;
+                                    QuickTimeSphere qts = qts_hit.collider.GetComponent<QuickTimeSphere>();
+                                    qts.OnHit();
+                                }
+                                
                             }
                             else
                             {
@@ -1451,7 +1482,7 @@ public class FPSGunController : MonoBehaviour
             }
             case(GunType.RocketLauncher):
             {
-                if(gunTimer == 0)
+                if(gunTimer == 0 && rocketLauncher.GetRocketsInMagazine() > 0)
                 {
                     if(primaryFire)
                     {
@@ -1793,7 +1824,7 @@ public class FPSGunController : MonoBehaviour
         }
     }
     
-    const float switchWeaponDuration = 0.35f;
+    const float switchWeaponDuration = 0.48f;
     
     public MeleeState meleeState;
     
@@ -1886,7 +1917,7 @@ public class FPSGunController : MonoBehaviour
                 
                 arm_right_animator.Play("Base.Hidden", 0, 0);
                 
-                gunTimer = switchWeaponDuration;
+                gunTimer = switchWeaponDuration / 2;
                 
                 
                 break;
@@ -2041,8 +2072,6 @@ public class FPSGunController : MonoBehaviour
         {
             case(FPS_Func.Punch1):
             {
-                
-                
                 Punch();
                 break;
             }
@@ -2310,7 +2339,7 @@ public class FPSGunController : MonoBehaviour
         }
         RaycastHit hit;
         
-        float revolverShotMaxDistance = 125F;
+        float revolverShotMaxDistance = 200F;
         revolverFX_ps.Play();
         
         Vector3 lineStart = pv.IsMine ? gunPoint_revolver_fps.position : gunPoint_revolver_tps.position;
@@ -2728,7 +2757,7 @@ public class FPSGunController : MonoBehaviour
         
         rocketLauncher_FX.Play();
         bool isMine = pv.IsMine;
-        bulletController.LaunchAsSphere(shotPos, direction, 0.15F, bulletMask, 46, rocketLauncherDmg, isMine);
+        bulletController.LaunchAsSphere(shotPos, direction, 0.15F, bulletMask, 125, rocketLauncherDmg, isMine);
         bulletController.on_die_behave = BulletOnDieBehaviour.Explode_1;
         bulletController.explosionRadius = 4.5f;
         bulletController.explosionForce = 36;
@@ -2753,6 +2782,7 @@ public class FPSGunController : MonoBehaviour
             CameraShaker.MakeTrauma(1.0F);
             rocketLauncher_alt_animatorFPS.Play("Base.Fire1", 0, 0);
             rocketLauncher_animatorFPS.Play("Base.Fire1", 0, 0);
+            rocketLauncher.OnShoot();
             //shotgunFX_alt__ps.Play();
         }
         

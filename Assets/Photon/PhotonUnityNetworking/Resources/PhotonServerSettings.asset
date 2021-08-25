@@ -67,4 +67,5 @@ MonoBehaviour:
   - WieldGunTPS
   - OnPlayerSpawned
   - SetSavePointPriority
+  - GC_RPC
   DisableAutoOpenWizard: 1

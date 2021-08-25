@@ -9,6 +9,7 @@ public enum Title
     Undercity,
     The_Machinery,
     Prologue,
+    The_Field,
     Arena_II
 }
 
@@ -56,7 +57,7 @@ public class TitlesManager : MonoBehaviour
         canvas = GetComponent<Canvas>();
     }
     
-    static string[] titles = {"Undefined", "Undercity", "The Machinery", "Prologue", "Arena II"};
+    static string[] titles = {"Undefined", "Undercity", "The Machinery", "Prologue", "Arena II", "The Field"};
     
     //Top title:
     public TextMeshProUGUI topTitle;

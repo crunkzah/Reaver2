@@ -75,6 +75,8 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     
     void Awake()
     {
+        
+        instance_id = GetInstanceID();
         spawnedObjectComp = GetComponent<SpawnedObject>();
         InitJoints();
         DisableSkeleton();
@@ -192,6 +194,8 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                 Vector3 shootPos = (Vector3)args[0];
                 pos_to_fire_at = (Vector3)args[1];
                 
+                
+                
                 brainTimer = 0;
                 firing_timer = 0;
                 canFire = true;
@@ -267,7 +271,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
         }
     }
     
-    const float footStepDistance = 2.75f;
+    const float footStepDistance = 1.25f;
     float distanceTravelledRunningSqr;
     
     void SetTarget(PlayerController target)
@@ -280,6 +284,11 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
         if(state == SinclaireState.Dead)
         {
             return;
+        }
+        
+        if(current_qts)
+        {
+            Destroy(current_qts);
         }
         
         switch(_state)
@@ -479,11 +488,11 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     bool canDoMeleeDamageToLocalPlayer = true;
     const float sword_attack1_duration = 4.2F / 3.5f;
     
-    const float sword_attack1_damageTimingStart = 0.29F / 3;
+    const float sword_attack1_damageTimingStart = 0.29F / 2;
     //const float sword_attack1_damageTimingEnd = 1.1F / 4;
     
     //const float sword_attack1_distance = 2F;
-    const float sword_attack1_radius = 1.05F;
+    const float sword_attack1_radius = 0.95F;
     const int sword_attack1_dmg = 20;
     
     
@@ -538,10 +547,11 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                 dmgDir.Normalize(); 
                 
                 dmgDir.y = 1;
-                local_pc.BoostVelocity(dmgDir * 14);
-                
-                
-                local_pc.TakeDamage(sword_attack1_dmg);
+                if(local_pc.CanTakeDamageFromProjectile())
+                {
+                    local_pc.BoostVelocity(dmgDir * 14);    
+                    local_pc.TakeDamage(sword_attack1_dmg);
+                }
                 return true;
             }
         }
@@ -640,6 +650,8 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     void DoSwordAttack1_withDash(Vector3 dashEndPos)
     {
         anim.Play("Base.Sword_Swing1", 0, 0);
+        
+        
         sword.OnSwing();
     }
     
@@ -912,7 +924,9 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     
     public Vector3 localStrikeOffset = new Vector3(0, 1, 0.33f);
     
-    
+    int instance_id;
+    public Transform qts_transform;
+    public QuickTimeSphere current_qts;
     
     void UpdateBrainLocally(float dt)
     {
@@ -962,13 +976,19 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                 destinationGizmo = currentDestination;
                 thisTransform.localPosition = Vector3.MoveTowards(currentPos, currentDestination, dV);
                 
+                if(UberManager.CanMakeQTS(instance_id))
+                {
+                    current_qts = UberManager.MakeQTS(instance_id, thisTransform, qts_transform.position, QuickTimeType.Default, 0.75f, 900, 0.25f);
+                }   
+                
                 RotateToLookAt(currentDestination, 0.08F);
                 
                 sword_attack_timer += dt;
                 if(canDoMeleeDamageToLocalPlayer)
                 {
                     //if(sword_attack_timer > sword_attack1_damageTimingStart && sword_attack_timer < sword_attack1_damageTimingEnd)
-                    if(sword_attack_timer > sword_attack1_damageTimingStart)
+                    float sqrDistanceToDestination = Math.SqrDistance(currentDestination, currentPos);
+                    if(sword_attack_timer > sword_attack1_damageTimingStart && dV > 0 && sqrDistanceToDestination > 0f)
                     {
                         Vector3 dmgPos = thisTransform.localPosition;
                         dmgPos = dmgPos + thisTransform.up * localStrikeOffset.y + thisTransform.forward * localStrikeOffset.z;// + thisTransform.forward * localStrikeOffset.z;
@@ -995,8 +1015,6 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                 
                 firing_timer += dt;
                 
-                
-                
                 if(canFire)
                 {
                     if(firing_timer > firing_timing)
@@ -1008,6 +1026,16 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                             ShootTriple(shootPosOffsetted, _shootDir);
                         else
                             ShootSingle(shootPosOffsetted, _shootDir);
+                    }
+                    else
+                    {
+                        if(firing_timer > 0.25f)
+                        {
+                            if(UberManager.CanMakeQTS(instance_id))
+                            {
+                                current_qts = UberManager.MakeQTS(instance_id, thisTransform, qts_transform.position, QuickTimeType.Default, 0.75f, 900, 0.25f);
+                            }       
+                        }
                     }
                 }
                 
