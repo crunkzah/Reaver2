@@ -276,6 +276,7 @@
      <Compile Include="Assets\Code\Projectile.cs" />
      <Compile Include="Assets\Code\ProjectileBullet.cs" />
      <Compile Include="Assets\Code\PuzzleGate.cs" />
+     <Compile Include="Assets\Code\QuickTimeSphere.cs" />
      <Compile Include="Assets\Code\RagdollController.cs" />
      <Compile Include="Assets\Code\RagdollController2.cs" />
      <Compile Include="Assets\Code\RagdollController3.cs" />

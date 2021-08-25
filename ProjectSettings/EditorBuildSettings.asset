@@ -30,8 +30,8 @@ EditorBuildSettings:
     path: Assets/Scenes/Level_Clouds.unity
     guid: 2fab9bacbc291ac42bd84120599bee7b
   - enabled: 1
-    path: Assets/Scenes/Level_Straight.unity
-    guid: a6ac08f580d61d645a8858b8d558b267
+    path: Assets/Scenes/Level_Field.unity
+    guid: e88e3fc31bc80f34b89d0d6dbee3e605
   - enabled: 1
     path: Assets/Scenes/Level_ArenaBoss.unity
     guid: 77716b70cd452ff4f9752bf1f27b30d8

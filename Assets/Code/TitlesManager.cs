@@ -57,7 +57,7 @@ public class TitlesManager : MonoBehaviour
         canvas = GetComponent<Canvas>();
     }
     
-    static string[] titles = {"Undefined", "Undercity", "The Machinery", "Prologue", "Arena II", "The Field"};
+    static string[] titles = {"Undefined", "Undercity", "The Machinery", "Prologue", "The Field", "Arena II"};
     
     //Top title:
     public TextMeshProUGUI topTitle;

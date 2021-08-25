@@ -30,7 +30,7 @@ TagManager:
   - Ragdoll
   - NavMeshSurface
   - NPC_NonCollidable
-  - ProjectileLavaBurst
+  - QTS
   - NPC2
   - FPSView
   - Interactable
