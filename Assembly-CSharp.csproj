@@ -56,10 +56,10 @@
      <Compile Include="Assets\Code\AI\Boss01Controller.cs" />
      <Compile Include="Assets\Code\AI\CarolineKneeling.cs" />
      <Compile Include="Assets\Code\AI\CatLadyController.cs" />
-     <Compile Include="Assets\Code\AI\Chaser2Controller.cs" />
      <Compile Include="Assets\Code\AI\Civ2Controller.cs" />
      <Compile Include="Assets\Code\AI\INetworkObject.cs" />
      <Compile Include="Assets\Code\AI\KateController.cs" />
+     <Compile Include="Assets\Code\AI\KikiController.cs" />
      <Compile Include="Assets\Code\AI\MrCoalController.cs" />
      <Compile Include="Assets\Code\AI\OliosController.cs" />
      <Compile Include="Assets\Code\AI\PadlaController.cs" />
@@ -71,9 +71,9 @@
      <Compile Include="Assets\Code\AI\Shooter2Controller.cs" />
      <Compile Include="Assets\Code\AI\Shooter3_shotgun.cs" />
      <Compile Include="Assets\Code\AI\SinclaireController.cs" />
+     <Compile Include="Assets\Code\AI\SinclaireCoolController.cs" />
      <Compile Include="Assets\Code\AI\SniperGirlController.cs" />
      <Compile Include="Assets\Code\AI\StepaController.cs" />
-     <Compile Include="Assets\Code\AI\WitchController.cs" />
      <Compile Include="Assets\Code\AmmoBox.cs" />
      <Compile Include="Assets\Code\AnimateTransform.cs" />
      <Compile Include="Assets\Code\Animations Scripts\Animation\BigTrainAnimator.cs" />
@@ -128,8 +128,10 @@
      <Compile Include="Assets\Code\Billboard3D.cs" />
      <Compile Include="Assets\Code\BlinkSphere.cs" />
      <Compile Include="Assets\Code\BloodHealing.cs" />
+     <Compile Include="Assets\Code\BloodOnCamera.cs" />
      <Compile Include="Assets\Code\BloodStainSprayer.cs" />
      <Compile Include="Assets\Code\Bomb1.cs" />
+     <Compile Include="Assets\Code\BossHPBar.cs" />
      <Compile Include="Assets\Code\Bullet.cs" />
      <Compile Include="Assets\Code\BulletController.cs" />
      <Compile Include="Assets\Code\BulletControllerHurtless.cs" />
@@ -200,6 +202,7 @@
      <Compile Include="Assets\Code\FPSGunController.cs" />
      <Compile Include="Assets\Code\FPSWeaponPlaceMover.cs" />
      <Compile Include="Assets\Code\GameSettings.cs" />
+     <Compile Include="Assets\Code\GameStats.cs" />
      <Compile Include="Assets\Code\GatesController.cs" />
      <Compile Include="Assets\Code\GearCentrifuge.cs" />
      <Compile Include="Assets\Code\GearRotationRandomizer.cs" />
@@ -207,10 +210,12 @@
      <Compile Include="Assets\Code\GlobalShooter.cs" />
      <Compile Include="Assets\Code\GoreManager.cs" />
      <Compile Include="Assets\Code\GoToMainMenuDebug.cs" />
+     <Compile Include="Assets\Code\GrapplingHook.cs" />
      <Compile Include="Assets\Code\GroundStomp.cs" />
      <Compile Include="Assets\Code\GunController.cs" />
      <Compile Include="Assets\Code\Health.cs" />
      <Compile Include="Assets\Code\HealthCrystal.cs" />
+     <Compile Include="Assets\Code\HealthCrystalSmall.cs" />
      <Compile Include="Assets\Code\HideRenderer.cs" />
      <Compile Include="Assets\Code\HurtZone.cs" />
      <Compile Include="Assets\Code\Inputs.cs" />
@@ -296,6 +301,7 @@
      <Compile Include="Assets\Code\ShotDirections.cs" />
      <Compile Include="Assets\Code\SinclaireFloating.cs" />
      <Compile Include="Assets\Code\SinclaireSword.cs" />
+     <Compile Include="Assets\Code\SinclareRoom.cs" />
      <Compile Include="Assets\Code\SlidingStructure.cs" />
      <Compile Include="Assets\Code\Sonar.cs" />
      <Compile Include="Assets\Code\SpawnedObject.cs" />

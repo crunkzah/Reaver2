@@ -73,6 +73,7 @@ public class Inputs : MonoBehaviour
     {
         return Input.GetKeyDown(KeyCode.Q);
     }
+
     
     public static bool Arm_FKeyDown()
     {

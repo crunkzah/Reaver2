@@ -13,7 +13,7 @@ public enum ScourgeCoolState : byte
     Dead
 }
 
-public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLocal
+public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLocal, IKillableThing
 {
     public GameObject remoteAgent_prefab;
     public ParticleSystem eye_ps;
@@ -49,6 +49,8 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
         InitJoints();
         DisableSkeleton();
         
+        slide_ps_main = slide_ps.emission;
+        
         col = GetComponent<CapsuleCollider>();
         if(audio_src == null)
             audio_src = GetComponentInChildren<AudioSource>();
@@ -83,6 +85,33 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
         remoteAgentTransform = remoteAgent.transform;
     }
     
+    public Transform head;
+    
+    public Vector3 GetHitSpot()
+    {
+        return head.position;
+    }
+    
+    public NetworkObject GetNetComp()
+    {
+        return net_comp;
+    }
+    
+    public byte GetHitSpotLimbId()
+    {
+        return 7;
+    }
+    
+    public bool CanBeBounceHit()
+    {
+        if(state != ScourgeCoolState.Dead)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+    
     void Start()
     {
         if(PhotonNetwork.IsMasterClient)
@@ -90,6 +119,7 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
             InitAsMaster();
         }
         
+        NPCManager.RegisterKillable(this);
         
         HitPoints = MaxHealth;
         SetMovePos(thisTransform.localPosition);
@@ -231,25 +261,40 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
                 
                 break;
             }
-            case(NetworkCommand.DieWithForce):
+            case(NetworkCommand.TakeDamageExplosive):
             {
+                int incomingDamage = (int)args[0];
                 
-                Vector3 force = (Vector3)args[0];
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
                 
-                byte limb_id = 0;
-                if(args.Length > 1)
-                {
-                    limb_id = (byte)args[1];
-                }
-                
-                Die(force, limb_id);
+                TakeDamageExplosive(incomingDamage);
                 
                 break;
             }
-            case(NetworkCommand.TakeDamage):
+            case(NetworkCommand.TakeDamageLimbNoForce):
             {
                 int incomingDamage = (int)args[0];
-                TakeDamage(incomingDamage);
+                
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
+                
+                byte limb_id = (byte)args[1];
+                TakeDamage(incomingDamage, limb_id);
+                //TakeDamageForce(incomingDamage, force, limb_id);
+                
+                break;
+            }
+            case(NetworkCommand.TakeDamageLimbWithForce):
+            {
+                int incomingDamage = (int)args[0];
+                
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
+                
+                Vector3 force = (Vector3)args[1];
+                byte limb_id = (byte)args[2];
+                TakeDamageForce(incomingDamage, force, limb_id);
                 
                 break;
             }
@@ -262,7 +307,7 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
     
     const float projectileSpeed = 55F;
     const float projectileRadius = 0.25F;
-    const int projectileDamage = 10;
+    const int projectileDamage = 12;
     //const int shotsPerRound = 3;
     int shotsPerformed = 0; 
     
@@ -335,27 +380,54 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
     
     float damage_taken_timeStamp;
     
-    void TakeDamage(int dmg)
+    void TakeDamage(int dmg, byte limb_id)
     {
+        InGameConsole.LogOrange("TakeDamage()");
         HitPoints -= dmg;
-        // if(HitPoints <= 0)
-        // {
-        //    Die(Vector3.zero);
-        //    HitPoints = 0;
-        // }
+         
+        if(HitPoints <= 0)
+        {
+            Die(Vector3.zero, limb_id);
+            HitPoints = 0;
+        }
     }
     
-    void Die(Vector3 force, byte limb_to_destroy)
+    void TakeDamageForce(int dmg, Vector3 force, byte limb_id)
+    {
+        //InGameConsole.LogOrange("TakeDamageForce()");
+        HitPoints -= dmg;
+         
+        if(HitPoints <= 0)
+        {
+            Die(force, limb_id);
+            HitPoints = 0;
+        }
+    }
+    
+    void TakeDamageExplosive(int dmg)
+    {
+        //InGameConsole.LogOrange("TakeDamageExplosive()");
+        HitPoints -= dmg;
+        if(HitPoints <= 0)
+        {
+            DieFromExplosion();
+            HitPoints = 0;
+        }
+    }
+    
+    void DieFromExplosion()
     {
         if(state == ScourgeCoolState.Dead)
         {
             return;
         }
         
-        if(spawnedObjectComp)
-            spawnedObjectComp.OnObjectDied();
+        //InGameConsole.LogOrange("DieFromExplosion()");
         
         SetState(ScourgeCoolState.Dead);
+        
+        if(spawnedObjectComp)
+            spawnedObjectComp.OnObjectDied();
         
         HitPoints = -1;
         
@@ -366,45 +438,81 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
         if(remoteAgent)
             Destroy(remoteAgent.gameObject, 0.1f);
             
-        int len = joint_rbs.Length;
         
-        // CapsuleCollider capsule_col;
-        // SphereCollider sphere_col;
-        // BoxCollider box_col;
         
-        // for(int i = 0; i < len; i++)    
-        // {
-        //     capsule_col = joint_rbs[i].GetComponent<CapsuleCollider>();
-        //     if(capsule_col)
-        //     {
-        //         //capsule_col.radius *= 0.65f;
-        //     }
-        //     else
-        //     {
-        //         sphere_col = joint_rbs[i].GetComponent<SphereCollider>();
-        //         if(sphere_col)
-        //         {
-        //             //sphere_col.center = new Vector3(0, 0, 0);
-        //             //sphere_col.radius *= 0.65f;
-        //         }
-        //         else
-        //         {
-        //             box_col = joint_rbs[i].GetComponent<BoxCollider>();
-        //             if(box_col)
-        //             {
-        //                 //box_col.size *= 0.75f;
-        //             }
-        //         }
-        //     }
-        // }
-        
-        AudioManager.Play3D(SoundType.death_impact_gib_distorted, thisTransform.localPosition);
-        
-        audio_src.PlayOneShot(clipDeath, 1);
+        audio_src.PlayOneShot(clipDeath, 0.5f);
         HitPoints = 0;
         
         EnableSkeleton();  
+        AudioManager.Play3D(SoundType.death_impact_gib_distorted, thisTransform.localPosition);
         
+        int len = limbs.Length;
+        for(int i = 0; i < len; i++)
+        {
+            limbs[i].MakeLimbDead();
+        }
+        int limb_to_destroy = 3;
+        
+        
+        if(limb_to_destroy != 0)
+        {
+            if(limbs != null)
+            {
+                for(int i = 0; i < len; i++)
+                {
+                    if(limbs[i].limb_id == limb_to_destroy)
+                    {
+                        //Vector3 f = force;
+                        //InGameConsole.LogOrange(string.Format("Apply force {0} to limb {1}", f, limb_to_destroy));
+                        
+                        //limbs[i].ApplyForceToAdjacentLimbs(f);
+                        if(!limbs[i].isRootLimb)
+                        {
+                            limbs[i].TakeDamageLimb(2500);
+                            
+                        }
+                        //limbs[i].AddForceToLimb(f);
+                        
+                        //break;
+                    }
+                }
+            }
+        }
+        DropHealthCrystals();
+    }
+    
+    void Die(Vector3 force, byte limb_to_destroy)
+    {
+        if(state == ScourgeCoolState.Dead)
+        {
+            return;
+        }
+        
+        SetState(ScourgeCoolState.Dead);
+        
+        if(spawnedObjectComp)
+            spawnedObjectComp.OnObjectDied();
+        
+        HitPoints = -1;
+        
+        anim.enabled = false;
+        col.enabled = false;
+        
+        NetworkObjectsManager.UnregisterNetObject(net_comp);
+        if(remoteAgent)
+            Destroy(remoteAgent.gameObject, 0.1f);
+            
+        audio_src.PlayOneShot(clipDeath, 0.5f);
+        HitPoints = 0;
+        
+        EnableSkeleton();  
+        AudioManager.Play3D(SoundType.death_impact_gib_distorted, thisTransform.localPosition);
+        
+        int len = limbs.Length;
+        for(int i = 0; i < len; i++)
+        {
+            limbs[i].MakeLimbDead();
+        }
         
         if(limb_to_destroy != 0)
         {
@@ -413,16 +521,16 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
                 len = limbs.Length;
                 for(int i = 0; i < len; i++)
                 {
-                    limbs[i].MakeLimbDead();
                     if(limbs[i].limb_id == limb_to_destroy)
                     {
                         Vector3 f = force;
-                        InGameConsole.LogOrange(string.Format("Apply force {0} to limb {1}", f, limb_to_destroy));
+                        //InGameConsole.LogOrange(string.Format("Apply force {0} to limb {1}", f, limb_to_destroy));
                         
                         limbs[i].ApplyForceToAdjacentLimbs(f);
                         if(!limbs[i].isRootLimb)
                         {
                             limbs[i].TakeDamageLimb(2500);
+                            
                         }
                         //limbs[i].AddForceToLimb(f);
                         
@@ -653,7 +761,7 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
                     
                     if(!canShootFromDestination)
                     {
-                        InGameConsole.LogFancy("ScourgeCool: Can't shoot from this position");
+                        //InGameConsole.LogFancy("ScourgeCool: Can't shoot from this position");
                         UpdateRemoteAgentDestination(targetGroundPos);
                         if(shootingChasingTimer > shootingChasingCooldown * 0.5F)
                         {
@@ -1003,12 +1111,16 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
     
     Vector3 shootingDirection;
     
+    public ParticleSystem slide_ps;
+    ParticleSystem.EmissionModule slide_ps_main;
+    
     void UpdateBrainLocally(float dt)
     {
         switch(state)
         {
             case(ScourgeCoolState.Idle):
             {
+                slide_ps_main.rateOverTime = 0;
                 break;
             }
             case(ScourgeCoolState.Chasing):
@@ -1028,6 +1140,10 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
                     RotateToLookAt(currentDestination, rotateTime * speedMult, false);
                 
                 Vector3 dPos = currentDestination - currentPos;
+                
+               
+                slide_ps_main.rateOverTime = 0;
+                
                 
                 anim.SetFloat(MoveSpeedHash, Math.Magnitude(dPos), animDampTime, dt);
                 
@@ -1051,7 +1167,7 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
                 float dV = speedMult * dt * moveSpeed;
                 Vector3 updatedPos = Vector3.MoveTowards(currentPos, currentDestination, dV);
                 thisTransform.localPosition = updatedPos; 
-                
+                slide_ps_main.rateOverTime = 0;
                 //RotateToLookAt(currentDestination, rotateTime * speedMult, false);
                 Vector3 shootingDirectionXZ = Math.GetXZ(shootingDirection);
                 if(target_pc)
@@ -1092,6 +1208,8 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
                 
                 Vector3 dPos = currentDestination - currentPos;
                 
+                slide_ps_main.rateOverTime = 25;
+                
                 anim.SetFloat(MoveSpeedHash, Math.Magnitude(dPos), animDampTime, dt);
                 
                 distanceTravelledRunningSqr += Math.Magnitude(updatedPos - currentPos);
@@ -1109,6 +1227,7 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
             }
             case(ScourgeCoolState.Dead):
             {
+                slide_ps_main.rateOverTime = 0;
                 break;
             }
         }

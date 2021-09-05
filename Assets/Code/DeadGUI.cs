@@ -31,6 +31,7 @@ public class DeadGUI : MonoBehaviour
     
     public static void Hide()
     {
+        //return;
         Singleton().canvas.enabled = false;
     }
 }

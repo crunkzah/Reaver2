@@ -13,7 +13,7 @@ public enum SinclaireState : byte
     Dead
 }
 
-public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLocal//, IRemoteAgent
+public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLocal, IKillableThing
 {
     public GameObject remoteAgent_prefab;
     NavMeshAgent remoteAgent;
@@ -115,12 +115,43 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
         remoteAgentTransform = remoteAgent.transform;
     }
     
+    public Transform head;
+    
+    public Vector3 GetHitSpot()
+    {
+        return head.position;
+    }
+    
+    public NetworkObject GetNetComp()
+    {
+        return net_comp;
+    }
+    
+    public byte GetHitSpotLimbId()
+    {
+        return 7;
+    }
+    
+    public bool CanBeBounceHit()
+    {
+        if(state != SinclaireState.Dead)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+    
     void Start()
     {
         if(PhotonNetwork.IsMasterClient)
         {
             InitAsMaster();    
         }
+        
+        NPCManager.RegisterKillable(this);
+        
+        AudioManager.AddEnemiesAlive();
         
         SetMovePos(thisTransform.localPosition);
         WarpRemoteAgent(thisTransform.localPosition);
@@ -221,49 +252,43 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                 
                 break;
             }
-            case(NetworkCommand.DieWithForce):
-            {
-                
-                Vector3 force = (Vector3)args[0];
-                
-                byte limb_id = 0;
-                if(args.Length > 1)
-                {
-                    limb_id = (byte)args[1];
-                }
-                
-                Die(force, limb_id);
-                
-                break;
-            }
-            case(NetworkCommand.TakeDamage):
+            case(NetworkCommand.TakeDamageExplosive):
             {
                 int incomingDamage = (int)args[0];
-                TakeDamage(incomingDamage);
                 
-                //Die(Vector3.zero);
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.5f, 0), small_healing_times);
+                
+                TakeDamageExplosive(incomingDamage);
                 
                 break;
             }
-            
-            //  case(NetworkCommand.DieWithForce):
-            // {
-            //     // UnlockSendingCommands();
+            case(NetworkCommand.TakeDamageLimbNoForce):
+            {
+                int incomingDamage = (int)args[0];
                 
-            //     Vector3 force = (Vector3)args[0];
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.5f, 0), small_healing_times);
                 
-            //     Die(force);
+                byte limb_id = (byte)args[1];
+                TakeDamage(incomingDamage, limb_id);
+                //TakeDamageForce(incomingDamage, force, limb_id);
                 
-            //     break;
-            // }
-            // case(NetworkCommand.TakeDamage):
-            // {
-            //     int incomingDamage = (int)args[0];
-             
-            //     TakeDamage(incomingDamage);
+                break;
+            }
+            case(NetworkCommand.TakeDamageLimbWithForce):
+            {
+                int incomingDamage = (int)args[0];
                 
-            //     break;
-            // }
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.5f, 0), small_healing_times);
+                
+                Vector3 force = (Vector3)args[1];
+                byte limb_id = (byte)args[2];
+                TakeDamageForce(incomingDamage, force, limb_id);
+                
+                break;
+            }
             default:
             {
                 break;
@@ -321,102 +346,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
         state = _state;
     }
     
-    public void Die(Vector3 force, byte limb_to_destroy)
-    {
-        if(state == SinclaireState.Dead)
-        {
-            return;
-        }
-        
-        if(spawnedObjectComp)
-            spawnedObjectComp.OnObjectDied();
-        
-        SetState(SinclaireState.Dead);
-        
-        
-        HitPoints = -1;
-        
-        sword.Drop();
-        
-        anim.enabled = false;
-        col.enabled = false;
-        NetworkObjectsManager.UnregisterNetObject(net_comp);
-        if(remoteAgent)
-            Destroy(remoteAgent.gameObject, 0.1f);
-            
-        int len = joint_rbs.Length;
-        
-        // CapsuleCollider capsule_col;
-        // SphereCollider sphere_col;
-        // BoxCollider box_col;
-        
-        // for(int i = 0; i < len; i++)    
-        // {
-        //     capsule_col = joint_rbs[i].GetComponent<CapsuleCollider>();
-        //     if(capsule_col)
-        //     {
-        //         capsule_col.radius *= 0.65f;
-        //     }
-        //     else
-        //     {
-        //         sphere_col = joint_rbs[i].GetComponent<SphereCollider>();
-        //         if(sphere_col)
-        //         {
-        //             sphere_col.center = new Vector3(0, 0, 0);
-        //             sphere_col.radius *= 0.65f;
-        //         }
-        //         else
-        //         {
-        //             box_col = joint_rbs[i].GetComponent<BoxCollider>();
-        //             if(box_col)
-        //             {
-        //                 box_col.size *= 0.75f;
-        //             }
-        //         }
-        //     }
-        // }
-        
-        audio_src.PlayOneShot(clipDeath, 1);
-        
-        AudioManager.Play3D(SoundType.death_impact_gib_distorted, thisTransform.localPosition);
-        HitPoints = 0;
-        
-        EnableSkeleton();  
-        len = details_ps.Length;     
-        for(int i = 0; i < len; i++)
-        {
-            details_ps[i].emissionRate = 0;
-            Destroy(details_ps[i].gameObject, 2f);
-        }
-        
-        if(limb_to_destroy != 0)
-        {
-            if(limbs != null)
-            {
-                len = limbs.Length;
-                for(int i = 0; i < len; i++)
-                {
-                    limbs[i].MakeLimbDead();
-                    if(limbs[i].limb_id == limb_to_destroy)
-                    {
-                        Vector3 f = force;
-                        InGameConsole.LogOrange(string.Format("Apply force {0} to limb {1}", f, limb_to_destroy));
-                        
-                        
-                        limbs[i].ApplyForceToAdjacentLimbs(f);
-                        if(!limbs[i].isRootLimb)
-                        {
-                            limbs[i].TakeDamageLimb(2500);
-                        }
-                        
-                        //break;
-                    }
-                }
-            }
-        }
-        
-        DropHealthCrystals();
-    }
+    
     
     void DropHealthCrystals()
     {
@@ -486,14 +416,14 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     
     public float sword_attack_timer = 0;
     bool canDoMeleeDamageToLocalPlayer = true;
-    const float sword_attack1_duration = 4.2F / 3.5f;
+    const float sword_attack1_duration = 4.0F / 3.5f;
     
-    const float sword_attack1_damageTimingStart = 0.29F / 2;
+    const float sword_attack1_damageTimingStart = 0.28F / 2;
     //const float sword_attack1_damageTimingEnd = 1.1F / 4;
     
     //const float sword_attack1_distance = 2F;
-    const float sword_attack1_radius = 0.95F;
-    const int sword_attack1_dmg = 20;
+    const float sword_attack1_radius = 1.25F;
+    const int sword_attack1_dmg = 25;
     
     
     const float firing_duration = 2 / 2;
@@ -549,7 +479,8 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                 dmgDir.y = 1;
                 if(local_pc.CanTakeDamageFromProjectile())
                 {
-                    local_pc.BoostVelocity(dmgDir * 14);    
+                    if(Math.SqrMagnitude(local_pc.fpsVelocity) < 6f * 6f)
+                        local_pc.BoostVelocity(dmgDir * 14);    
                     local_pc.TakeDamage(sword_attack1_dmg);
                 }
                 return true;
@@ -560,9 +491,11 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     
     Transform shooterHelper;
     
-    const int daggerDamage = 20;
+    const int daggerDamage = 30;
     
     const float daggerSpeed = 36;
+    
+    const float daggerRadius = 0.55f;
     
     public void ShootTriple(Vector3 shootPos, Vector3 shootDir)
     {
@@ -591,19 +524,19 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
         int owner_id = col.GetInstanceID();
         
         dagger = dagger_go.GetComponent<FlyingDagger>();
-        dagger.LaunchSinclaireDagger(shootPos, forwardDir, daggerSpeed, 0.45f, daggerDamage, isMine, owner_id);
+        dagger.LaunchSinclaireDagger(shootPos, forwardDir, daggerSpeed, daggerRadius, daggerDamage, isMine, owner_id);
         dagger.nailedExplosionDelay = 2.25f;
         
         dagger_go = ObjectPool2.s().Get(ObjectPoolKey.FlyingDagger1, false);
         
         dagger = dagger_go.GetComponent<FlyingDagger>();
-        dagger.LaunchSinclaireDagger(shootPos, rightDir, daggerSpeed, 0.45f, daggerDamage, isMine, owner_id);
+        dagger.LaunchSinclaireDagger(shootPos, rightDir, daggerSpeed, daggerRadius, daggerDamage, isMine, owner_id);
         dagger.nailedExplosionDelay = 2.0f;
         
         dagger_go = ObjectPool2.s().Get(ObjectPoolKey.FlyingDagger1, false);
         
         dagger = dagger_go.GetComponent<FlyingDagger>();
-        dagger.LaunchSinclaireDagger(shootPos, leftDir, daggerSpeed, 0.45f, daggerDamage, isMine, owner_id);
+        dagger.LaunchSinclaireDagger(shootPos, leftDir, daggerSpeed, daggerRadius, daggerDamage, isMine, owner_id);
         dagger.nailedExplosionDelay = 2.5f;
         
         ParticlesManager.PlayPooled(ParticleType.daggerShot_ps, shootPos + shootDir*1.0f, forwardDir);
@@ -638,8 +571,8 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
         int owner_id = col.GetInstanceID();
         
         dagger = dagger_go.GetComponent<FlyingDagger>();
-        dagger.LaunchSinclaireDagger(shootPos, forwardDir, daggerSpeed, 0.45f, daggerDamage, isMine, owner_id);
-        dagger.nailedExplosionDelay = 2.25f;
+        dagger.LaunchSinclaireDagger(shootPos, forwardDir, daggerSpeed, daggerRadius, daggerDamage, isMine, owner_id);
+        dagger.nailedExplosionDelay = 1.25f;
         
         
         ParticlesManager.PlayPooled(ParticleType.daggerShot_ps, shootPos + shootDir*1.0f, forwardDir);
@@ -922,7 +855,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     }
     
     
-    public Vector3 localStrikeOffset = new Vector3(0, 1, 0.33f);
+    public Vector3 localStrikeOffset = new Vector3(0, 1.25f, 0.25f);
     
     int instance_id;
     public Transform qts_transform;
@@ -1052,15 +985,177 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     const int MaxHealth = 2500;
     int HitPoints = MaxHealth;
     
-    void TakeDamage(int dmg)
+    void TakeDamage(int dmg, byte limb_id)
     {
+        InGameConsole.LogOrange("TakeDamage()");
         HitPoints -= dmg;
-        //InGameConsole.LogFancy("DMG taken: " + dmg.ToString() + "HP: " + HitPoints.ToString());
-        // if(HitPoints <= 0)
-        // {
-        //    Die(Vector3.zero);
-        //    HitPoints = 0;
-        // }
+         
+        if(HitPoints <= 0)
+        {
+            Die(Vector3.zero, limb_id);
+            HitPoints = 0;
+        }
+    }
+    
+    void TakeDamageForce(int dmg, Vector3 force, byte limb_id)
+    {
+        //InGameConsole.LogOrange("TakeDamageForce()");
+        HitPoints -= dmg;
+         
+        if(HitPoints <= 0)
+        {
+            Die(force, limb_id);
+            HitPoints = 0;
+        }
+    }
+    
+    void TakeDamageExplosive(int dmg)
+    {
+        //InGameConsole.LogOrange("TakeDamageExplosive()");
+        HitPoints -= dmg;
+        if(HitPoints <= 0)
+        {
+            DieFromExplosion();
+            HitPoints = 0;
+        }
+    }
+    
+    void DieFromExplosion()
+    {
+        if(state == SinclaireState.Dead)
+        {
+            return;
+        }
+        
+        AudioManager.RemoveEnemiesAlive();
+        
+        //InGameConsole.LogOrange("DieFromExplosion()");
+        
+        SetState(SinclaireState.Dead);
+        
+        if(spawnedObjectComp)
+            spawnedObjectComp.OnObjectDied();
+        
+        HitPoints = -1;
+        
+        anim.enabled = false;
+        col.enabled = false;
+        
+        NetworkObjectsManager.UnregisterNetObject(net_comp);
+        if(remoteAgent)
+            Destroy(remoteAgent.gameObject, 0.1f);
+            
+        
+        
+        audio_src.PlayOneShot(clipDeath, 0.5f);
+        HitPoints = 0;
+        
+        EnableSkeleton();  
+        AudioManager.Play3D(SoundType.death_impact_gib_distorted, thisTransform.localPosition);
+        
+        int len = limbs.Length;
+        for(int i = 0; i < len; i++)
+        {
+            limbs[i].MakeLimbDead();
+        }
+        int limb_to_destroy = 3;
+        
+        
+        if(limb_to_destroy != 0)
+        {
+            if(limbs != null)
+            {
+                for(int i = 0; i < len; i++)
+                {
+                    if(limbs[i].limb_id == limb_to_destroy)
+                    {
+                        //Vector3 f = force;
+                        //InGameConsole.LogOrange(string.Format("Apply force {0} to limb {1}", f, limb_to_destroy));
+                        
+                        //limbs[i].ApplyForceToAdjacentLimbs(f);
+                        if(!limbs[i].isRootLimb)
+                        {
+                            limbs[i].TakeDamageLimb(2500);
+                            
+                        }
+                        //limbs[i].AddForceToLimb(f);
+                        
+                        //break;
+                    }
+                }
+            }
+        }
+        DropHealthCrystals();
+    }
+    
+    void Die(Vector3 force, byte limb_to_destroy)
+    {
+        if(state == SinclaireState.Dead)
+        {
+            return;
+        }
+        
+        AudioManager.RemoveEnemiesAlive();
+        
+        SetState(SinclaireState.Dead);
+        
+        if(spawnedObjectComp)
+            spawnedObjectComp.OnObjectDied();
+        
+        sword.Drop();
+        
+        anim.enabled = false;
+        col.enabled = false;
+        
+        NetworkObjectsManager.UnregisterNetObject(net_comp);
+        if(remoteAgent)
+            Destroy(remoteAgent.gameObject, 0.1f);
+            
+        audio_src.PlayOneShot(clipDeath, 0.5f);
+        HitPoints = 0;
+        
+        
+        EnableSkeleton();  
+        AudioManager.Play3D(SoundType.death_impact_gib_distorted, thisTransform.localPosition);
+        
+        int len = limbs.Length;
+        for(int i = 0; i < len; i++)
+        {
+            limbs[i].MakeLimbDead();
+        }
+        len = details_ps.Length;     
+        for(int i = 0; i < len; i++)
+        {
+            details_ps[i].emissionRate = 0;
+            Destroy(details_ps[i].gameObject, 2f);
+        }
+        
+        if(limb_to_destroy != 0)
+        {
+            if(limbs != null)
+            {
+                len = limbs.Length;
+                for(int i = 0; i < len; i++)
+                {
+                    if(limbs[i].limb_id == limb_to_destroy)
+                    {
+                        Vector3 f = force;
+                        //InGameConsole.LogOrange(string.Format("Apply force {0} to limb {1}", f, limb_to_destroy));
+                        
+                        limbs[i].ApplyForceToAdjacentLimbs(f);
+                        if(!limbs[i].isRootLimb)
+                        {
+                            limbs[i].TakeDamageLimb(2500);
+                            
+                        }
+                        //limbs[i].AddForceToLimb(f);
+                        
+                        //break;
+                    }
+                }
+            }
+        }
+        DropHealthCrystals();
     }
     
     
@@ -1104,8 +1199,8 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
         UpdateBrainLocally(dt);
     }
     
-    const float dashDistanceCheck = 2.5F;
-    const float dashDistance = 6.0F;
+    const float dashDistanceCheck = 3.25F;
+    const float dashDistance = 7.0F;
     
     
     

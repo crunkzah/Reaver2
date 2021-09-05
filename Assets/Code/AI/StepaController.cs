@@ -15,7 +15,7 @@ public enum StepaState : byte
     Dead
 }
 
-public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, ILaunchableAirbourne
+public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, ILaunchableAirbourne, IKillableThing
 {
     public GameObject remoteAgent_prefab;
     NavMeshAgent remoteAgent;
@@ -42,6 +42,38 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     //public TrailRendererController trail_spine;
     
     SpawnedObject spawnedObjectComp;
+    
+    public Cloth coat1;
+    public Cloth coat2;
+    
+    public Transform head;
+    
+    public Vector3 GetHitSpot()
+    {
+        return head.position;
+    }
+    
+    public NetworkObject GetNetComp()
+    {
+        return net_comp;
+    }
+    
+    public byte GetHitSpotLimbId()
+    {
+        return 7;
+    }
+    
+    public bool CanBeBounceHit()
+    {
+        if(state != StepaState.Dead)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+    
+    
     
     void Awake()
     {
@@ -91,6 +123,18 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             InitAsMaster();
         }
         
+        NPCManager.RegisterKillable(this);
+        
+        AudioManager.AddEnemiesAlive();
+        
+        if(!UberManager.RenderCoats)
+        {
+            coat1.GetComponent<SkinnedMeshRenderer>().enabled = false;
+            coat1.enabled = false;
+            
+            coat2.GetComponent<SkinnedMeshRenderer>().enabled = false;
+            coat2.enabled = false;
+        }
         
         HitPoints = MaxHealth;
         SetMovePos(thisTransform.localPosition);
@@ -174,6 +218,11 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 
                 byte _state = (byte)args[0];
                 
+                if(_state == (byte)StepaState.Aiming)
+                {
+                    aimingPos = (Vector3)args[1];
+                }
+                
                 SetState((StepaState)_state);
                 
                 break;
@@ -209,31 +258,48 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 
                 
                 shootingDirection = _shotDir;
-                
+                aim_ps.Stop();
                 Shoot(_shotPos + new Vector3(0, offsetShootingY, 0), _shotDir);
                 SetState(StepaState.Shooting);
                 
                 break;
             }
-            case(NetworkCommand.DieWithForce):
+            case(NetworkCommand.TakeDamageExplosive):
             {
+                int incomingDamage = (int)args[0];
                 
-                Vector3 force = (Vector3)args[0];
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.0f, 0), small_healing_times);
                 
-                byte limb_id = 0;
-                if(args.Length > 1)
-                {
-                    limb_id = (byte)args[1];
-                }
-                
-                Die(force, limb_id);
+                TakeDamageExplosive(incomingDamage);
                 
                 break;
             }
-            case(NetworkCommand.TakeDamage):
+            case(NetworkCommand.TakeDamageLimbNoForce):
             {
                 int incomingDamage = (int)args[0];
-                TakeDamage(incomingDamage);
+                
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.0f, 0), small_healing_times);
+                
+                
+                
+                byte limb_id = (byte)args[1];
+                TakeDamage(incomingDamage, limb_id);
+                //TakeDamageForce(incomingDamage, force, limb_id);
+                
+                break;
+            }
+            case(NetworkCommand.TakeDamageLimbWithForce):
+            {
+                int incomingDamage = (int)args[0];
+                
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.0f, 0), small_healing_times);
+                
+                Vector3 force = (Vector3)args[1];
+                byte limb_id = (byte)args[2];
+                TakeDamageForce(incomingDamage, force, limb_id);
                 
                 break;
             }
@@ -255,7 +321,8 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 {
                     //We receive a damage also:
                     int incomingDamage = (int)args[2];
-                    TakeDamage(incomingDamage);
+                    byte limb_rnd = (byte)Random.Range(2, 5);
+                    TakeDamage(incomingDamage, limb_rnd);
                 }
                     
                 velocity = launchVel * Globals.NPC_airbourne_force_mult;
@@ -309,7 +376,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     
     const float projectileSpeed = 38F;
     const float projectileRadius = 0.4F;
-    const int projectileDamage = 20;
+    const int projectileDamage = 25;
     
     const float shootMaxDistance = 55;
     const float shootingChasingCooldown = 2.15F;
@@ -339,6 +406,10 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
         AudioManager.Play3D(SoundType.projectile_launch1, shotPos, 0.7F);
         DoLight(shotPos);
     }
+    
+    Vector3 aimingPos;
+    const float aimingDurationBeforeShooting = 0.5f;
+    public ParticleSystem aim_ps;
     
     void SetState(StepaState _state)
     {
@@ -371,6 +442,13 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 distanceTravelledRunningSqr = 0;
                 break;
             }
+            case(StepaState.Aiming):
+            {
+                brainTimer = 0;
+                anim.Play("Base.Aim", 0, 0);
+                aim_ps.Play();
+                break;                
+            }
             case(StepaState.Shooting):
             {
                 brainTimer = 0;
@@ -387,27 +465,56 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     
     float damage_taken_timeStamp;
     
-    void TakeDamage(int dmg)
+    void TakeDamage(int dmg, byte limb_id)
     {
+        //InGameConsole.LogOrange("TakeDamage()");
         HitPoints -= dmg;
-        // if(HitPoints <= 0)
-        // {
-        //    Die(Vector3.zero);
-        //    HitPoints = 0;
-        // }
+         
+        if(HitPoints <= 0)
+        {
+            Die(Vector3.zero, limb_id);
+            HitPoints = 0;
+        }
     }
     
-    void Die(Vector3 force, byte limb_to_destroy)
+    void TakeDamageForce(int dmg, Vector3 force, byte limb_id)
+    {
+        //InGameConsole.LogOrange("TakeDamageForce()");
+        HitPoints -= dmg;
+         
+        if(HitPoints <= 0)
+        {
+            Die(force, limb_id);
+            HitPoints = 0;
+        }
+    }
+    
+    void TakeDamageExplosive(int dmg)
+    {
+        //InGameConsole.LogOrange("TakeDamageExplosive()");
+        HitPoints -= dmg;
+        if(HitPoints <= 0)
+        {
+            DieFromExplosion();
+            HitPoints = 0;
+        }
+    }
+    
+    void DieFromExplosion()
     {
         if(state == StepaState.Dead)
         {
             return;
         }
         
-        if(spawnedObjectComp)
-            spawnedObjectComp.OnObjectDied();
+        AudioManager.RemoveEnemiesAlive();
+        
+///        InGameConsole.LogOrange("DieFromExplosion()");
         
         SetState(StepaState.Dead);
+        
+        if(spawnedObjectComp)
+            spawnedObjectComp.OnObjectDied();
         
         HitPoints = -1;
         
@@ -418,45 +525,92 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
         if(remoteAgent)
             Destroy(remoteAgent.gameObject, 0.1f);
             
-        int len = joint_rbs.Length;
         
-        // CapsuleCollider capsule_col;
-        // SphereCollider sphere_col;
-        // BoxCollider box_col;
         
-        // for(int i = 0; i < len; i++)    
+        audio_src.PlayOneShot(clipDeath, 0.5f);
+        HitPoints = 0;
+        
+        EnableSkeleton();  
+        AudioManager.Play3D(SoundType.death_impact_gib_distorted, thisTransform.localPosition);
+        
+        int len = limbs.Length;
+        for(int i = 0; i < len; i++)
+        {
+            limbs[i].MakeLimbDead();
+        }
+        int limb_to_destroy = 3;
+        
+        for(int i = 0; i < len; i++)
+        {
+            if(!limbs[i].isRootLimb && limbs[i].canBeDestroyed)
+            {
+                limbs[i].ExplodeLimbWhenMasterAlive();
+                break;
+            }
+        }
+        
+        
+        // if(limb_to_destroy != 0)
         // {
-        //     capsule_col = joint_rbs[i].GetComponent<CapsuleCollider>();
-        //     if(capsule_col)
+        //     if(limbs != null)
         //     {
-        //         //capsule_col.radius *= 0.65f;
-        //     }
-        //     else
-        //     {
-        //         sphere_col = joint_rbs[i].GetComponent<SphereCollider>();
-        //         if(sphere_col)
+        //         for(int i = 0; i < len; i++)
         //         {
-        //             //sphere_col.center = new Vector3(0, 0, 0);
-        //             //sphere_col.radius *= 0.65f;
-        //         }
-        //         else
-        //         {
-        //             box_col = joint_rbs[i].GetComponent<BoxCollider>();
-        //             if(box_col)
+        //             if(limbs[i].limb_id == limb_to_destroy)
         //             {
-        //                 //box_col.size *= 0.75f;
+        //                 //Vector3 f = force;
+        //                 //InGameConsole.LogOrange(string.Format("Apply force {0} to limb {1}", f, limb_to_destroy));
+                        
+        //                 //limbs[i].ApplyForceToAdjacentLimbs(f);
+        //                 if(!limbs[i].isRootLimb)
+        //                 {
+        //                     limbs[i].TakeDamageLimb(2500);
+                            
+        //                 }
+        //                 //limbs[i].AddForceToLimb(f);
+                        
+        //                 //break;
         //             }
         //         }
         //     }
         // }
+        DropHealthCrystals();
+    }
+    
+    void Die(Vector3 force, byte limb_to_destroy)
+    {
+        if(state == StepaState.Dead)
+        {
+            return;
+        }
         
-        AudioManager.Play3D(SoundType.death_impact_gib_distorted, thisTransform.localPosition);
+        AudioManager.RemoveEnemiesAlive();
         
-        audio_src.PlayOneShot(clipDeath, 1);
+        SetState(StepaState.Dead);
+        
+        if(spawnedObjectComp)
+            spawnedObjectComp.OnObjectDied();
+        
+        HitPoints = -1;
+        
+        anim.enabled = false;
+        col.enabled = false;
+        
+        NetworkObjectsManager.UnregisterNetObject(net_comp);
+        if(remoteAgent)
+            Destroy(remoteAgent.gameObject, 0.1f);
+            
+        audio_src.PlayOneShot(clipDeath, 0.5f);
         HitPoints = 0;
         
         EnableSkeleton();  
+        AudioManager.Play3D(SoundType.death_impact_gib_distorted, thisTransform.localPosition);
         
+        int len = limbs.Length;
+        for(int i = 0; i < len; i++)
+        {
+            limbs[i].MakeLimbDead();
+        }
         
         if(limb_to_destroy != 0)
         {
@@ -465,16 +619,16 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 len = limbs.Length;
                 for(int i = 0; i < len; i++)
                 {
-                    limbs[i].MakeLimbDead();
                     if(limbs[i].limb_id == limb_to_destroy)
                     {
                         Vector3 f = force;
-                        InGameConsole.LogOrange(string.Format("Apply force {0} to limb {1}", f, limb_to_destroy));
+                        //InGameConsole.LogOrange(string.Format("Apply force {0} to limb {1}", f, limb_to_destroy));
                         
                         limbs[i].ApplyForceToAdjacentLimbs(f);
                         if(!limbs[i].isRootLimb)
                         {
                             limbs[i].TakeDamageLimb(2500);
+                            
                         }
                         //limbs[i].AddForceToLimb(f);
                         
@@ -483,6 +637,8 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 }
             }
         }
+        Destroy(coat1.gameObject);
+        Destroy(coat2.gameObject);
         DropHealthCrystals();
     }
     
@@ -496,7 +652,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
         //hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0));
     }
     
-    const int MaxHealth = 300;
+    const int MaxHealth = 400;
     public int HitPoints = MaxHealth;
     
     public int GetCurrentHP()
@@ -525,7 +681,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     
     public StepaState state = StepaState.Idle;
     
-    const float PATH_UPDATE_BASE = 0.2F;//0.15F;
+    const float PATH_UPDATE_BASE = 0.18F;//0.15F;
     float path_update_cd;
     float brainTimer = 0;
     
@@ -636,7 +792,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
         target_pc = target;
     }
     
-    const float offsetShootingY = 1.75F;
+    const float offsetShootingY = 2.25F;
     
     public bool CanShootAtPos(Vector3 offsetedCheckPosition, Vector3 posToCheck, float maxDistance)
     {
@@ -746,12 +902,14 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                                 brainTimer = 0;
                                 
                                 //Vector3 _shotPos =  GetRemoteAgentPos();
-                                Vector3 _shotPos = currentDestination;
-                                Vector3 _shotDir = (offsettedTargetHeadPos - shootingCheckPosOffsetted).normalized;
+                                // Vector3 _shotPos = currentDestination;
+                                // Vector3 _shotDir = (offsettedTargetHeadPos - shootingCheckPosOffsetted).normalized;
+                                //NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Shoot, _shotPos, _shotDir);
                                 
                                     
                                 LockSendingCommands();
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Shoot, _shotPos, _shotDir);
+                                Vector3 _aimingPos = currentDestination;
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetState, StepaState.Aiming, _aimingPos);
                             }
                         }
                         else if(brainTimer > path_update_cd)
@@ -788,6 +946,33 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                         }
                     }
                     
+                }
+                
+                break;
+            }
+            case(StepaState.Aiming):
+            {
+                brainTimer += dt;
+                WarpRemoteAgent(aimingPos);
+                
+                if(brainTimer > aimingDurationBeforeShooting)
+                {
+                    if(canSendCommands)
+                    {
+                        Vector3 targetGroundPos = target_pc.GetGroundPosition();
+                    
+                        Vector3 shootingCheckPosOffsetted = currentDestination;
+                        shootingCheckPosOffsetted.y += offsetShootingY;
+                        
+                        Vector3 offsettedTargetHeadPos = target_pc.GetHeadPosition();
+                        offsettedTargetHeadPos.y -= 0.25F;
+                        
+                        Vector3 _shotPos = currentDestination;
+                        Vector3 _shotDir = (offsettedTargetHeadPos - shootingCheckPosOffsetted).normalized;
+                        
+                        LockSendingCommands();
+                        NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Shoot, _shotPos, _shotDir);
+                    }
                 }
                 
                 break;
@@ -940,10 +1125,11 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 velocity.y = Math.Clamp(-GRAVITY_MAX, GRAVITY_MAX, velocity.y);
                 
                 
-                if(thisTransform.localPosition.y < -500 && canSendCommands)
+                if(thisTransform.localPosition.y < Globals.Airbourne_YCoord_Lowest && canSendCommands)
                 {
                     LockSendingCommands();
-                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.DieWithForce, new Vector3(0, 0, 0));
+                    //NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.TakeDamageLimbNoForce, HitPoints * 2, 1);
+                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.TakeDamageLimbNoForce, HitPoints * 2, (byte)7);
                 }
                 
                 RaycastHit hit;
@@ -1117,6 +1303,41 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 {
                     if(target_pc)
                         RotateToLookAt(target_pc.GetGroundPosition(), rotateTimeAtTarget * speedMult, false);
+                }
+                else
+                    RotateToLookAt(currentDestination, rotateTime * speedMult, false);
+                
+                Vector3 dPos = currentDestination - currentPos;
+                
+                anim.SetFloat(MoveSpeedHash, Math.Magnitude(dPos), animDampTime, dt);
+                
+                distanceTravelledRunningSqr += Math.Magnitude(updatedPos - currentPos);
+                
+                if(distanceTravelledRunningSqr > footStepDistance * footStepDistance)
+                {
+                    distanceTravelledRunningSqr -= footStepDistance * footStepDistance;
+                    if(distanceTravelledRunningSqr  > footStepDistance * footStepDistance)
+                        distanceTravelledRunningSqr = 0;
+                    
+                    //audio_src.PlayOneShot(clipStep, 0.33F);
+                }
+                
+                break;
+            }
+            case(StepaState.Aiming):
+            {
+                Vector3 currentPos = thisTransform.localPosition;
+                
+                float dV = speedMult * dt * moveSpeed;
+                Vector3 updatedPos = Vector3.MoveTowards(currentPos, currentDestination, dV);
+                thisTransform.localPosition = updatedPos; 
+                
+                //RotateToLookAt(currentDestination, rotateTime * speedMult, false);
+                
+                if(currentDestination == currentPos)
+                {
+                    if(target_pc)
+                        RotateToLookAt(target_pc.GetGroundPosition(), 0.1f * speedMult, false);
                 }
                 else
                     RotateToLookAt(currentDestination, rotateTime * speedMult, false);

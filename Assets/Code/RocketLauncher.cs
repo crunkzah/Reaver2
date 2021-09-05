@@ -108,6 +108,8 @@ public class RocketLauncher : MonoBehaviour
                 int i = rockets_in_magazine;
                 
                 float _scale = Mathf.Lerp(0, icons_full_scale, charge);
+                if(icons == null || icons[i] == null)
+                    return;
                 icons[i].localScale = new Vector3(_scale, _scale, _scale);
                 
                 if(charge >= 1f)

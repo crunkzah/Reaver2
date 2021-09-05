@@ -19,6 +19,22 @@ public interface ITriggerable
     void OnTrigger();
 }
 
+public interface IBoss
+{
+    float GetBossHitPointsPercents();
+    // int GetMaxHP()
+    // {
+        
+    // }
+}
+
+public interface IKillableThing
+{
+    Vector3 GetHitSpot();
+    bool CanBeBounceHit();
+    NetworkObject GetNetComp();
+    byte GetHitSpotLimbId();
+}
 
 public interface ISceneSyncable
 {

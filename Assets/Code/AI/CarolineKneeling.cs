@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Photon.Pun;
 
 public class CarolineKneeling : MonoBehaviour, INetworkObject
 {
@@ -54,22 +55,47 @@ public class CarolineKneeling : MonoBehaviour, INetworkObject
         canSendCommands = true;
     }
     
+    public NetworkObjectAndCommand[] messages_on_pickup;
+    
     void Update()
     {
-        if(canSendCommands)
+        if(canSendCommands && PhotonNetwork.IsMasterClient)
         {
-            PlayerController masterPlayer = PhotonManager.GetLocalPlayer();
-            if(masterPlayer)
+            for(int i = 0; i < NPCManager.AITargets().Count; i++)
             {
-                float distance_to_revolver = Vector3.Distance(shotgun_transform.position, masterPlayer.GetHeadPosition());
-                //InGameConsole.LogFancy("distance_to_revolver is " + distance_to_revolver.ToString("f"));
-                if(distance_to_revolver < 1.5f)
+                PlayerController playerTarget = NPCManager.AITargets()[i].GetComponent<PlayerController>();
+                if(playerTarget)
                 {
-                    LockSendingCommands();
-                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability1);
-                    PlayerInventory.Singleton().RaiseEventGiveWeaponToAllPlayers(GunType.Shotgun);
+                    float distance_to_revolver = Math.SqrDistance(shotgun_transform.position, playerTarget.GetHeadPosition());
+                    //InGameConsole.LogFancy("distance_to_revolver is " + distance_to_revolver.ToString("f"));
+                    if(distance_to_revolver < 1.6f * 1.6f)
+                    {
+                        LockSendingCommands();
+                        NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability1);
+                        if(messages_on_pickup != null)
+                        {
+                            for(int j = 0; j < messages_on_pickup.Length; j++)
+                            {
+                                NetworkObjectsManager.CallNetworkFunction(messages_on_pickup[j].net_comp.networkId, messages_on_pickup[j].command);
+                            }
+                        }
+                        PlayerInventory.Singleton().RaiseEventGiveWeaponToAllPlayers(GunType.Revolver);
+                    }
                 }
             }
+            
+            // PlayerController masterPlayer = PhotonManager.GetLocalPlayer();
+            // if(masterPlayer)
+            // {
+            //     float distance_to_revolver = Vector3.Distance(shotgun_transform.position, masterPlayer.GetHeadPosition());
+            //     //InGameConsole.LogFancy("distance_to_revolver is " + distance_to_revolver.ToString("f"));
+            //     if(distance_to_revolver < 1.5f)
+            //     {
+            //         LockSendingCommands();
+            //         NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability1);
+            //         PlayerInventory.Singleton().RaiseEventGiveWeaponToAllPlayers(GunType.Shotgun);
+            //     }
+            // }
         }
     }
 }

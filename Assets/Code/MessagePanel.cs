@@ -39,9 +39,9 @@ public class MessagePanel : MonoBehaviour
         Invoke(nameof(Flicker), 0.6F);
     }
     
-    public void HideMessage()
+    public static void HideMessage()
     {
-        OnHide();
+        Singleton().OnHide();
     }
     
     void Flicker()

@@ -17,12 +17,12 @@ public class CameraShaker : MonoBehaviour
     
     Transform thisTransform;
     float shakeMult = 0.5f;
-    float damping = 0.265f;
+    float smoothTime = 0.33f;
     float trauma = 0;
-    const float MAX_TRAUMA = 2.8f;
+    const float MAX_TRAUMA = 4f;
     
-    float horizontalMult = 0.33f;
-    float verticalMult = 1f;
+    float horizontalMult = 0.8f;
+    float verticalMult = 1.33f;
     
     Vector3 normalPos;
     Vector3 duckingPos;
@@ -81,7 +81,7 @@ public class CameraShaker : MonoBehaviour
     {
         float dt = UberManager.DeltaTime();
         
-        shakeVelocityY = Math.Clamp(-10, 10, shakeVelocityY);
+        //shakeVelocityY = Math.Clamp(-10, 10, shakeVelocityY);
         
         shakeVelocityY += snapbackStrengthY * dt;
         
@@ -117,7 +117,7 @@ public class CameraShaker : MonoBehaviour
         float offsetX = trauma * shakeMult * Random.Range(-1f, 1f) * horizontalMult;
         float offsetY = trauma * shakeMult * Random.Range(-1f, 1f) * verticalMult;
         
-        trauma = Mathf.SmoothDamp(trauma, 0, ref v, damping, 1000, dt);
+        trauma = Mathf.SmoothDamp(trauma, 0, ref v, smoothTime, 1000, dt);
         
         Vector3 duckOffset = isDucking ? duckCameraPlacePosition : normalCameraPlacePosition;
         

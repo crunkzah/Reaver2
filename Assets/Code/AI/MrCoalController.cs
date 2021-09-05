@@ -11,7 +11,7 @@ public enum MrCoalState : int
     Walking
 }
 
-public class MrCoalController : MonoBehaviour, INetworkObject, Interactable
+public class MrCoalController : MonoBehaviour, INetworkObject, Interactable, IDamagableLocal
 {
     NetworkObject net_comp;
     AudioSource audioSrc;
@@ -144,10 +144,21 @@ public class MrCoalController : MonoBehaviour, INetworkObject, Interactable
                 Invoke(nameof(Die), 2);
                 break;
             }
-            case(NetworkCommand.TakeDamage):
+            case(NetworkCommand.TakeDamageLimbNoForce):
             {
-                if(agent.speed != 18)
+                //InGameConsole.LogFancy("MrCoal: TakeDamageLimbNoForce");
+                if(agent.speed < 24 && agent.speed >= 18)
+                {
                     agent.speed = 18;
+                }
+                else if(agent.speed < 18 && agent.speed >= 12)
+                {
+                    agent.speed = 18;
+                }
+                else if(agent.speed < 12)
+                {
+                    agent.speed = 12;
+                }
                 // if(PhotonNetwork.IsMasterClient)
                 // {
                     
@@ -156,6 +167,23 @@ public class MrCoalController : MonoBehaviour, INetworkObject, Interactable
                     // }
                     
                 // }
+                break;
+            }
+            case(NetworkCommand.TakeDamageLimbWithForce):
+            {
+                //InGameConsole.LogFancy("MrCoal: TakeDamageLimbWithForce");
+                if(agent.speed < 24 && agent.speed >= 18)
+                {
+                    agent.speed = 18;
+                }
+                else if(agent.speed < 18 && agent.speed >= 12)
+                {
+                    agent.speed = 18;
+                }
+                else if(agent.speed < 12)
+                {
+                    agent.speed = 12;
+                }
                 break;
             }
             default:
@@ -182,8 +210,6 @@ public class MrCoalController : MonoBehaviour, INetworkObject, Interactable
         Vector3 pos = thisTransform.position + new Vector3(0, 2, 0) + 1.5f * Math.RandomVector();
         ParticlesManager.PlayPooled(ParticleType.hurt1_ps, thisTransform.position, new Vector3(0, 0, 1));
         ObjectPool.s().Get(ObjectPoolKey.BloodSprayer, false).GetComponent<BloodStainSprayer>().MakeStains(thisTransform.position + new Vector3(0, 1, 0));
-        
-        
         
         ParticlesManager.PlayPooled(ParticleType.gibs1_ps, pos, Vector3.forward);
         ParticlesManager.PlayPooled(ParticleType.hurt1_ps, pos, Vector3.forward);
@@ -390,6 +416,28 @@ public class MrCoalController : MonoBehaviour, INetworkObject, Interactable
                 break;
             }
         }        
+    }
+    
+    float damage_taken_timeStamp;
+    
+    public void TakeDamageLocally(int dmg, Vector3 hitPos, Vector3 hitDir)
+    {
+        if(damage_taken_timeStamp + 0.15F < Time.time)
+        {
+            float vol = Random.Range(0.8f, 1f);
+            
+            damage_taken_timeStamp = Time.time;
+        }
+    }
+    
+    public bool IsDead()
+    {
+        return false;
+    }
+    
+    public int GetCurrentHP()
+    {
+        return 10000;        
     }
 
     void Update()

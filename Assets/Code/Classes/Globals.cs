@@ -64,6 +64,8 @@ public static class Globals
     
     public const float NPC_airbourne_force_mult = 1.5F;
     public const float NPC_gravity = -15F;
+    public const float Airbourne_YCoord_Lowest = -400;
+    
 }
 
 public static class QuaternionUtil 
@@ -444,7 +446,9 @@ public static class Math
         return result;
     }
     
+    
 }
+
 
 public static class Colors
 {

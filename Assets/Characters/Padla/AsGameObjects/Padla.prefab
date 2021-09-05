@@ -1428,6 +1428,7 @@ MonoBehaviour:
   audio_src: {fileID: 0}
   limbs: []
   trail_spine: {fileID: 6320656908697318067}
+  head: {fileID: 6810072008130432639}
   canSendCommands: 1
   HitPoints: 300
   state: 0
@@ -1516,7 +1517,7 @@ SkinnedMeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: b5faa22cd2339434d94466e00b1968cd, type: 2}
-  - {fileID: 2100000, guid: fc5c00f7995f9de4fa6c4fbe30095b19, type: 2}
+  - {fileID: 2100000, guid: fd59be4f5745e4d4e89279cca6496baa, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

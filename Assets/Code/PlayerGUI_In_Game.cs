@@ -50,6 +50,8 @@ public class PlayerGUI_In_Game : MonoBehaviour
     {
         localPlayer = _player;
         fpsCamera = _fpsCamera;
+        if(_player)
+            ProcessHealth();
     }
     
     public void ReleasePlayerGUI()
@@ -57,56 +59,76 @@ public class PlayerGUI_In_Game : MonoBehaviour
         localPlayer = null;
     }
     
+    
+    public Transform GUI3D_holder;
+    public Transform GUI3D_Heart;
+    bool GUI3D = true;
+    
     void Update()
     {
-        if(localPlayer)
+        if(GUI3D)
         {
-            if(!hpBar.gameObject.activeSelf)
+            if(localPlayer)
             {
-                hpBar.gameObject.SetActive(true);
-                hpText.gameObject.SetActive(true);
+                float dt = UberManager.DeltaTime();
+                OrthoCamera.Show3DGUI();
+                OrthoCamera.Update3DGUI(dt, localPlayer.HitPoints, localPlayer.GetCurrentMaxHealthPenalty(), localPlayer.GetMaxHealth(), localPlayer.Stamina);
             }
-            if(!staminaBar.gameObject.activeSelf)
+            else
             {
-                staminaBar.gameObject.SetActive(true);
-                staminaText.gameObject.SetActive(true);
+                OrthoCamera.Hide3DGUI();
             }
-            if(!crosshair.activeSelf)
-            {
-                crosshair.SetActive(true);
-            }
-            
-            if(playerHp != localPlayer.HitPoints)
-            {
-                ProcessHealth();
-            }
-            
-            if(playerStamina != localPlayer.Stamina)
-            {
-                ProcessStamina();
-            }
-            
-            
+            HidePlayerGUI();
         }
         else
         {
-            if(hpBar.gameObject.activeSelf)
+            if(localPlayer)
             {
-                hpBar.gameObject.SetActive(false);
-                hpText.gameObject.SetActive(false);
-                staminaBar.gameObject.SetActive(false);
-                staminaText.gameObject.SetActive(false);
+                if(!hpBar.gameObject.activeSelf)
+                {
+                    hpBar.gameObject.SetActive(true);
+                    hpText.gameObject.SetActive(true);
+                }
+                if(!staminaBar.gameObject.activeSelf)
+                {
+                    staminaBar.gameObject.SetActive(true);
+                    staminaText.gameObject.SetActive(true);
+                }
+                if(!crosshair.activeSelf)
+                {
+                    crosshair.SetActive(true);
+                }
+                
+                if(playerHp != localPlayer.HitPoints)
+                {
+                    ProcessHealth();
+                }
+                
+                if(playerStamina != localPlayer.Stamina)
+                {
+                    ProcessStamina();
+                }
             }
-            if(crosshair.activeSelf)
+            else
             {
-                crosshair.SetActive(false);
+                if(hpBar.gameObject.activeSelf)
+                {
+                    hpBar.gameObject.SetActive(false);
+                    hpText.gameObject.SetActive(false);
+                    staminaBar.gameObject.SetActive(false);
+                    staminaText.gameObject.SetActive(false);
+                }
+                if(crosshair.activeSelf)
+                {
+                    crosshair.SetActive(false);
+                }
+                
             }
-            
         }
         
     }
     
-    void ProcessHealth()
+    public void ProcessHealth()
     {
         playerHp = localPlayer.HitPoints;
         
@@ -116,7 +138,7 @@ public class PlayerGUI_In_Game : MonoBehaviour
         // float hp_bar_width = Mathf.Lerp(0, barFullWidth, t);
         // hpBar.sizeDelta = new Vector2(hp_bar_width,  hpBar.sizeDelta.y);
         
-        hpText.SetText(playerHp.ToString());
+        hpText.SetText(playerHp.ToString() + "/" + localPlayer.GetMaxHealth().ToString());
     }
     
     void ProcessStamina()

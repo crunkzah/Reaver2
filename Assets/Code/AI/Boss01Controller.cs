@@ -88,7 +88,7 @@ public class Boss01Controller : MonoBehaviour, INetworkObject
     {
         switch(command)
         {
-            case(NetworkCommand.TakeDamage):
+            case(NetworkCommand.TakeDamageLimbWithForce):
             {
                 int dmg = (int)args[0];
                 

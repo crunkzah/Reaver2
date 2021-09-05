@@ -1,6 +1,7 @@
 using UnityEngine;
 using Photon.Pun;
 using System.Collections.Generic;
+using System.Collections;
 
 
 public enum GunType : byte
@@ -10,14 +11,9 @@ public enum GunType : byte
     Shotgun,
     RocketLauncher,
     AR,
-    MP5_alt
-}
-
-public enum MeleeState : byte
-{
-    Idle,
-    Charging,
-    ChargingAir
+    MP5_alt,
+    Revolver_blue,
+    Shotgun_blue,
 }
 
 public struct MeleeTimedDamage
@@ -29,12 +25,40 @@ public struct MeleeTimedDamage
     
 }
 
+public struct ShotgunHit
+{
+    public Collider col;
+    public int damage;
+}
 
 public enum ArmType : byte 
 {
     None,
     Arm1,
     Sunstrike
+}
+
+[System.Serializable]
+public struct InventoryPosition
+{
+    public int mainIndex;
+    public int altIndex;
+    public InventoryPosition(int main, int alt)
+    {
+        mainIndex = main;
+        altIndex = alt;
+    }
+    public bool Equals(InventoryPosition x)
+    {
+        if((this.mainIndex == x.mainIndex) && (this.altIndex == x.altIndex))
+            return true;
+        else 
+            return false;
+    }
+    public override string ToString()
+    {
+        return string.Format("[<color=yellow>{0}</color>,<color=red>{1}</color>]", this.mainIndex, this.altIndex    );
+    }
 }
 
 public class FPSGunController : MonoBehaviour
@@ -46,17 +70,17 @@ public class FPSGunController : MonoBehaviour
     const int revolverDmg_ult = 550;//530;
     const float revolverFireRate = 0.325F * 2;
     const float revolverParryRate = 0.9f;
-    const float revolverPump_Rate = 0.365F / 1.0f;
     
     const int shotgunDmgPellet = 60;
     const int shotgunDmgPellet_Alt = 44;
     const float shotgunFireRate = 1.15F;
     const float shotgunAngle = 10F;
     const int shotgunPelletCount = 22;
+    const int shotgunBluePelletCount = 9;
     const int shotgunPelletCount_Alt = 7;
     
     const int rocketLauncherDmg = 200;
-    const float rocketLauncherFireRate = 0.4F;
+    const float rocketLauncherFireRate = 0.3F;
     
     const int swordAttackDmg = 125;
     const float swordAttackRate = 0.2F;
@@ -67,8 +91,8 @@ public class FPSGunController : MonoBehaviour
     const float ARFireRateFastest = 0.075F;//0.1F;
     const float ARFireRateSlowest = 0.135F;
     
-    const int mp5_dmg = 70;
-    const float mp5FireRate = 0.12F;
+    const int mp5_dmg = 62;
+    const float mp5FireRate = 0.095F;
     const int mp5_alt_dmg = 700;
     const float mp5_alt_force = 14f;
     const float mp5FireRate_alt = 1.0f;
@@ -88,12 +112,26 @@ public class FPSGunController : MonoBehaviour
     public ParticleSystem revolverFX_stronger_ps;
     public ParticleSystem revolverFX_alt_ps;
     
+    
+    public Revolver revolver_blue_fps;
+    public Transform gunPoint_revolver_blue_fps;
+    //public Animator revolver_animatorFPS;
+    public ParticleSystem revolverFX_blue_ps;
+    public ParticleSystem revolverFX_blue_stronger_ps;
+    public ParticleSystem revolverFX_blue_alt_ps;
+    
     public TrailRendererController sword1TR;
     
     public Transform shotgun_fps;
     public ParticleSystem shotgunFX_ps;
     public ParticleSystem shotgunFX_alt__ps;
     public Animator shotgun_animatorFPS;
+    
+    public Transform shotgun_blue_fps;
+    public ParticleSystem shotgunFX_blue_ps;
+    //public ParticleSystem shotgunFX_alt_blue_ps;
+    public Animator shotgun_blue_animatorFPS;
+    public MeshRenderer shotgun_hook_rend_fps;
     
     public Transform rocketLauncher_fps;
     public RocketLauncher rocketLauncher;
@@ -129,13 +167,23 @@ public class FPSGunController : MonoBehaviour
     public Transform AR_ghost_tps;
     public Transform mp5_alt_tps;
     public Transform gunPoint_revolver_tps;
+    public Transform revolver_blue_tps;
+    public Transform shotgun_blue_tps;
     
     PlayerController pController;
     PhotonView pv;
     
-    public GunType[] slots = new GunType[4];
-    public int currentSlot = 0;
-    public int prevSlot = 1;
+    public GunType[][] inventory;
+    
+    
+    public InventoryPosition currentSlotPositionInInventory;
+    public InventoryPosition prevSlotPositionInInventory;
+    
+    // public int currentSlot = 0;
+    // public int currentAltSlot = 0;
+    // public int prevSlot = 1;
+    // public int prevAltSlot = 0;
+    
     TrailRendererController meleeTr;
   
     
@@ -145,6 +193,7 @@ public class FPSGunController : MonoBehaviour
     static int staticObjectsMask = -1;
     static int interactablesMask = -1;
     static int QTSLayer = -1;
+    static int groundCeilingMask = -1;
     
     
     bool touchedGroundAfterSpawn = false;
@@ -159,20 +208,32 @@ public class FPSGunController : MonoBehaviour
             staticObjectsMask   = LayerMask.GetMask("Ground", "Ceiling");
             interactablesMask   = LayerMask.GetMask("Interactable");
             QTSLayer            = LayerMask.GetMask("QTS");
+            groundCeilingMask   = LayerMask.GetMask("Ground", "Ceiling");
+        }
+        
+        inventory = new GunType[4][];
+        for(int i = 0; i < inventory.Length; i++)
+        {
+            inventory[i] = new GunType[2];
         }
         
         BaseFire1_hash = Animator.StringToHash("Base.Fire1");
         pController = GetComponent<PlayerController>();
         pv = GetComponent<PhotonView>();
         
+        PlayerInventory.Singleton().Init();
+        
         ReadPlayerInventory();
     }
     
     public void ReadPlayerInventory()
     {
-        for(int i = 0; i < slots.Length; i++)
+        for(int i = 0; i < inventory.Length; i++)
         {
-            slots[i] = PlayerInventory.Singleton().playerGunSlots[i];
+            for(int j = 0; j < inventory[i].Length; j++)
+            {
+                inventory[i][j] = PlayerInventory.Singleton().playerGunSlots[i][j];
+            }
         }
     }
     
@@ -180,7 +241,7 @@ public class FPSGunController : MonoBehaviour
     {
         if(pv.IsMine)
         {
-            currentSlot = 0;
+            currentSlotPositionInInventory = new InventoryPosition(0, 0);
             WieldGunFPS();
         }
     }
@@ -189,16 +250,7 @@ public class FPSGunController : MonoBehaviour
     {
         if(pv.IsMine)
         {
-            currentSlot = 1;
-            WieldGunFPS();
-        }
-    }
-    
-    public void WieldRocketLauncher()
-    {
-        if(pv.IsMine)
-        {
-            currentSlot = 2;
+            currentSlotPositionInInventory = new InventoryPosition(1, 0);
             WieldGunFPS();
         }
     }
@@ -207,7 +259,7 @@ public class FPSGunController : MonoBehaviour
     {
         if(pv.IsMine)
         {
-            currentSlot = 3;
+            currentSlotPositionInInventory = new InventoryPosition(2, 0);
             WieldGunFPS();
         }
     }
@@ -216,10 +268,39 @@ public class FPSGunController : MonoBehaviour
     {
         if(pv.IsMine)
         {
-            currentSlot = 3;
+            currentSlotPositionInInventory = new InventoryPosition(2, 1);
             WieldGunFPS();
         }
     }
+    
+    public void WieldRocketLauncher()
+    {
+        if(pv.IsMine)
+        {
+            currentSlotPositionInInventory = new InventoryPosition(3, 0);
+            WieldGunFPS();
+        }
+    }
+    
+    public void WieldRevolver_Blue()
+    {
+        if(pv.IsMine)
+        {
+            currentSlotPositionInInventory = new InventoryPosition(0, 1);
+            WieldGunFPS();
+        }
+    }
+    
+    public void WieldShotgun_Blue()
+    {
+        if(pv.IsMine)
+        {
+            currentSlotPositionInInventory = new InventoryPosition(1, 1);
+            WieldGunFPS();
+        }
+    }
+    
+    
     
     void Start()
     {
@@ -248,41 +329,44 @@ public class FPSGunController : MonoBehaviour
         Destroy(arm_animator.gameObject);
         Destroy(arm_right_animator.gameObject);
         Destroy(mp5_alt_fps.gameObject);
+        Destroy(revolver_blue_fps.gameObject);
+        Destroy(shotgun_blue_fps.gameObject);
     }
     
-    void IncrementCurrentSlot(int x)
-    {
-        int t = currentSlot;
-        currentSlot += x;
-        if(currentSlot >= slots.Length)
-        {
-            currentSlot = 0;
-        }
-        else
-        {
-            if(currentSlot <= 0)
-            {
-                currentSlot = slots.Length - 1;
-            }
-        }
+    // void IncrementCurrentSlot(int x)
+    // {
+    //     int t = currentSlot;
+    //     currentSlot += x;
+    //     if(currentSlot >= slots.Length)
+    //     {
+    //         currentSlot = 0;
+    //     }
+    //     else
+    //     {
+    //         if(currentSlot <= 0)
+    //         {
+    //             currentSlot = slots.Length - 1;
+    //         }
+    //     }
         
-        prevSlot = t;
+    //     prevSlot = t;
         
-    }
+    // }
     
-    void SetCurrentSlot(int newSlotIndex)
+    void SetCurrentSlot(InventoryPosition newPositionFromInventory)
     {
-        // if(currentSlot == newSlotIndex || slots[newSlotIndex] == GunType.None)
-        if(currentSlot == newSlotIndex)
+        InGameConsole.LogFancy(string.Format("SetCurrentSlot() {0}-><color=green>{1}</color>", currentSlotPositionInInventory.ToString(), newPositionFromInventory.ToString()));
+        if(currentSlotPositionInInventory.Equals(newPositionFromInventory))
         {
+            InGameConsole.LogFancy("Kek");
             return;
         }
         
-        int t = currentSlot;
+        InventoryPosition t = currentSlotPositionInInventory;
         
-        currentSlot = newSlotIndex;
+        currentSlotPositionInInventory = newPositionFromInventory;
         
-        prevSlot = t;
+        prevSlotPositionInInventory = t;
     }
     
     bool SwapAltWeaponKey()
@@ -322,8 +406,8 @@ public class FPSGunController : MonoBehaviour
     public float gunTimer = 0;
     float fireRateMultiplier = 1f;
     float gunAltTimer = 0;
-    public float meleeCharge = 0;
-    float meleeChargeRate = 2;
+    //public float meleeCharge = 0;
+    //float meleeChargeRate = 2;
     
     bool hasARGhost = false;
     float ARGhostCooldownTimer = 0;
@@ -429,7 +513,7 @@ public class FPSGunController : MonoBehaviour
     }
     
     
-    public AudioClip lavaBurstClip;
+    //public AudioClip lavaBurstClip;
     public AudioSource gunAudio2;
    
     
@@ -444,43 +528,12 @@ public class FPSGunController : MonoBehaviour
     const float ARSpreadDecreaseRate = 1f;
     const float ARSpreadMult = 0.1f;
     
-    const float punchDistance = 2.45F;
+    const float punchDistance = 2.85F;
     
     const int punchDamage = 300;
     const int punchDamage_Ult = 600;
     
-    public void Punch_Ult()
-    {
-        //InGameConsole.LogFancy("Punch_Ult");
-        if(pv.IsMine)
-        {
-            Ray ray = pController.GetFPSRay();
-            RaycastHit hit;
-        
-            if(Physics.Raycast(ray, out hit, punchDistance, interactablesMask))
-            {
-                Interactable interactable = hit.collider.GetComponent<Interactable>();
-                
-                if(interactable != null)
-                {
-                    NetworkObject interactableNetComp = hit.collider.GetComponent<NetworkObject>();
-                    if(interactableNetComp)
-                    {
-                        NetworkObjectsManager.InteractWithNetObject(interactableNetComp.gameObject);
-                    }
-                }
-            }
-            
-            if(Physics.Raycast(ray, out hit, punchDistance, bulletMask))
-            {
-                OnPunch_Ult(hit.point, ray.direction, hit.normal, punchDamage_Ult, hit.collider);
-            }
-            else
-            {
-                AudioManager.Play3D(SoundType.punch_whoosh1, ray.origin, 0.1f, 0.7f);
-            }
-        }
-    }
+    
     
     public void Punch()
     {
@@ -536,112 +589,7 @@ public class FPSGunController : MonoBehaviour
         }
     }
     
-    void OnPunch_Ult(Vector3 point, Vector3 damageDirection, Vector3 normal, int damage, Collider col = null, NetworkObject targetNetworkObject = null)
-    {
-        if(targetNetworkObject == null)
-        {
-            targetNetworkObject = col.GetComponent<NetworkObject>();
-        }
-        
-        DamagableLimb limb = col.GetComponent<DamagableLimb>();
-        if(limb)
-        {
-            targetNetworkObject    = limb.net_comp_from_parent;
-            if(limb.isHeadshot)
-            {
-                damage *= 15;
-                damage /= 10;
-            }
-            limb.React(point, damageDirection);
-        }
-        
-        if(targetNetworkObject != null)
-        {
-            IDamagableLocal idl = targetNetworkObject.GetComponent<IDamagableLocal>();
-            if(idl != null)
-            {
-                idl.TakeDamageLocally(damage, point, damageDirection);
-                
-                if(pv.IsMine)
-                {
-                    int target_hp = idl.GetCurrentHP();
-                    if(target_hp <= 0)
-                    {
-                        if(limb)
-                        {
-                            // InGameConsole.LogFancy("Destroy limb from punch!");
-                            CameraShaker.MakeTrauma(0.2f);
-                            limb.TakeDamageLimb(damage);
-                            float __pitch = Random.Range(0.95f, 1.05f);
-                            AudioManager.Play3D(SoundType.punch_impact1, point, __pitch, 0.7f);
-                        }
-                        return;
-                    }
-                    
-                    int remainingHitPoints = target_hp - damage;
-                    if(remainingHitPoints <= 0)
-                    {
-                        CameraShaker.MakeTrauma(0.5f);
-                        Vector3 force = damageDirection * damage * 3;
-                        NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.DieWithForce, force, limb.limb_id);                                
-                    }
-                    else
-                    {
-                        DropHealthCrystalsFromPunch(limb.transform, punchDamage, limb.isHeadshot);
-                        CameraShaker.MakeTrauma(0.2f);
-                        ILaunchableAirbourne ila = targetNetworkObject.GetComponent<ILaunchableAirbourne>();
-                        
-                        if(damageDirection.y < 0.135F)
-                        {
-                            damageDirection.y = 0.135F;
-                            damageDirection.Normalize();
-                        }
-                        
-                        if(ila != null && ila.CanBeLaunched())
-                        {
-                            
-                            Vector3 launchPos = targetNetworkObject.transform.localPosition;
-                            if(damage != 0)
-                            {
-                                NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.LaunchAirborne, launchPos, damageDirection * 14, damage);
-                            }
-                            else
-                            {
-                                NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.LaunchAirborne, launchPos, damageDirection * 14);
-                            }
-                        }
-                        else
-                        {
-                            NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.TakeDamage, damage);                               
-                       }
-                    }
-                }
-                                    
-            }
-            
-        }
-        else
-        {
-            PhotonView pv_that_was_hit = col.GetComponent<PhotonView>();
-            if(pv_that_was_hit)
-            {
-                // col.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.AllViaServer, dmg);
-                //col.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.All, dmg);
-                
-            }
-            else // We hit something static
-            {
-                if(pv.IsMine)
-                {
-                    CameraShaker.MakeTrauma(0.06f);
-                }
-                ParticlesManager.PlayPooled(ParticleType.punch_impact1, point, -damageDirection);
-            }
-        }
-        
-        float _pitch = Random.Range(0.4F, 0.55F);
-        AudioManager.Play3D(SoundType.punch_impact1, point, _pitch, 0.6F);
-    }
+   
     
     void OnPunch(Vector3 point, Vector3 damageDirection, Vector3 normal, int damage, Collider col = null, NetworkObject targetNetworkObject = null)
     {
@@ -665,8 +613,6 @@ public class FPSGunController : MonoBehaviour
             limb.React(point, damageDirection);
         }
         
-        
-        
         if(targetNetworkObject != null)
         {
             IDamagableLocal idl = targetNetworkObject.GetComponent<IDamagableLocal>();
@@ -676,57 +622,34 @@ public class FPSGunController : MonoBehaviour
                 
                 if(pv.IsMine)
                 {
-                    int target_hp = idl.GetCurrentHP();
-                    if(target_hp <= 0)
+                    if(!limb.isMasterAlive)
                     {
-                        if(limb)
-                        {
-                            // InGameConsole.LogFancy("Destroy limb from punch!");
-                            CameraShaker.MakeTrauma(0.2f);
-                            limb.TakeDamageLimb(damage);
-                            float __pitch = Random.Range(0.95f, 1.05f);
-                            AudioManager.Play3D(SoundType.punch_impact1, point, __pitch, 0.7f);
-                            
-                        }
+                        // InGameConsole.LogFancy("Destroy limb from punch!");
+                        CameraShaker.MakeTrauma(0.2f);
+                        limb.TakeDamageLimb(damage);
+                        float __pitch = Random.Range(0.95f, 1.05f);
+                        AudioManager.Play3D(SoundType.punch_impact1, point, __pitch, 0.7f);
+                        
                         return;
                     }
                     
-                    int remainingHitPoints = target_hp - damage;
-                    if(remainingHitPoints <= 0)
+                    //DropHealthCrystalsFromPunch(limb.transform, punchDamage, limb.isHeadshot);
+                    CameraShaker.MakeTrauma(0.2f);
+                    ILaunchableAirbourne ila = targetNetworkObject.GetComponent<ILaunchableAirbourne>();
+                    
+                    if(damageDirection.y < 0.135F)
                     {
-                        CameraShaker.MakeTrauma(0.5f);
-                        Vector3 force = damageDirection * damage * 3;
-                        NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.DieWithForce, force, limb.limb_id);                                
+                        damageDirection.y = 0.135F;
+                        damageDirection.Normalize();
                     }
-                    else
+                    
+                    
+                    Vector3 launchPos = targetNetworkObject.transform.localPosition;
+                    NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.LaunchAirborne, launchPos, damageDirection * 14);
+                    if(damage != 0)
                     {
-                        DropHealthCrystalsFromPunch(limb.transform, punchDamage, limb.isHeadshot);
-                        CameraShaker.MakeTrauma(0.2f);
-                        ILaunchableAirbourne ila = targetNetworkObject.GetComponent<ILaunchableAirbourne>();
-                        
-                        if(damageDirection.y < 0.135F)
-                        {
-                            damageDirection.y = 0.135F;
-                            damageDirection.Normalize();
-                        }
-                        
-                        if(ila != null && ila.CanBeLaunched())
-                        {
-                            
-                            Vector3 launchPos = targetNetworkObject.transform.localPosition;
-                            if(damage != 0)
-                            {
-                                NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.LaunchAirborne, launchPos, damageDirection * 14, damage);
-                            }
-                            else
-                            {
-                                NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.LaunchAirborne, launchPos, damageDirection * 14);
-                            }
-                        }
-                        else
-                        {
-                            NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.TakeDamage, damage);                               
-                       }
+                        //NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.TakeDamageExplosive, damage);
+                        NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.TakeDamageLimbWithForce, damage, damageDirection * 300, limb.limb_id);
                     }
                 }
                                     
@@ -879,26 +802,16 @@ public class FPSGunController : MonoBehaviour
     }
     
     float switchWeaponTimer = 0f;
-    const float SwitchWeaponRate = 0.075F;
     
     // bool SwitchToPrevSlot_KeyDown()
     // {
     //     return Input.GetKeyDown(KeyCode.Q);
     // }
     
-    public AudioClip revolverPumpClip;
-    
-    
-    void PumpRevolver()
-    {
-        revolver_fps.anim.Play("Base.Fire_alt", 0, 0);
-        gunAudio.PlayOneShot(revolverPumpClip, 0.5f);
-        revolver_fps.PumpBullet();
-    }
-    
     bool isF_arm_combo = false;
     
     RevolverState revolverState;
+    RevolverState revolver_blue_State;
     
     
     public Animator CurrentArmAnimator()
@@ -964,9 +877,14 @@ public class FPSGunController : MonoBehaviour
         pController.SetTargetFovNormal();
     }
     
+    public GunType GetWeaponFromInventory(int mainIndex, int altIndex)
+    {
+        return inventory[mainIndex][altIndex];
+    }
+    
     public GunType GetCurrentWeapon()
     {
-        return slots[currentSlot];
+        return inventory[currentSlotPositionInInventory.mainIndex][currentSlotPositionInInventory.altIndex];
     }
     
     public void R_Alt()
@@ -1007,9 +925,84 @@ public class FPSGunController : MonoBehaviour
         // pv.RPC("FPSCommand2", RpcTarget.Others, fpsCommand, shotgunRay.origin, shotgunRay.direction, seed);
     }
     
+    public void S_Blue()
+    {
+        if(GetCurrentWeapon() != GunType.Shotgun_blue)
+        {
+            return;
+        }
+        gunTimer = fireRateMultiplier * shotgunFireRate * 1.33f;
+        
+        // Ray shotgunRay = pController.GetFPSRay();
+        Ray shotgunRay = pController.GetLowerFPSRay();
+        byte fpsCommand = (byte)FPS_Func.Shoot_shotgun_blue;
+        
+        byte seed = (byte)Random.Range(0, 64);
+        InGameConsole.LogFancy("Blue Shotgun seed: " + seed);
+        FPSCommand2(fpsCommand, shotgunRay.origin, shotgunRay.direction, seed);
+        pv.RPC("FPSCommand2", RpcTarget.Others, fpsCommand, shotgunRay.origin, shotgunRay.direction, seed);
+        
+        // byte seed = (byte)Random.Range(0, 64);
+        // FPSCommand2(fpsCommand, shotgunRay.origin, shotgunRay.direction, seed);
+        // pv.RPC("FPSCommand2", RpcTarget.Others, fpsCommand, shotgunRay.origin, shotgunRay.direction, seed);
+    }
+    
+    public GrapplingHook hook;
+       
+    // public void HookCallFPSCommand()
+    // {
+    //     if(GetCurrentWeapon() != GunType.Shotgun_blue)
+    //     {
+    //         InGameConsole.LogFancy("TRYING TO HOOK WITHOUT <color=blue>BLUE</color> SHOTGUN");
+    //         return;
+    //     }
+        
+    //     gunTimer = fireRateMultiplier * shotgunFireRate * 1.25f;
+        
+    //     // Ray shotgunRay = pController.GetFPSRay();
+    //     Ray shotgunRay = pController.GetLowerFPSRay();
+    //     byte fpsCommand = (byte)FPS_Func.Hook_shotgun_blue;
+        
+    //     FPSCommand(fpsCommand, shotgunRay.origin, shotgunRay.direction);
+    //     pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand, shotgunRay.origin, shotgunRay.direction);
+        
+    //     // byte seed = (byte)Random.Range(0, 64);
+    //     // FPSCommand2(fpsCommand, shotgunRay.origin, shotgunRay.direction, seed);
+    //     // pv.RPC("FPSCommand2", RpcTarget.Others, fpsCommand, shotgunRay.origin, shotgunRay.direction, seed);
+    // }
+    
+    float hookTimer; 
+    
+    void Hook(Vector3 hookStartPos, Vector3 dir)
+    {
+        if(pv.IsMine)
+        {
+            //CameraShaker.MakeTrauma(0.4F);
+            //gunTimer = fireRateMultiplier * 0.3f;
+            hookTimer = 0.8f;
+            shotgun_blue_animatorFPS.Play("Base.Fire_alt", 0, 0);
+            //shotgunFX_ps.Play();
+            //shotgunFX_alt__ps.Play();
+            
+            // if(pController.IsGrounded())
+            // {
+            //     pController.BoostVelocityAdditive(-shotDir * 17.5f);
+            // }
+            // else
+            // {
+            //     pController.BoostVelocityAdditive(-shotDir * 13.5f);
+            // }
+        }
+        byte fpsCommand = (byte)FPS_Func.Hook_shotgun_blue;
+        FPSCommand(fpsCommand, hookStartPos, dir);
+        pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand, hookStartPos, dir);
+        // hook.ReleaseHook();
+        // hook.LaunchHook(pController, dir, pv.IsMine);
+    }
+    
     int revolver_alt_fired_count            = 0;
     float revolver_charge;
-    const float revolver_chargeRate         = 1.25F;
+    const float revolver_chargeRate         = 1.85F;
     
     float Ability_R_timer                   = 0;
     float Ability_R_cooldown_timer          = 0;
@@ -1026,9 +1019,6 @@ public class FPSGunController : MonoBehaviour
         {
             BerserkPowerUp();
             AudioManager.PlayClip(SoundType.gun_pick_up, 0.8f, 1f);
-            //Invoke("rofl1", 0.150f);
-            // Invoke("rofl2", 0.150f);
-            // Invoke("rofl3", 0.150f);
         }
         //InGameConsole.LogFancy("OnInject()");
     }
@@ -1148,11 +1138,26 @@ public class FPSGunController : MonoBehaviour
         }
     }
     
+    public GunType GetCurrentWeaponInHands()
+    {
+        return inventory[currentSlotPositionInInventory.mainIndex][currentSlotPositionInInventory.altIndex];
+    }
     
+    public GunType GetPrevWeapon()
+    {
+        return inventory[prevSlotPositionInInventory.mainIndex][prevSlotPositionInInventory.altIndex];
+    }
+    
+    public bool isInDialogueOrInRange = false;
     
     void Update()
     {
         if(pv.IsMine == false)
+        {
+            return;
+        }
+        
+        if(!pController.isAlive)
         {
             return;
         }
@@ -1168,12 +1173,28 @@ public class FPSGunController : MonoBehaviour
         }
         
         float dt = UberManager.DeltaTime();
+        hookTimer -= dt;
+        if(hookTimer <= 0)
+        {
+            hookTimer = 0;
+        }
         
         Arm_Tick(dt);
         Ability_R_Tick(dt);
         rocketLauncher.CooldownsTick(dt);
         
-        
+        if(Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            for(int i = 0; i < inventory.Length; i++)
+            {
+                string s = "";
+                for(int j = 0; j < inventory[i].Length; j++)
+                {
+                    s += inventory[i][j].ToString() + " ";
+                }
+                InGameConsole.LogFancy(s);
+            }
+        }
         
         TickWeaponCooldowns(dt);
                
@@ -1214,18 +1235,24 @@ public class FPSGunController : MonoBehaviour
             //     {
             if(Inputs.SwitchToPrevSlot_KeyDown() && pController.CanControlPlayer())
             {
-                if(switchWeaponTimer == 0f && slots[prevSlot] != GunType.None)
+                if(switchWeaponTimer == 0f && inventory[currentSlotPositionInInventory.mainIndex][currentSlotPositionInInventory.altIndex] != GunType.None)
                 {
-                    int t = currentSlot;
-                    currentSlot = prevSlot;
-                    prevSlot = t;
-                    switchWeaponTimer = SwitchWeaponRate;
+                    InventoryPosition t = currentSlotPositionInInventory;
+                    currentSlotPositionInInventory = prevSlotPositionInInventory;;
+                    prevSlotPositionInInventory = t;
+                    switchWeaponTimer = GetSwitchWeaponDuration();
                     WieldGunFPS();
                 }
             }
             else if(SwapAltWeaponKey())
             {
-                GunType currentGun = slots[currentSlot];
+                if(DialogueManager.GetState() != DialogueState.Hidden)
+                {
+                    return;
+                }
+                //GunType currentGun = inventory[currentSlotPositionInInventory.mainIndex][currentSlotPositionInInventory.altIndex];
+                GunType currentGun = GetCurrentWeaponInHands();
+                
                 switch(currentGun)
                 {
                     case(GunType.None):
@@ -1234,10 +1261,49 @@ public class FPSGunController : MonoBehaviour
                     }
                     case(GunType.Revolver):
                     {
+                        if(GetWeaponFromInventory(0, 1) == GunType.None)
+                        {
+                            return;
+                        }
+                        currentSlotPositionInInventory = new InventoryPosition(0, 1);
+                        //inventory[currentSlotPositionInInventory.mainIndex][currentSlotPositionInInventory.altIndex] = GunType.MP5_alt;
+                        
+                        WieldGunFPS();
+                        switchWeaponTimer = GetSwitchWeaponDuration();
+                        break;
+                    }
+                    case(GunType.Revolver_blue):
+                    {
+                        if(GetWeaponFromInventory(0, 0) == GunType.None)
+                        {
+                            return;
+                        }
+                        currentSlotPositionInInventory = new InventoryPosition(0, 0);
+                        WieldGunFPS();
+                        switchWeaponTimer = GetSwitchWeaponDuration();
+                        
                         break;
                     }
                     case(GunType.Shotgun):
                     {
+                        if(GetWeaponFromInventory(1, 1) == GunType.None)
+                        {
+                            return;
+                        }
+                        currentSlotPositionInInventory = new InventoryPosition(1, 1);
+                        WieldGunFPS();
+                        switchWeaponTimer = GetSwitchWeaponDuration();
+                        break;
+                    }
+                    case(GunType.Shotgun_blue):
+                    {
+                        if(GetWeaponFromInventory(1, 0) == GunType.None)
+                        {
+                            return;
+                        }
+                        currentSlotPositionInInventory = new InventoryPosition(1, 0);
+                        WieldGunFPS();
+                        switchWeaponTimer = GetSwitchWeaponDuration();
                         break;
                     }
                     case(GunType.RocketLauncher):
@@ -1246,16 +1312,28 @@ public class FPSGunController : MonoBehaviour
                     }
                     case(GunType.AR):
                     {
-                        slots[currentSlot] = GunType.MP5_alt;
-                        switchWeaponTimer = SwitchWeaponRate;
+                        if(GetWeaponFromInventory(2, 1) == GunType.None)
+                        {
+                            return;
+                        }
+                        currentSlotPositionInInventory = new InventoryPosition(2, 1);
+                        //inventory[currentSlotPositionInInventory.mainIndex][currentSlotPositionInInventory.altIndex] = GunType.MP5_alt;
+                        
                         WieldGunFPS();
+                        switchWeaponTimer = GetSwitchWeaponDuration();
                         break;
                     }
                     case(GunType.MP5_alt):
                     {
-                        slots[currentSlot] = GunType.AR;
-                        switchWeaponTimer = SwitchWeaponRate;
+                        if(GetWeaponFromInventory(2, 0) == GunType.None)
+                        {
+                            return;
+                        }
+                        currentSlotPositionInInventory = new InventoryPosition(2, 0);
+                        
+                        //inventory[currentSlotPositionInInventory] = GunType.AR;
                         WieldGunFPS();
+                        switchWeaponTimer = GetSwitchWeaponDuration();
                         break;
                     }
                 }
@@ -1265,16 +1343,19 @@ public class FPSGunController : MonoBehaviour
         }
         else
         {
-            if(keyBoard != currentSlot && slots[keyBoard] != GunType.None)
+            //if(keyBoard != GetWeaponFromInventory && inventory[keyBoard] != GunType.None)
+            //if(keyBoard != currentSlotPositionInInventory.mainIndex && GetWeaponFromInventory(keyBoard, 0) != GunType.None)
+            if(keyBoard != currentSlotPositionInInventory.mainIndex)
             {
                 if(switchWeaponTimer == 0)
                 {
-                    if(slots[currentSlot] == GunType.Revolver)
+                    if(GetCurrentWeaponInHands() == GunType.Revolver)
                     {
                         OnRevolverUltEnded();
                     }
-                    SetCurrentSlot(keyBoard);
-                    switchWeaponTimer = SwitchWeaponRate;
+                    
+                    SetCurrentSlot(new InventoryPosition(keyBoard, 0));
+                    switchWeaponTimer = GetSwitchWeaponDuration();
                     WieldGunFPS();
                 }
             }
@@ -1305,7 +1386,7 @@ public class FPSGunController : MonoBehaviour
             gunAltTimer = 0;
         }
         
-        switch(slots[currentSlot])
+        switch(GetCurrentWeaponInHands())
         {
             case(GunType.Revolver):
             {
@@ -1338,7 +1419,8 @@ public class FPSGunController : MonoBehaviour
                                     arm_right_animator.Play("Base.Parry", 0, 0);
                                     gunTimer  = revolverParryRate;
                                     QuickTimeSphere qts = qts_hit.collider.GetComponent<QuickTimeSphere>();
-                                    qts.OnHit();
+                                    if(qts)
+                                        qts.OnHit();
                                 }
                                 
                             }
@@ -1409,11 +1491,23 @@ public class FPSGunController : MonoBehaviour
                             }
                             else
                             {
+                                if(!altFire)
+                                {
+                                    revolver_charge -= dt * (revolver_chargeRate / 2) * fireRateMultiplier;    
+                                }
+                                else
+                                    revolver_charge += dt * revolver_chargeRate * fireRateMultiplier;
+                                    
+                                    
+                                    
                                 //InGameConsole.LogFancy(string.Format("Charging <color=yellow>{0}</color>", revolver_charge.ToString("f")));
-                                revolver_charge += dt * revolver_chargeRate * fireRateMultiplier;
                                 if(revolver_charge >= 1)
                                 {
                                     revolver_charge = 1f;
+                                }
+                                if(revolver_charge <= 0)
+                                {
+                                    revolverState = RevolverState.Normal;
                                 }
                             }
                         }
@@ -1449,6 +1543,144 @@ public class FPSGunController : MonoBehaviour
                 }
                 break;
             }
+            case(GunType.Revolver_blue):
+            {
+                switch(revolver_blue_State)
+                {
+                    case(RevolverState.Normal):
+                    {
+                        if(gunTimer == 0)
+                        {
+                            isF_arm_combo = false;
+                            //if(primaryFireKeyDown)
+                            if(primaryFire)
+                            {
+                                Ray revolverRay = pController.GetFPSRay();
+                                
+                                revolver_blue_fps.OnShotFPS();
+                                
+                                gunTimer += fireRateMultiplier * revolverFireRate;
+                                byte fpsCommand = (byte)FPS_Func.Shoot_revolver_blue;
+                                FPSCommand(fpsCommand, revolverRay.origin, revolverRay.direction);
+                                pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand, revolverRay.origin, revolverRay.direction);
+                                
+                                //RaycastHit qts_hit;
+                                //InGameConsole.LogFancy("Trying to call qts!!!!!");
+                                // if(Physics.Raycast(revolverRay, out qts_hit, 200f, QTSLayer))
+                                // {
+                                //     //InGameConsole.LogFancy("Calling qts!!!!!");
+                                //     CameraShaker.MakeTrauma(0.15f);
+                                //     revolver_blue_fps.anim.Play("Base.Parry", 0, 0);
+                                //     arm_right_animator.Play("Base.Parry", 0, 0);
+                                //     gunTimer  = revolverParryRate;
+                                //     QuickTimeSphere qts = qts_hit.collider.GetComponent<QuickTimeSphere>();
+                                //     if(qts)
+                                //         qts.OnHit();
+                                // }
+                                
+                            }
+                            else
+                            {
+                                if(altFire)
+                                {
+                                    revolver_blue_State = RevolverState.Charging;
+                                    //revolver_alt_fired_count = 0;
+                                    
+                                    //R_Alt();
+                                    //Invoke("R_Alt", 0.125F);
+                                    //Invoke("R_Alt", 0.25F);
+                                   // Invoke("R_Alt", 0.375F);
+                                }
+                            }
+                        }
+                        // else
+                        // {
+                        //     //Ult:
+                        //     // if(!pController.isSliding && currentArm != ArmType.None)
+                        //     // {
+                        //     //     if(Arm_FKeyDown())
+                        //     //     {
+                        //     //         OnRevolverUltStarted();
+                        //     //         revolverState = RevolverState.Ult;
+                        //     //     }
+                        //     // }
+                        // }
+                        break;
+                    }
+                    case(RevolverState.Charging):
+                    {
+                        revolver_blue_fps.StartShaking();
+                        revolver_blue_fps.shaking_mult = revolver_charge;
+                        
+                        if(primaryFireKeyDown || !altFire)
+                        {
+                            if(revolver_charge >= 0.9F)
+                            {
+                                 Ray revolverRay = pController.GetFPSRay();
+                                revolver_blue_fps.OnShotFPS();
+                                
+                                gunTimer += fireRateMultiplier * revolverFireRate;
+                                byte fpsCommand = (byte)FPS_Func.Shoot_revolver_blue_stronger;
+                                FPSCommand(fpsCommand, revolverRay.origin, revolverRay.direction);
+                                pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand, revolverRay.origin, revolverRay.direction);
+                            }
+                            revolver_charge = 0;
+                            revolver_blue_State = RevolverState.Normal;
+                            
+                            revolver_blue_fps.StopShaking();
+                            revolver_blue_fps.shaking_mult = revolver_charge;
+                        }
+                        else
+                        {
+                            if(altFire && Inputs.Arm_FKeyDown() && !pController.isSliding && currentArm != ArmType.None)
+                            {
+                                revolver_charge = 0;
+                                revolver_blue_fps.StopShaking();
+                                revolver_blue_fps.shaking_mult = revolver_charge;
+                                revolver_blue_fps.shaking_mult_smoothed = 0;
+                                //OnRevolverUltStarted();
+                                revolver_blue_State = RevolverState.Ult;
+                            }
+                            else
+                            {
+                                //InGameConsole.LogFancy(string.Format("Charging <color=yellow>{0}</color>", revolver_charge.ToString("f")));
+                                revolver_charge += dt * revolver_chargeRate * fireRateMultiplier;
+                                if(revolver_charge >= 1)
+                                {
+                                    revolver_charge = 1f;
+                                }
+                            }
+                        }
+                        
+                        break;
+                    }
+                    case(RevolverState.Ult):
+                    {
+                        if(primaryFireKeyDown)
+                        {
+                            if(gunTimer == 0)
+                            {
+                                gunTimer += fireRateMultiplier * revolverFireRate * 2.25f;
+                                
+                                Ray revolverRay = pController.GetFPSRay();
+                                    
+                                revolver_blue_fps.OnShotFPS();
+                                
+                                byte fpsCommand = (byte)FPS_Func.Shoot_revolver_blue_ult;
+                                FPSCommand(fpsCommand, revolverRay.origin, revolverRay.direction);
+                                pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand, revolverRay.origin, revolverRay.direction);
+                                
+                                //SetPlayerControllerNormalState();
+                                revolver_blue_fps.shaking_mult = 0;
+                                
+                                revolver_blue_State = RevolverState.Normal;
+                            }
+                        }
+                        break;
+                    }
+                }
+                break;
+            }
             case(GunType.Shotgun):
             {
                     if(gunTimer == 0)
@@ -1472,6 +1704,54 @@ public class FPSGunController : MonoBehaviour
                                 S_Alt();
                                 //Invoke("S_Alt", 0f);
                                 //Invoke("S_Alt", 0.175F);
+                            }
+                        }
+                    }
+                    
+                   
+                
+                break;
+            }
+            case(GunType.Shotgun_blue):
+            {
+                    if(hook && hook.state == HookState.None && hookTimer == 0)
+                    {
+                        if(!shotgun_hook_rend_fps.enabled)
+                        {
+                            OnBlueHookReturned();
+                            shotgun_hook_rend_fps.enabled = true;
+                        }
+                    }
+                    else
+                        shotgun_hook_rend_fps.enabled = false;
+                
+                    if(gunTimer == 0)
+                    {
+                        if(primaryFire)
+                        {
+                            gunTimer += fireRateMultiplier * shotgunFireRate;
+                            
+                            S_Blue();
+                            Invoke(nameof(S_Blue), 0.18f);
+                            //Ray shotgunRay = pController.GetFPSRay();
+                            //byte seed = (byte)Random.Range(0, 64);
+                            
+                            //byte fpsCommand = (byte)FPS_Func.Shoot_shotgun_blue;
+                                    
+                            //FPSCommand2(fpsCommand, shotgunRay.origin, shotgunRay.direction, seed);
+                            //pv.RPC("FPSCommand2", RpcTarget.Others, fpsCommand, shotgunRay.origin, shotgunRay.direction, seed);
+                        }
+                        else
+                        {
+                            //if(altFire && gunAltTimer == 0)
+                            if(altFire)
+                            {
+                                Ray shotgunRay = pController.GetFPSRay();
+                                
+                                if(hook.state == HookState.None && hookTimer == 0)
+                                {
+                                    Hook(pController.GetCenterPosition(), shotgunRay.direction);
+                                }
                             }
                         }
                     }
@@ -1705,92 +1985,6 @@ public class FPSGunController : MonoBehaviour
     
     
     
-    bool tryingToMelee = false;
-    float meleeDamageTimer = 0;
-    //Melee timings for sword 1:
-    float swingTiming = 0.05f;
-    float pokeTiming = 0.05f;
-    float strongSwingTiming = 0.05f;
-    
-    
-    static RaycastHit[] meleeHits = new RaycastHit[64];
-    const float meleeCastSphereRadius = 1.15f;
-    
-    
-    void DoMeleeDamage(MeleeTimedDamage mtd)
-    {
-        DoMeleeDamage(mtd.damage, mtd.pos, mtd.sweepRange, mtd.sweepDir);
-    }
-    
-    void DoMeleeDamage(int dmg, Vector3 pos, float sweepRange, Vector3 sweepDir)
-    {
-        pos -= sweepDir * sweepRange/2;
-        
-        int hitsLen = Physics.SphereCastNonAlloc(pos, meleeCastSphereRadius, sweepDir, meleeHits, sweepRange, npcMask2);
-        //Debug.DrawRay(pos, sweepDir * sweepRange, Color.yellow, 3f);
-        //InGameConsole.LogOrange(string.Format("We hit {0} targets!", hitsLen));
-        
-        for(int i = 0; i < hitsLen; i++)
-        {
-            Collider col = meleeHits[i].collider;
-            
-            //InGameConsole.LogOrange(string.Format("Hit <color=green>{0}</color>", meleeHits[i].collider.name));
-            
-            if (col != null)
-            {
-                NetworkObject targetNetworkObject = col.GetComponent<NetworkObject>();
-                
-                if(targetNetworkObject != null)
-                {
-                    IDamagableLocal idl = targetNetworkObject.GetComponent<IDamagableLocal>();
-                    if(idl != null)
-                    {
-                        
-                        idl.TakeDamageLocally(dmg, meleeHits[i].point, sweepDir);
-                        
-                        if(pv.IsMine)
-                        {
-                            int remainingHitPoints = idl.GetCurrentHP() - dmg;
-                            if(remainingHitPoints <= 0)
-                            {
-                                if(pv.IsMine)
-                                {
-                                    CameraShaker.MakeTrauma(2.2f);
-                                }
-                                Vector3 force = sweepDir * dmg;
-                                NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.DieWithForce, force);                                
-                            }
-                            else
-                            {
-                                if(pv.IsMine)
-                                {
-                                    CameraShaker.MakeTrauma(0.15f);
-                                }
-                                NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.TakeDamage, dmg);                               
-                            }
-                        }
-                                            
-                    }
-                }
-                else
-                {
-                    PhotonView pv = col.GetComponent<PhotonView>();
-                    if(pv)
-                    {
-                        // col.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.AllViaServer, dmg);
-                        //col.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.All, dmg);
-                        
-                    }
-                    else // We hit something static
-                    {
-                        // ParticlesManager.Play(ParticleType.shot, point, -damageDirection);
-                    }
-                }
-            }
-        }
-    }
-    
-    
     void TickWeaponCooldowns(float dt)
     {
         ARGhostCooldownTimer -= dt;
@@ -1824,26 +2018,33 @@ public class FPSGunController : MonoBehaviour
         }
     }
     
-    const float switchWeaponDuration = 0.48f;
-    
-    public MeleeState meleeState;
+    const float switchWeaponDuration = 0.41f;
+    float GetSwitchWeaponDuration()
+    {
+        if(fastWeaponSwitch)
+        {
+            fastWeaponSwitch = false;
+            //InGameConsole.LogFancy("GetSwitchWeaponDuration()GetSwitchWeaponDuration()GetSwitchWeaponDuration()");
+            return 0.15f;
+        }
+        else
+            return switchWeaponDuration;
+    }
+    public bool fastWeaponSwitch = false;
     
     public AudioClip switchWeaponClip;
     
     void WieldGunFPS()
     {
-        GunType gun = slots[currentSlot];
+        //GunType gun = inventory[currentSlotPositionInInventory];
+        GunType gun = GetCurrentWeaponInHands();
+        InGameConsole.LogOrange(string.Format("WieldGunFPS(): gun to wield is <color=yellow>{0}</color>", gun.ToString()));
         
         if(pv.IsMine)
         {
             CancelInvoke();
             pv.RPC("WieldGunTPS", RpcTarget.Others, (byte)gun);
         }
-        
-        meleeState = MeleeState.Idle;
-        
-        
-        tryingToMelee = false;
         
         gunAudio.PlayOneShot(switchWeaponClip, 0.3f);
         
@@ -1857,21 +2058,31 @@ public class FPSGunController : MonoBehaviour
         {
             case(GunType.None):
             {
+                if(!pController.isAlive)
+                {
+                    return;
+                }
                 revolver_fps.gameObject.SetActive(false);
                 shotgun_fps.gameObject.SetActive(false);
                 rocketLauncher_fps.gameObject.SetActive(false);
                 AR_fps.gameObject.SetActive(false);
                 AR_ghost_fps.gameObject.SetActive(false);
                 mp5_alt_fps.gameObject.SetActive(false);
+                revolver_blue_fps.gameObject.SetActive(false);
+                shotgun_blue_fps.gameObject.SetActive(false);
                 
                 arm_right_animator.Play("Base.Hidden", 0, 0);
                 
-                gunTimer = switchWeaponDuration;
+                gunTimer = GetSwitchWeaponDuration();
                 
                 break;
             }
             case(GunType.Revolver):
             {
+                if(!pController.isAlive)
+                {
+                    return;
+                }
                 revolver_fps.gameObject.SetActive(true);
                 arm_right_animator.Play("Base.Wield", 0, 0);
                 revolver_fps.anim.Play("Base.Wield", 0, 0);
@@ -1881,16 +2092,21 @@ public class FPSGunController : MonoBehaviour
                 AR_fps.gameObject.SetActive(false);
                 AR_ghost_fps.gameObject.SetActive(false);
                 mp5_alt_fps.gameObject.SetActive(false);
+                revolver_blue_fps.gameObject.SetActive(false);
+                shotgun_blue_fps.gameObject.SetActive(false);
                 
-                gunTimer = switchWeaponDuration;
+                gunTimer = GetSwitchWeaponDuration();
                 revolver_fps.shaking_mult = 0;
                 
                 break;
             }
             case(GunType.Shotgun):
             {
+                if(!pController.isAlive)
+                {
+                    return;
+                }
                 revolver_fps.gameObject.SetActive(false);
-                
                 shotgun_animatorFPS.Play("Base.Wield", 0, 0);
                 
                 shotgun_fps.gameObject.SetActive(true);
@@ -1898,37 +2114,49 @@ public class FPSGunController : MonoBehaviour
                 AR_fps.gameObject.SetActive(false);
                 AR_ghost_fps.gameObject.SetActive(false);
                 mp5_alt_fps.gameObject.SetActive(false);
+                revolver_blue_fps.gameObject.SetActive(false);
+                shotgun_blue_fps.gameObject.SetActive(false);
                 
                 arm_right_animator.Play("Base.Hidden", 0, 0);
-                gunTimer = switchWeaponDuration;
-                
-                
+                gunTimer = GetSwitchWeaponDuration();
                 
                 break;
             }
             case(GunType.RocketLauncher):
             {
+                if(!pController.isAlive)
+                {
+                    return;
+                }
                 revolver_fps.gameObject.SetActive(false);
                 shotgun_fps.gameObject.SetActive(false);
                 rocketLauncher_fps.gameObject.SetActive(true);
                 AR_fps.gameObject.SetActive(false);
                 AR_ghost_fps.gameObject.SetActive(false);
                 mp5_alt_fps.gameObject.SetActive(false);
+                revolver_blue_fps.gameObject.SetActive(false);
+                shotgun_blue_fps.gameObject.SetActive(false);
                 
                 arm_right_animator.Play("Base.Hidden", 0, 0);
                 
-                gunTimer = switchWeaponDuration / 2;
+                gunTimer = GetSwitchWeaponDuration() / 3;
                 
                 
                 break;
             }
             case(GunType.AR):
             {
+                if(!pController.isAlive)
+                {
+                    return;
+                }
                 revolver_fps.gameObject.SetActive(false);
                 shotgun_fps.gameObject.SetActive(false);
                 rocketLauncher_fps.gameObject.SetActive(false);
                 AR_fps.gameObject.SetActive(true);
                 mp5_alt_fps.gameObject.SetActive(false);
+                revolver_blue_fps.gameObject.SetActive(false);
+                shotgun_blue_fps.gameObject.SetActive(false);
                 
                 currentARFireRate = ARFireRateFastest;
                 
@@ -1941,22 +2169,74 @@ public class FPSGunController : MonoBehaviour
                 }
                 
                 
-                gunTimer = switchWeaponDuration;
+                gunTimer = GetSwitchWeaponDuration();
                 
                 break;
             }
             case(GunType.MP5_alt):
             {
+                if(!pController.isAlive)
+                {
+                    return;
+                }
                 revolver_fps.gameObject.SetActive(false);
                 shotgun_fps.gameObject.SetActive(false);
                 rocketLauncher_fps.gameObject.SetActive(false);
                 AR_fps.gameObject.SetActive(false);
                 mp5_alt_fps.gameObject.SetActive(true);
+                revolver_blue_fps.gameObject.SetActive(false);
+                shotgun_blue_fps.gameObject.SetActive(false);
                 
                 arm_right_animator.Play("Base.Hidden", 0, 0);
                 
                 
-                gunTimer = switchWeaponDuration;
+                gunTimer = GetSwitchWeaponDuration();
+                break;
+            }
+            case(GunType.Shotgun_blue):
+            {
+                if(!pController.isAlive)
+                {
+                    return;
+                }
+                revolver_fps.gameObject.SetActive(false);
+                
+                shotgun_animatorFPS.Play("Base.Wield", 0, 0);
+                
+                shotgun_fps.gameObject.SetActive(false);
+                rocketLauncher_fps.gameObject.SetActive(false);
+                AR_fps.gameObject.SetActive(false);
+                AR_ghost_fps.gameObject.SetActive(false);
+                mp5_alt_fps.gameObject.SetActive(false);
+                revolver_blue_fps.gameObject.SetActive(false);
+                shotgun_blue_fps.gameObject.SetActive(true);
+                
+                arm_right_animator.Play("Base.Hidden", 0, 0);
+                gunTimer = GetSwitchWeaponDuration();
+                
+                break;
+            }
+            case(GunType.Revolver_blue):
+            {
+                if(!pController.isAlive)
+                {
+                    return;
+                }
+                revolver_fps.gameObject.SetActive(false);
+                arm_right_animator.Play("Base.Wield", 0, 0);
+                revolver_blue_fps.anim.Play("Base.Wield", 0, 0);
+                
+                shotgun_fps.gameObject.SetActive(false);
+                rocketLauncher_fps.gameObject.SetActive(false);
+                AR_fps.gameObject.SetActive(false);
+                AR_ghost_fps.gameObject.SetActive(false);
+                mp5_alt_fps.gameObject.SetActive(false);
+                revolver_blue_fps.gameObject.SetActive(true);
+                shotgun_blue_fps.gameObject.SetActive(false);
+                
+                gunTimer = GetSwitchWeaponDuration();
+                revolver_blue_fps.shaking_mult = 0;
+                
                 break;
             }
         }
@@ -1975,8 +2255,9 @@ public class FPSGunController : MonoBehaviour
                 rocketLauncher_tps.gameObject.SetActive(false);
                 AR_tps.gameObject.SetActive(false);
                 mp5_alt_tps.gameObject.SetActive(false);
-                //AR_tps.gameObject.SetActive(false)
-                
+                revolver_blue_tps.gameObject.SetActive(false);
+                shotgun_blue_tps.gameObject.SetActive(false);
+                                
                 break;
             }
             case(GunType.Revolver):
@@ -1986,6 +2267,8 @@ public class FPSGunController : MonoBehaviour
                 rocketLauncher_tps.gameObject.SetActive(false);
                 AR_tps.gameObject.SetActive(false);
                 mp5_alt_tps.gameObject.SetActive(false);
+                revolver_blue_tps.gameObject.SetActive(false);
+                shotgun_blue_tps.gameObject.SetActive(false);
                 
                 break;
             }
@@ -1996,6 +2279,8 @@ public class FPSGunController : MonoBehaviour
                 rocketLauncher_tps.gameObject.SetActive(false);
                 AR_tps.gameObject.SetActive(false);
                 mp5_alt_tps.gameObject.SetActive(false);
+                revolver_blue_tps.gameObject.SetActive(false);
+                shotgun_blue_tps.gameObject.SetActive(false);
                 
                 break;
             }
@@ -2006,6 +2291,8 @@ public class FPSGunController : MonoBehaviour
                 rocketLauncher_tps.gameObject.SetActive(true);
                 AR_tps.gameObject.SetActive(false);
                 mp5_alt_tps.gameObject.SetActive(false);   
+                revolver_blue_tps.gameObject.SetActive(false);
+                shotgun_blue_tps.gameObject.SetActive(false);
                 
                 break;
             }
@@ -2016,6 +2303,8 @@ public class FPSGunController : MonoBehaviour
                 rocketLauncher_tps.gameObject.SetActive(false);
                 AR_tps.gameObject.SetActive(true);
                 mp5_alt_tps.gameObject.SetActive(false);
+                revolver_blue_tps.gameObject.SetActive(false);
+                shotgun_blue_tps.gameObject.SetActive(false);
                    
                 break;
             }
@@ -2026,11 +2315,36 @@ public class FPSGunController : MonoBehaviour
                 rocketLauncher_tps.gameObject.SetActive(false);
                 AR_tps.gameObject.SetActive(false);
                 mp5_alt_tps.gameObject.SetActive(true);
-                
-                
+                revolver_blue_tps.gameObject.SetActive(false);
+                shotgun_blue_tps.gameObject.SetActive(false);
                 
                 break;
             }
+            case(GunType.Revolver_blue):
+            {
+                revolver_tps.gameObject.SetActive(false);
+                shotgun_tps.gameObject.SetActive(false);
+                rocketLauncher_tps.gameObject.SetActive(false);
+                AR_tps.gameObject.SetActive(false);
+                mp5_alt_tps.gameObject.SetActive(false);
+                revolver_blue_tps.gameObject.SetActive(true);
+                shotgun_blue_tps.gameObject.SetActive(false);
+                
+                break;
+            }
+            case(GunType.Shotgun_blue):
+            {
+                revolver_tps.gameObject.SetActive(false);
+                shotgun_tps.gameObject.SetActive(false);
+                rocketLauncher_tps.gameObject.SetActive(false);
+                AR_tps.gameObject.SetActive(false);
+                mp5_alt_tps.gameObject.SetActive(false);
+                revolver_blue_tps.gameObject.SetActive(false);
+                shotgun_blue_tps.gameObject.SetActive(true);
+                
+                break;
+            }
+            
         }
     }
     
@@ -2051,12 +2365,31 @@ public class FPSGunController : MonoBehaviour
     //Shotgun:
     public AudioClip shotgunShotClip;
     public AudioClip shotgunAltShotClip;
+    public AudioClip shotgunBlueShotClip;
     //RocketLauncher:
     public AudioClip rocketLauncherShotClip;
     //AR:
     public AudioClip arShotClip;
     
     Vector3[] revolverShotPositions = new Vector3[2];
+    
+    void OnGUI()
+    {
+        return;
+        if(pv.IsMine)
+        {
+            GUIStyle style = new GUIStyle();
+            style.alignment = TextAnchor.MiddleCenter;
+            
+            float w = 350;
+            float h = 50;
+            
+            style.normal.textColor = Color.green;
+            GUI.Label(new Rect(Screen.width/2 - w/2, Screen.height - h*2.9f, w, h), "currentSlotPos: [<color=yellow>" + currentSlotPositionInInventory.mainIndex.ToString() + "</color>,<color=red>" + currentSlotPositionInInventory.altIndex.ToString() + "</color>]", style);
+            GUI.Label(new Rect(Screen.width/2 - w/2, Screen.height - h*2.6f, w, h), "prevSlotPos: [<color=yellow>" + prevSlotPositionInInventory.mainIndex.ToString() + "</color>,<color=red>" + prevSlotPositionInInventory.altIndex.ToString() + "</color>]", style);
+        }
+       
+    }
     
     
     bool arm1_overcharged = false;
@@ -2072,19 +2405,13 @@ public class FPSGunController : MonoBehaviour
         {
             case(FPS_Func.Punch1):
             {
+                if(!pv.IsMine)
+                {
+                    pController.debugAvatarAnim.SetTrigger("DoAttack");
+                }
                 Punch();
                 break;
             }
-            case(FPS_Func.Punch1_ult):
-            {
-                if(pv.IsMine)
-                {
-                    Punch_Ult();
-                    Arm_timer = arm1_punchCooldown;
-                }
-                break;
-            }
-            
             default:
             {
                 InGameConsole.LogWarning(string.Format("FPSCommand(): {0} is <color=red>not</color> handled", func));
@@ -2158,6 +2485,18 @@ public class FPSGunController : MonoBehaviour
                 ShootShotgun_Alt2(pos, dir);
                 break;
             }
+            case(FPS_Func.Hook_shotgun_blue):
+            {
+                if(pv.IsMine)
+                {
+                    if(GetCurrentWeapon() != GunType.Shotgun_blue && pController.isAlive)
+                        return;
+                }
+                
+                hook.LaunchHook(pController, dir, pv.IsMine);
+                
+                break;
+            }
             case(FPS_Func.Shoot_AR):
             {
                 if(pv.IsMine)
@@ -2218,6 +2557,49 @@ public class FPSGunController : MonoBehaviour
                     CrosshairController.MakeTrauma(crosshairTrauma);
                 }
                 ShootRocketLauncher(pos, dir);
+                break;
+            }
+            case(FPS_Func.Shoot_revolver_blue):
+            {
+                if(pv.IsMine)
+                {
+                    if(GetCurrentWeapon() != GunType.Revolver_blue && pController.isAlive)
+                        return;
+                    
+                    CrosshairController.MakeTrauma(crosshairTrauma);
+                }
+                
+                ShootRevolver_Blue(pos, dir);
+                break;
+            }
+            case(FPS_Func.Shoot_revolver_blue_stronger):
+            {
+                if(pv.IsMine)
+                {
+                    if(GetCurrentWeapon() != GunType.Revolver_blue && pController.isAlive)
+                        return;
+                    if(pController.IsGrounded())
+                    {
+                        pController.velocity.y = 0;
+                    }
+                    pController.BoostVelocityAdditive(-dir * 6f);
+                    CrosshairController.MakeTrauma(crosshairTrauma);
+                }
+                
+                ShootRevolver_Stronger_Blue(pos, dir);
+                break;
+            }
+            case(FPS_Func.Shoot_revolver_blue_ult):
+            {
+                if(pv.IsMine)
+                {
+                    if(GetCurrentWeapon() != GunType.Revolver_blue && pController.isAlive)
+                        return;
+                        
+                    CrosshairController.MakeTrauma(crosshairTrauma);
+                }
+                
+                //ShootRevolver_Ult(pos, dir);
                 break;
             }
             
@@ -2288,6 +2670,21 @@ public class FPSGunController : MonoBehaviour
                 }
                 
                 ShootShotgun_Alt(pos, dir, seed);
+                break;
+            }
+            case(FPS_Func.Shoot_shotgun_blue):
+            {
+                //ShootShotgun(pos, dir, seed);
+                if(pv.IsMine)
+                {
+                    if(GetCurrentWeapon() != GunType.Shotgun_blue && pController.isAlive)
+                        return;
+                    CrosshairController.MakeTrauma(crosshairTrauma);
+                }
+                
+                //ShootShotgun_HitScan(pos, dir, seed);
+                ShootShotgun_blue_HitScan(pos, dir, seed);
+         //       InGameConsole.LogFancy(string.Format("{0}", "ShootShotgun()"));
                 break;
             }
             default:
@@ -2376,7 +2773,8 @@ public class FPSGunController : MonoBehaviour
                 {
                     hits_scanned.Add(limb_net_id);
                     
-                    OnHitScan(hits[i].point, hitScanDirection, hit.normal, ult_dmg, hits[i].collider, null, 2.6f);
+                    
+                    OnHitScan(hits[i].point, hitScanDirection, hit.normal, ult_dmg, hits[i].collider, null, 2.6f, 1, 900);
                 }
             }
         }
@@ -2399,9 +2797,11 @@ public class FPSGunController : MonoBehaviour
         if(pv.IsMine)
         {
             CameraShaker.MakeTrauma(0.1f);
-            revolver_fps.anim.Play("Base.Fire1", 0, 0);
+            if(revolver_fps && revolver_fps.anim)
+                revolver_fps.anim.Play("Base.Fire1", 0, 0);
             revolverFX_stronger_ps.Play();
-            arm_right_animator.Play("Base.Fire1", 0, 0);
+            if(arm_right_animator)
+                arm_right_animator.Play("Base.Fire1", 0, 0);
         }
                 
         //RaycastHit hit;
@@ -2454,7 +2854,7 @@ public class FPSGunController : MonoBehaviour
         if(Physics.Raycast(ray, out hit, revolverShotMaxDistance, bulletMask))
         {
             lineEnd = hit.point;
-            OnHitScan(hit.point, hitScanDirection, hit.normal, revolverDmg, hit.collider, null, 2.5f);
+            OnHitScan(hit.point, hitScanDirection, hit.normal, revolverDmg, hit.collider, null, 2.5f, 1, 650);
         }
         else
         {
@@ -2466,13 +2866,106 @@ public class FPSGunController : MonoBehaviour
         //ParticlesManager.PlayPooled(ParticleType.shot_star_ps, lineStart, ray.direction);
     }
     
+    void ShootRevolver_Blue(Vector3 shotPos, Vector3 hitScanDirection)
+    {
+        if(playerGunLight)
+        {
+            playerGunLight.ShootRevolver();
+        }
+        if(gunAudio)
+        {
+            gunAudio.PlayOneShot(revolverShotClip, 1);
+        }
+        
+        if(pv.IsMine)
+        {
+            CameraShaker.MakeTrauma(0.15f);
+            revolver_blue_fps.anim.Play("Base.Fire1", 0, 0);
+            arm_right_animator.Play("Base.Fire1", 0, 0);
+        }
+                
+        RaycastHit hit;
+        Ray ray = new Ray(shotPos, hitScanDirection);
+        
+        float revolverShotMaxDistance = 200f;
+        revolverFX_blue_ps.Play();
+        
+        Vector3 lineStart = pv.IsMine ? gunPoint_revolver_blue_fps.position : gunPoint_revolver_tps.position;
+        Vector3 lineEnd = lineStart + ray.direction * revolverShotMaxDistance;
+        
+        if(Physics.Raycast(ray, out hit, revolverShotMaxDistance, bulletMask))
+        {
+            lineEnd = hit.point;
+            OnHitScan(hit.point, hitScanDirection, hit.normal, revolverDmg, hit.collider, null, 2.5f, 1, 650);
+        }
+        else
+        {
+            OnHitScan(shotPos + hitScanDirection * revolverShotMaxDistance, hitScanDirection, -hitScanDirection, revolverDmg, null);
+        }
+        
+        GameObject bulletFX = ObjectPool.s().Get(ObjectPoolKey.RevolverBullet);
+        bulletFX.GetComponent<BulletControllerHurtless>().Launch2(lineStart, lineEnd);
+        //ParticlesManager.PlayPooled(ParticleType.shot_star_ps, lineStart, ray.direction);
+    }
+    
+    void ShootRevolver_Stronger_Blue(Vector3 shotPos, Vector3 hitScanDirection)
+    {
+        if(playerGunLight)
+        {
+            playerGunLight.ShootRevolver();
+        }
+        if(gunAudio)
+        {
+            gunAudio.PlayOneShot(revolverShotClip, 1);
+        }
+        
+        if(pv.IsMine && pController.isAlive)
+        {
+            CameraShaker.MakeTrauma(0.15f);
+            revolver_blue_fps.anim.Play("Base.Fire2", 0, 0);
+            arm_right_animator.Play("Base.Fire2", 0, 0);
+        }
+                
+        RaycastHit hit;
+        Ray ray = new Ray(shotPos, hitScanDirection);
+        
+        float revolverShotMaxDistance = 200f;
+        revolverFX_blue_ps.Play();
+        
+        Vector3 lineStart = pv.IsMine ? gunPoint_revolver_blue_fps.position : gunPoint_revolver_tps.position;
+        Vector3 lineEnd = lineStart + ray.direction * revolverShotMaxDistance;
+        
+        if(Physics.Raycast(ray, out hit, revolverShotMaxDistance, bulletMask))
+        {
+            lineEnd = hit.point;
+            OnHitScanBounce(hit.point, hitScanDirection, hit.normal, revolverDmg * 2, hit.collider, null, 2.5f, 2, 1650);
+        }
+        else
+        {
+            OnHitScan(shotPos + hitScanDirection * revolverShotMaxDistance, hitScanDirection, -hitScanDirection, revolverDmg, null);
+        }
+        
+        ParticlesManager.PlayPooled(ParticleType.shot_star_ps, lineStart, ray.direction);
+        GameObject bulletFX = ObjectPool.s().Get(ObjectPoolKey.Revolver_bullet_ult);
+        bulletFX.GetComponent<BulletControllerHurtless>().Launch2(lineStart, lineEnd);
+        //ParticlesManager.PlayPooled(ParticleType.shot_star_ps, lineStart, ray.direction);
+    }
+    
+    
+    
     const float shotgunSpread = 0.25F;
     // const float shotgunSpread_Alt = 0.275F * 2F;
     const float shotgunSpread_Alt = 0.275F * 0.175F * 0.175F;
     
     const int shotgunHits_len = 16;
-    Collider[] shotgunHits = new Collider[shotgunHits_len];
-    HashSet<int> shotgunHits_IDs = new HashSet<int>();
+    //Collider[] shotgunHits = new Collider[shotgunHits_len];
+    //int shotgunHitsNum = 0;
+    Dictionary<int, ShotgunHit> shotgunHits_netIDs_and_dmg = new Dictionary<int, ShotgunHit>(64);
+    Vector3 shotgunLastHitPoint;
+    Vector3 shotgunLastHitDir;
+    Vector3 shotgunLastHitNormal;
+    
+    static readonly Vector3 vForward = new Vector3(0, 0, 1);
     
     void ShootShotgun_HitScan(Vector3 shotPos, Vector3 hitScanDirection, byte seed)
     {
@@ -2494,13 +2987,18 @@ public class FPSGunController : MonoBehaviour
             
             if(pController.IsGrounded())
             {
+                
                 pController.BoostVelocityAdditive(-hitScanDirection * 17.5f);
             }
             else
             {
-                pController.BoostVelocityAdditive(-hitScanDirection * 13.5f);
+                if(pController.fpsVelocity.y < 0 && (Vector3.Dot(Vector3.down, hitScanDirection) > 0.9f))
+                    pController.fpsVelocity.y = 0;
+                pController.BoostVelocityAdditive(-hitScanDirection * 9.5f);
             }
         }
+        
+        shotgunHits_netIDs_and_dmg.Clear();
         
         ParticlesManager.PlayPooled(ParticleType.shot_explosion1, shotPos + hitScanDirection, hitScanDirection);
         
@@ -2534,15 +3032,181 @@ public class FPSGunController : MonoBehaviour
             
             if(Physics.Raycast(ray, out hit, ray_max_distance, bulletMask))
             {
-                
                 bulletController.time_to_be_alive = pellet_speed * hit.distance;// / 0.5f;
                 //lineEnd = hit.point;
-                OnHitScan(hit.point, hitScanDirection, hit.normal, shotgunDmgPellet, hit.collider, null, 1, 0.1f);
+                DamagableLimb hit_limb = hit.collider.GetComponent<DamagableLimb>();
+                if(hit_limb)
+                {
+                    
+                    int hit_netId = hit_limb.net_comp_from_parent.networkId;
+                    int rnd = Random.Range(0, 10);
+                    
+                    if(rnd > 7)
+                        hit_limb.React(hit_limb.transform.localPosition, vForward);
+                    
+                    if(shotgunHits_netIDs_and_dmg.ContainsKey(hit_netId))
+                    {
+                        ShotgunHit x = new ShotgunHit();
+                        
+                        x.col = shotgunHits_netIDs_and_dmg[hit_netId].col;
+                        x.damage = shotgunHits_netIDs_and_dmg[hit_netId].damage;
+                        x.damage += shotgunDmgPellet;
+                        
+                        shotgunHits_netIDs_and_dmg[hit_netId] = x;
+                    }
+                    else
+                    {
+                        ShotgunHit x = new ShotgunHit();
+                        x.col = hit.collider;
+                        x.damage = shotgunDmgPellet;
+                        
+                        shotgunHits_netIDs_and_dmg.Add(hit_netId, x);
+                        
+                        shotgunLastHitPoint = hit.point;
+                        shotgunLastHitDir = hitScanDirection;
+                        shotgunLastHitNormal = hit.normal;
+                    }
+                }
+                else
+                {
+                    OnHitScan(hit.point, hitScanDirection, hit.normal, shotgunDmgPellet, hit.collider, null, 1, 0.1f);
+                }
             }
             else
             {
                 OnHitScan(shotPos + hitScanDirection * 60, hitScanDirection, -hitScanDirection, shotgunDmgPellet, null);
             }
+        }
+        
+        foreach(KeyValuePair<int, ShotgunHit> hit_pair in shotgunHits_netIDs_and_dmg)
+        {
+            InGameConsole.LogFancy(string.Format("Doing {0} damage to {1}", hit_pair.Value.damage, hit_pair.Value.col.name));
+            OnHitExplosive(shotgunLastHitPoint, shotgunLastHitDir, shotgunLastHitNormal, hit_pair.Value.damage, hit_pair.Value.col, null, 1, 1f);
+        }
+    }
+    
+    public void OnBlueHookReturned()
+    {
+        if(pv.IsMine)
+        {
+            shotgun_blue_animatorFPS.Play("Base.Fire_alt", 0, 0);
+        }
+    }
+    
+    void ShootShotgun_blue_HitScan(Vector3 shotPos, Vector3 hitScanDirection, byte seed)
+    {
+        if(playerGunLight)
+        {
+            playerGunLight.ShootShotgun();
+        }
+        if(gunAudio)
+        {
+            gunAudio.PlayOneShot(shotgunBlueShotClip, 1);
+        }
+        
+        if(pv.IsMine)
+        {
+            CameraShaker.MakeTrauma(0.25f);
+        
+            shotgun_blue_animatorFPS.Play("Base.Fire1", 0, 0);
+            shotgunFX_blue_ps.Play();
+            
+            if(pController.IsGrounded())
+            {
+                pController.BoostVelocityAdditive(-hitScanDirection * 12.5f);
+            }
+            else
+            {
+                pController.BoostVelocityAdditive(-hitScanDirection * 4.5f);
+                if(pController.fpsVelocity.y < 0  && (Vector3.Dot(Vector3.down, hitScanDirection) > 0.9f))
+                    pController.fpsVelocity.y = 0;
+            }
+        }
+        
+        shotgunHits_netIDs_and_dmg.Clear();
+        
+        ParticlesManager.PlayPooled(ParticleType.shot_explosion1, shotPos + hitScanDirection, hitScanDirection);
+        
+        Random.InitState(seed);
+        GaussianDistribution gd = new GaussianDistribution();
+        
+        Quaternion rotation = Quaternion.LookRotation(hitScanDirection);
+        
+        RaycastHit hit;
+        Ray ray = new Ray(shotPos, hitScanDirection);
+        
+        
+        for(int i = 0; i < shotgunBluePelletCount; i++)
+        {
+            Vector3 randomPoint = new Vector3(gd.Next(0f, 1f, -1f, 1f), gd.Next(0f, 1f, -1f, 1f), 0);
+            
+            Vector3 pelletDir = hitScanDirection + rotation * randomPoint * shotgunSpread;
+            ray.direction = Math.Normalized(pelletDir);
+            
+            
+            float pellet_speed = 60f;
+            float ray_max_distance = 60f;
+            
+            
+            GameObject bullet = ObjectPool.s().Get(ObjectPoolKey.ShotgunPellet);    
+            BulletController bulletController = bullet.GetComponent<BulletController>();
+            bulletController.LaunchAsSphere(ray.origin, ray.direction, 0.1f, bulletMask, pellet_speed, shotgunDmgPellet, false);
+            bulletController.time_to_be_alive = ray_max_distance / pellet_speed;
+            bulletController.on_die_behave = BulletOnDieBehaviour.Hurtless;
+            
+            
+            if(Physics.Raycast(ray, out hit, ray_max_distance, bulletMask))
+            {
+                bulletController.time_to_be_alive = pellet_speed * hit.distance;// / 0.5f;
+                //lineEnd = hit.point;
+                DamagableLimb hit_limb = hit.collider.GetComponent<DamagableLimb>();
+                if(hit_limb)
+                {
+                    
+                    int hit_netId = hit_limb.net_comp_from_parent.networkId;
+                    int rnd = Random.Range(0, 10);
+                    
+                    if(rnd > 7)
+                        hit_limb.React(hit_limb.transform.localPosition, vForward);
+                    
+                    if(shotgunHits_netIDs_and_dmg.ContainsKey(hit_netId))
+                    {
+                        ShotgunHit x = new ShotgunHit();
+                        
+                        x.col = shotgunHits_netIDs_and_dmg[hit_netId].col;
+                        x.damage = shotgunHits_netIDs_and_dmg[hit_netId].damage;
+                        x.damage += shotgunDmgPellet;
+                        
+                        shotgunHits_netIDs_and_dmg[hit_netId] = x;
+                    }
+                    else
+                    {
+                        ShotgunHit x = new ShotgunHit();
+                        x.col = hit.collider;
+                        x.damage = shotgunDmgPellet;
+                        
+                        shotgunHits_netIDs_and_dmg.Add(hit_netId, x);
+                        
+                        shotgunLastHitPoint = hit.point;
+                        shotgunLastHitDir = hitScanDirection;
+                        shotgunLastHitNormal = hit.normal;
+                    }
+                }
+                else
+                {
+                    OnHitScan(hit.point, hitScanDirection, hit.normal, shotgunDmgPellet, hit.collider, null, 1, 0.1f);
+                }
+            }
+            else
+            {
+                OnHitScan(shotPos + hitScanDirection * 60, hitScanDirection, -hitScanDirection, shotgunDmgPellet, null);
+            }
+        }
+        
+        foreach(KeyValuePair<int, ShotgunHit> hit_pair in shotgunHits_netIDs_and_dmg)
+        {
+            //InGameConsole.LogFancy(string.Format("Doing {0} damage to {1}", hit_pair.Value.damage, hit_pair.Value.col.name));
+            OnHitExplosive(shotgunLastHitPoint, shotgunLastHitDir, shotgunLastHitNormal, hit_pair.Value.damage, hit_pair.Value.col, null, 1, 1f);
         }
     }
     
@@ -2559,7 +3223,7 @@ public class FPSGunController : MonoBehaviour
         
         if(pv.IsMine)
         {
-            CameraShaker.MakeTrauma(0.5f);
+            CameraShaker.MakeTrauma(0.55f);
         
             shotgun_animatorFPS.Play("Base.Fire1", 0, 0);
             shotgunFX_ps.Play();
@@ -2607,7 +3271,7 @@ public class FPSGunController : MonoBehaviour
         
         if(pv.IsMine)
         {
-            CameraShaker.MakeTrauma(1.4F);
+            CameraShaker.MakeTrauma(0.4F);
         
             shotgun_animatorFPS.Play("Base.Fire_alt", 0, 0);
             //shotgunFX_ps.Play();
@@ -2892,13 +3556,16 @@ public class FPSGunController : MonoBehaviour
         if(Physics.Raycast(ray, out hit, ray_max_distance, bulletMask))
         {
             bulletController.time_to_be_alive = hit.distance / bullet_speed;
-            OnHitScan(hit.point, hitScanDirection, hit.normal, arDmg, hit.collider, null, 1.5f, 0.075f);
+            OnHitScan(hit.point, hitScanDirection, hit.normal, arDmg, hit.collider, null, 1.5f, 0.075f, 0);
         }
         else
         {
             OnHitScan(shotPos + hitScanDirection * ray_max_distance, hitScanDirection, -hitScanDirection, revolverDmg, null);
         }
     }
+    
+    
+    
     
     void ShootARGhost_HitScan(Vector3 shotPos, Vector3 hitScanDirection)
     {
@@ -2910,7 +3577,8 @@ public class FPSGunController : MonoBehaviour
         if(pv.IsMine)
         {
             CameraShaker.MakeTrauma(0.025f);
-            AR_ghost_animator_fps.Play(BaseFire1_hash , 0, 0);
+            if(AR_ghost_animator_fps)
+                AR_ghost_animator_fps.Play(BaseFire1_hash , 0, 0);
             if(ARGhost_bulletShells_ps)
             {
                 ARGhost_bulletShells_ps.Emit(1);
@@ -2940,7 +3608,7 @@ public class FPSGunController : MonoBehaviour
         {
             bulletController.time_to_be_alive = hit.distance / bullet_speed;
             //lineEnd = hit.point;
-            OnHitScan(hit.point, hitScanDirection, hit.normal, arDmg, hit.collider, null, 1.5f, 0.005f);
+            OnHitScan(hit.point, hitScanDirection, hit.normal, arDmg, hit.collider, null, 1.5f, 0.005f, 0);
         }
         else
         {
@@ -3031,7 +3699,7 @@ public class FPSGunController : MonoBehaviour
     }
     
     
-    void OnHitScan(Vector3 point, Vector3 damageDirection, Vector3 normal, int damage, Collider col = null, NetworkObject targetNetworkObject = null, float headshotDmgMult = 2, float shakeMultiplier = 1)
+    void OnHitScan(Vector3 point, Vector3 damageDirection, Vector3 normal, int damage, Collider col = null, NetworkObject targetNetworkObject = null, float headshotDmgMult = 2, float shakeMultiplier = 1, float forceMultiplier = 1)
     {
         if (col != null)
         {
@@ -3050,9 +3718,13 @@ public class FPSGunController : MonoBehaviour
                     //PlayHeadshotSmall
                     //InGameConsole.LogFancy("Headshot damage is " + dmg.ToString());
                 }
+                if(!limb.isMasterAlive)
+                {
+                    limb.TakeDamageLimb(damage);
+                    limb.AddForceToLimb(damage * damageDirection);
+                }
                 limb.React(point, damageDirection);
                 //Debug:
-                limb.AddForceToLimb(damage * damageDirection);
             }
             
             if(targetNetworkObject != null)
@@ -3064,37 +3736,25 @@ public class FPSGunController : MonoBehaviour
                     
                     if(pv.IsMine)
                     {
-                        int target_hp = idl.GetCurrentHP();
-                        
                         if(limb.isHeadshot && headshotDmgMult > 1.1f)
                         {
                             CrosshairController.MakeHeadShot();
                         }
                         
-                        if(target_hp <= 0)
-                        {
-                            if(limb)
-                            {
-                                limb.TakeDamageLimb(damage);
-                            }
-                        }
-                        
-                        
-                        
-                        
-                        int remainingHitPoints = target_hp - damage;
+                        //int remainingHitPoints = target_hp - damage;
                         //InGameConsole.LogFancy(string.Format("Remaining hitpoints: {0}", (target_hp - damage)));
-                        if(remainingHitPoints <= 0)
+                        CameraShaker.MakeTrauma(0.15f * shakeMultiplier);
+                        if(limb.isMasterAlive)
                         {
-                            CameraShaker.MakeTrauma(0.75f * shakeMultiplier);
-                            Vector3 force = damageDirection * damage;
-                            
-                            NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.DieWithForce, force, limb.limb_id);                                
-                        }
-                        else
-                        {
-                            CameraShaker.MakeTrauma(0.15f * shakeMultiplier);
-                            NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.TakeDamage, damage);                               
+                            if(forceMultiplier > 0.01f)
+                            {
+                                NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.TakeDamageLimbWithForce, damage, damageDirection * forceMultiplier, limb.limb_id);
+                            }
+                            else
+                            {
+                                NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.TakeDamageLimbNoForce, damage, limb.limb_id);
+                                //TakeDamageLimbNoForce
+                            }
                         }
                     }
                 }
@@ -3116,6 +3776,253 @@ public class FPSGunController : MonoBehaviour
         }
     }
     
+    HashSet<IKillableThing> killables_cache = new HashSet<IKillableThing>();
+    
+    void OnHitScanBounce(Vector3 point, Vector3 damageDirection, Vector3 normal, int damage, Collider col = null, NetworkObject targetNetworkObject = null, float headshotDmgMult = 2, float shakeMultiplier = 1, float forceMultiplier = 1)
+    {
+        if (col != null)
+        {
+            if(targetNetworkObject == null)
+            {
+                targetNetworkObject = col.GetComponent<NetworkObject>();
+            }
+            
+            DamagableLimb limb = col.GetComponent<DamagableLimb>();
+            if(limb)
+            {
+                targetNetworkObject    = limb.net_comp_from_parent;
+                if(limb.isHeadshot)
+                {
+                    damage = (int)((float)damage * headshotDmgMult);
+                    //PlayHeadshotSmall
+                    //InGameConsole.LogFancy("Headshot damage is " + dmg.ToString());
+                }
+                if(!limb.isMasterAlive)
+                {
+                    limb.TakeDamageLimb(damage);
+                    limb.AddForceToLimb(damage * damageDirection);
+                }
+                limb.React(point, damageDirection);
+                //Debug:
+            }
+            
+            if(targetNetworkObject != null)
+            {
+                IDamagableLocal idl = targetNetworkObject.GetComponent<IDamagableLocal>();
+                if(idl != null)
+                {
+                    idl.TakeDamageLocally(damage, point, damageDirection);
+                    
+                    if(pv.IsMine)
+                    {
+                        if(limb.isHeadshot && headshotDmgMult > 1.1f)
+                        {
+                            CrosshairController.MakeHeadShot();
+                        }
+                        
+                        //int remainingHitPoints = target_hp - damage;
+                        //InGameConsole.LogFancy(string.Format("Remaining hitpoints: {0}", (target_hp - damage)));
+                        CameraShaker.MakeTrauma(0.15f * shakeMultiplier);
+                        if(limb.isMasterAlive)
+                        {
+                            if(forceMultiplier > 0.01f)
+                            {
+                                NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.TakeDamageLimbWithForce, damage, damageDirection * forceMultiplier, limb.limb_id);
+                            }
+                            else
+                            {
+                                NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.TakeDamageLimbNoForce, damage, limb.limb_id);
+                                //TakeDamageLimbNoForce
+                            }
+                            
+                            if(pv.IsMine)
+                            {
+                                if(!limb.isHeadshot)
+                                {
+                                    return;
+                                }
+                                killables_cache.Clear();
+                                int len = NPCManager.killablesMaxNum;
+                                const float maxDistanceSqr = 16 * 16;
+                                int maxBounces = 3;
+                                // if(maxBounces > NPCManager.killables.Count)
+                                // {
+                                //     maxBounces = NPCManager.killables.Count;
+                                // }
+                                Vector3 startPoint = point;
+                                
+                                for(int j = 0; j < maxBounces; j++)
+                                {
+                                    //InGameConsole.LogFancy(string.Format("maxBounces: {0}, killables.Count: {1}", maxBounces, NPCManager.killables.Count));
+                                    IKillableThing killable_target = null;
+                                    float closestDistance = float.MaxValue;
+                                    
+                                    for(int i = 0; i < len; i++)
+                                    {
+                                        if(NPCManager.killables[i] != null)
+                                        {
+                                            if(NPCManager.killables[i].CanBeBounceHit() && !killables_cache.Contains(NPCManager.killables[i]))
+                                            {
+                                                float sqrDistanceToKillable = Math.SqrDistance(NPCManager.killables[i].GetHitSpot(), startPoint);
+                                                if((sqrDistanceToKillable < maxDistanceSqr) && (sqrDistanceToKillable < closestDistance))
+                                                {
+                                                    closestDistance = sqrDistanceToKillable;
+                                                    killable_target = NPCManager.killables[i];
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    if(killable_target != null)
+                                    {
+                                        Vector3 hitSpot = killable_target.GetHitSpot();
+                                        RaycastHit bounceHit; 
+                                        Vector3 bounceDir = (hitSpot - startPoint).normalized;
+                                        Ray bounceRay = new Ray(startPoint, bounceDir);
+                                        float d = Math.Magnitude(hitSpot - startPoint);
+                                        killables_cache.Add(killable_target);
+                                        
+                                        float bounceDelay = 0.08f;
+                                        if(!PhotonNetwork.OfflineMode)
+                                        {
+                                            bounceDelay = 0.033f;
+                                        }
+                                        
+                                        if(Physics.Raycast(bounceRay, out bounceHit, d, groundCeilingMask))
+                                        {
+                                            //Target is obstructed:
+                                            float _bounceDelay = (j > 2) ? bounceDelay / 1.5f : bounceDelay;
+                                            StartCoroutine(RBounceWall(startPoint, bounceHit.point, bounceDelay * (j + 1)));
+                                            //NetworkObjectsManager.CallGlobalCommand(GlobalCommand.BounceHit_RevolverBlue, RpcTarget.All, startPoint, bounceHit.point);
+                                            
+                                        }
+                                        else
+                                        {
+                                            //Target was not obstructed:
+                                            //maxBounces--;
+                                            NetworkObject killable_net_comp = killable_target.GetNetComp();
+                                            if(killable_net_comp)
+                                            {
+                                                //NetworkObjectsManager.CallGlobalCommand(GlobalCommand.BounceHit_RevolverBlue, RpcTarget.All, startPoint, hitSpot);
+                                                //NetworkObjectsManager.CallNetworkFunction(killable_net_comp.networkId, NetworkCommand.TakeDamageLimbWithForce, 400, bounceDir * 800,  killable_target.GetHitSpotLimbId());
+                                                float _bounceDelay = (j > 2) ? bounceDelay / 1.5f : bounceDelay;
+                                                StartCoroutine(RBounce(startPoint, hitSpot, killable_net_comp.networkId, bounceDir, killable_target.GetHitSpotLimbId(), bounceDelay * (j + 1)));
+                                               // ShootRevolver_Blue(startPoint, bounceRay.direction);
+                                                startPoint = hitSpot;
+                                            }
+                                        }
+                                        
+                                    }
+                                    else
+                                    {
+                                        j = maxBounces + 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                PhotonView pv = col.GetComponent<PhotonView>();
+                if(pv)
+                {
+                    // col.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.AllViaServer, dmg);
+                    //col.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.All, dmg);
+                    
+                }
+                else // We hit something static
+                {
+                    ParticlesManager.Play(ParticleType.shot, point, -damageDirection);
+                }
+            }
+        }
+    }
+    
+    IEnumerator RBounceWall(Vector3 startPoint, Vector3 hitPoint, float delayTime)
+    {
+        yield return new WaitForSeconds(delayTime);
+        // Now do your thing here
+        NetworkObjectsManager.CallGlobalCommand(GlobalCommand.BounceHit_RevolverBlue, RpcTarget.All, startPoint, hitPoint);
+    }
+    
+    
+    IEnumerator RBounce(Vector3 startPoint, Vector3 hitSpot, int networkId, Vector3 bounceDir, byte limb_id, float delayTime)
+    {
+        yield return new WaitForSeconds(delayTime);
+        
+        NetworkObjectsManager.CallGlobalCommand(GlobalCommand.BounceHit_RevolverBlue, RpcTarget.All, startPoint, hitSpot);
+        NetworkObjectsManager.CallNetworkFunction(networkId, NetworkCommand.TakeDamageLimbWithForce, 400, bounceDir * 800,  limb_id);
+    }
+    
+    void OnHitExplosive(Vector3 point, Vector3 damageDirection, Vector3 normal, int damage, Collider col = null, NetworkObject targetNetworkObject = null, float headshotDmgMult = 2, float shakeMultiplier = 1, float forceMultiplier = 1)
+    {
+        if (col != null)
+        {
+            if(targetNetworkObject == null)
+            {
+                targetNetworkObject = col.GetComponent<NetworkObject>();
+            }
+            
+            DamagableLimb limb = col.GetComponent<DamagableLimb>();
+            if(limb)
+            {
+                targetNetworkObject    = limb.net_comp_from_parent;
+                if(limb.isHeadshot)
+                {
+                    damage = (int)((float)damage * headshotDmgMult);
+                    //PlayHeadshotSmall
+                    //InGameConsole.LogFancy("Headshot damage is " + dmg.ToString());
+                }
+                if(!limb.isMasterAlive)
+                {
+                    limb.AddForceToLimb(damage * damageDirection);
+                }
+                limb.React(point, damageDirection);
+                //Debug:
+            }
+            
+            if(targetNetworkObject != null)
+            {
+                IDamagableLocal idl = targetNetworkObject.GetComponent<IDamagableLocal>();
+                if(idl != null)
+                {
+                    idl.TakeDamageLocally(damage, point, damageDirection);
+                    
+                    if(pv.IsMine)
+                    {
+                        if(limb.isHeadshot && headshotDmgMult > 1.1f)
+                        {
+                            CrosshairController.MakeHeadShot();
+                        }
+                        
+                        //int remainingHitPoints = target_hp - damage;
+                        //InGameConsole.LogFancy(string.Format("Remaining hitpoints: {0}", (target_hp - damage)));
+                        if(limb.isMasterAlive)
+                        {
+                            CameraShaker.MakeTrauma(0.15f * shakeMultiplier);
+                            NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.TakeDamageExplosive, damage);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                PhotonView pv = col.GetComponent<PhotonView>();
+                if(pv)
+                {
+                    // col.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.AllViaServer, dmg);
+                    //col.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.All, dmg);
+                    
+                }
+                else // We hit something static
+                {
+                    ParticlesManager.Play(ParticleType.shot, point, -damageDirection);
+                }
+            }
+        }
+    }
     
     
     public PlayerLightController playerGunLight;

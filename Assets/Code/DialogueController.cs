@@ -98,6 +98,7 @@ public class DialogueController : MonoBehaviour, INetworkObject
     public bool showMsg = false;
     
     public string msgToShow = "MSG TO SHOW";
+    public bool isInDialogueOrNearIt = false; 
     
     void Update()
     {
@@ -116,10 +117,12 @@ public class DialogueController : MonoBehaviour, INetworkObject
         if(local_player != null)
         {
             Vector3 localPlayer_pos = local_player.GetHeadPosition();
-            if(Math.SqrDistance(localPlayer_pos, thisTransform.position) < dialogueRadius * dialogueRadius)
+            bool isInRange = Math.SqrDistance(localPlayer_pos, thisTransform.position) < dialogueRadius * dialogueRadius;
+            if(isInRange)
             {
                 if(DialogueManager.GetState() == DialogueState.Hidden)
                 {
+                    //local_player.gunController.isInDialogueOrInRange = true;
                     if(showMsg)
                     {
                         showMsg = false;

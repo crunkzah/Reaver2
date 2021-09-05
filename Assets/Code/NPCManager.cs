@@ -22,6 +22,37 @@ public class NPCManager : MonoBehaviour {
     
     public List<CoverForNPC> covers = new List<CoverForNPC>(16);
     
+    public const int killablesMaxNum = 128;
+    //static bool wasKillablesInit = false;
+    static int currentKillablesIndex = 0;
+    public static List<IKillableThing> killables = new List<IKillableThing>(killablesMaxNum);
+    
+    void InitKillablesWithNulls()
+    {
+        killables.Clear();
+        for(int i = 0; i < killablesMaxNum; i++)
+        {
+            killables.Add(null);
+        }
+        
+      //  wasKillablesInit = true;
+    }
+    
+    public static void RegisterKillable(IKillableThing _killable)
+    {
+        killables[currentKillablesIndex] = _killable;
+        currentKillablesIndex++;
+        if(currentKillablesIndex >= killablesMaxNum)
+        {
+            currentKillablesIndex = 0;
+        }
+    }
+    
+    public static void UnregisterKillable(IKillableThing _killable)
+    {
+        killables.Remove(_killable);
+    }
+    
     public void AddCover(CoverForNPC _cover)
     {
         covers.Add(_cover);
@@ -98,6 +129,11 @@ public class NPCManager : MonoBehaviour {
         
     void Awake()
     {
+        //if(!wasKillablesInit)
+        //{
+        InitKillablesWithNulls();
+        //}
+        
         if(_instance != null && _instance != this)
         {
             Destroy(this.gameObject);
@@ -127,6 +163,7 @@ public class NPCManager : MonoBehaviour {
     
     public void RegisterAiTarget(Transform targetToAdd)
     {
+        InGameConsole.LogOrange("TryingToRegister" + targetToAdd.gameObject.name);
         if(!aiTargets.Contains(targetToAdd))
         {
             aiTargets.Add(targetToAdd);

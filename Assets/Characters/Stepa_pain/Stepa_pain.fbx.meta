@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 185ce3746aa26fb4199ea62a86950423
+guid: 86c7f6a74bdc6564994833a0fe4934a5
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -10,15 +10,17 @@ ModelImporter:
     100008: Chest
     100010: Foot1.l
     100012: Foot1.r
-    100014: Head
-    100016: Leg1.l
-    100018: Leg1.r
-    100020: Leg2.l
-    100022: Leg2.r
-    100024: Root_pelvis
-    100026: //RootNode
-    100028: Stepa_pain
-    100030: Stepa_pain_Armature
+    100014: Hand.l
+    100016: Hand.r
+    100018: Head
+    100020: Leg1.l
+    100022: Leg1.r
+    100024: Leg2.l
+    100026: Leg2.r
+    100028: Root_pelvis
+    100030: //RootNode
+    100032: Stepa_pain
+    100034: Stepa_pain_Armature
     400000: Arm1.l
     400002: Arm1.r
     400004: Arm2.l
@@ -26,28 +28,31 @@ ModelImporter:
     400008: Chest
     400010: Foot1.l
     400012: Foot1.r
-    400014: Head
-    400016: Leg1.l
-    400018: Leg1.r
-    400020: Leg2.l
-    400022: Leg2.r
-    400024: Root_pelvis
-    400026: //RootNode
-    400028: Stepa_pain
-    400030: Stepa_pain_Armature
-    2100000: No Name
+    400014: Hand.l
+    400016: Hand.r
+    400018: Head
+    400020: Leg1.l
+    400022: Leg1.r
+    400024: Leg2.l
+    400026: Leg2.r
+    400028: Root_pelvis
+    400030: //RootNode
+    400032: Stepa_pain
+    400034: Stepa_pain_Armature
+    2100000: Material
+    2100002: Material.002
     4300000: Stepa_pain
     7400000: Stepa_pain_Armature|_T_Pose
     7400002: Stepa_pain_Armature|Airbourne
-    7400004: Stepa_pain_Armature|Idle
-    7400006: Stepa_pain_Armature|Running
-    7400008: Stepa_pain_Armature|Fire1
-    7400010: Stepa_pain_Armature|Fire_aiming
+    7400004: Stepa_pain_Armature|Fire1
+    7400006: Stepa_pain_Armature|Fire_aiming
+    7400008: Stepa_pain_Armature|Idle
+    7400010: Stepa_pain_Armature|Running
     9500000: //RootNode
     13700000: Stepa_pain
   externalObjects: {}
   materials:
-    importMaterials: 0
+    importMaterials: 1
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -130,62 +135,6 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Stepa_pain_Armature|Idle
-      takeName: Stepa_pain_Armature|Idle
-      firstFrame: 0
-      lastFrame: 21
-      wrapMode: 0
-      orientationOffsetY: 0
-      level: 0
-      cycleOffset: 0
-      loop: 0
-      hasAdditiveReferencePose: 0
-      loopTime: 1
-      loopBlend: 0
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
-      loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
-      keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
-      heightFromFeet: 0
-      mirror: 0
-      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves: []
-      events: []
-      transformMask: []
-      maskType: 3
-      maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 0
-    - serializedVersion: 16
-      name: Stepa_pain_Armature|Running
-      takeName: Stepa_pain_Armature|Running
-      firstFrame: 0
-      lastFrame: 40
-      wrapMode: 0
-      orientationOffsetY: 0
-      level: 0
-      cycleOffset: 0
-      loop: 0
-      hasAdditiveReferencePose: 0
-      loopTime: 1
-      loopBlend: 0
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
-      loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
-      keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
-      heightFromFeet: 0
-      mirror: 0
-      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves: []
-      events: []
-      transformMask: []
-      maskType: 3
-      maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 0
-    - serializedVersion: 16
       name: Stepa_pain_Armature|Fire1
       takeName: Stepa_pain_Armature|Fire1
       firstFrame: 0
@@ -218,6 +167,62 @@ ModelImporter:
       takeName: Stepa_pain_Armature|Fire_aiming
       firstFrame: 0
       lastFrame: 39
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Stepa_pain_Armature|Idle
+      takeName: Stepa_pain_Armature|Idle
+      firstFrame: 0
+      lastFrame: 21
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Stepa_pain_Armature|Running
+      takeName: Stepa_pain_Armature|Running
+      firstFrame: 0
+      lastFrame: 40
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

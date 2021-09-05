@@ -80,16 +80,21 @@ public class Civ2Controller : MonoBehaviour, INetworkObject
             {
                 if(canSendCommands)
                 {
-                    PlayerController masterPlayer = PhotonManager.GetLocalPlayer();
-                    if(masterPlayer)
+                    //PlayerController masterPlayer = PhotonManager.GetLocalPlayer();
+                    
+                    for(int i = 0; i < NPCManager.AITargets().Count; i++)
                     {
-                        float distance_to_revolver = Vector3.Distance(revolver_holding.position, masterPlayer.GetHeadPosition());
-                        //InGameConsole.LogFancy("distance_to_revolver is " + distance_to_revolver.ToString("f"));
-                        if(distance_to_revolver < 2.1f)
+                        PlayerController playerTarget = NPCManager.AITargets()[i].GetComponent<PlayerController>();
+                        if(playerTarget)
                         {
-                            LockSendingCommands();
-                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetState, (byte)Civ2State.Idle);
-                            PlayerInventory.Singleton().RaiseEventGiveWeaponToAllPlayers(GunType.Revolver);
+                            float distance_to_revolver = Vector3.Distance(revolver_holding.position, playerTarget.GetHeadPosition());
+                            //InGameConsole.LogFancy("distance_to_revolver is " + distance_to_revolver.ToString("f"));
+                            if(distance_to_revolver < 2.1f)
+                            {
+                                LockSendingCommands();
+                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetState, (byte)Civ2State.Idle);
+                                PlayerInventory.Singleton().RaiseEventGiveWeaponToAllPlayers(GunType.Revolver);
+                            }
                         }
                     }
                 }

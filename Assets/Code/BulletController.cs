@@ -257,6 +257,7 @@ public class BulletController : MonoBehaviour, IPooledObject
                 DamagableLimb hitLimb = hit.collider.GetComponent<DamagableLimb>();
                 if(hitLimb && !hitLimb.isMasterAlive)
                 {
+                    distanceThisFrame = 0;
                     hitLimb.TakeDamageLimb(1000);                    
                 }
                 else
@@ -346,7 +347,6 @@ public class BulletController : MonoBehaviour, IPooledObject
             return;
         }
         
-        
         if(on_die_behave == BulletOnDieBehaviour.Explode_1)
         {
             GameObject obj = ObjectPool.s().Get(ObjectPoolKey.Kaboom1, false);
@@ -357,15 +357,6 @@ public class BulletController : MonoBehaviour, IPooledObject
                 explosionDamage = 0;
             }
             obj.GetComponent<Kaboom1>().ExplodeDamageHostile(thisTransform.localPosition, explosionRadius, explosionForce, explosionDamage, isMine, explosionCanDamageLocalPlayer, explosionPlayerDamage);
-            // if(PhotonNetwork.IsMasterClient)
-            // {
-                
-                // float _radius = Random.Range(2, 7);
-                
-                
-            // }
-            
-            //FollowingCamera.ShakeY(13f);
         }
         else
         {
@@ -387,8 +378,11 @@ public class BulletController : MonoBehaviour, IPooledObject
                 {
                     targetNetworkObject    = limb.net_comp_from_parent;
                     
-                    
-                    limb.AddForceToLimb(damage * direction);
+                    if(!limb.isMasterAlive)
+                    {
+                        limb.AddForceToLimb(damage * direction);
+                        limb.TakeDamageLimb(damage);
+                    }
                     limb.React(point, direction);
                 }
                 else
@@ -413,43 +407,10 @@ public class BulletController : MonoBehaviour, IPooledObject
                     {
                         shouldPlayFXonHit = false;
                         idl.TakeDamageLocally(damage, point, fly_direction);
-                        if(isMine && explosionCanDamageNPCs)
+                        if(isMine && explosionCanDamageNPCs && limb.isMasterAlive)
                         {
-                            
-                            int target_hp = idl.GetCurrentHP();
-                            int remainingHitPoints = target_hp - this.damage;
-                            Vector3 force = fly_direction * damage;
-                            if(target_hp > 0)
-                            {
-                                if(remainingHitPoints <= 0)
-                                {
-                                    // InGameConsole.LogFancy("ONE");
-                                    NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.DieWithForce, force, limb.limb_id);                                
-                                }
-                                else
-                                {
-                                    // InGameConsole.LogFancy("TWO");
-                                   
-                                    NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.TakeDamage, damage);
-                                }
-                            }
-                            else
-                            {
-                                if(idl.IsDead())
-                                {
-                                    if(limb)
-                                    {
-                                        // InGameConsole.LogFancy("THREE");
-                                        shouldPlayFXonHit = false;
-                                        limb.TakeDamageLimb(damage);
-                                    }
-                                }
-                                else
-                                {
-                                    // InGameConsole.LogFancy("FOUR");
-                                    NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.DieWithForce, force, limb.limb_id);
-                                }
-                            }
+//                            Vector3 force = fly_direction * damage;
+                            NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.TakeDamageLimbNoForce, damage, limb.limb_id);
                         }
                     }
                 }
@@ -570,7 +531,7 @@ public class BulletController : MonoBehaviour, IPooledObject
                 
             }
             
-            if(soundOnHit != SoundType.None)
+            if(soundOnHit != SoundType.None && shouldPlayFXonHit)
             {
                 AudioManager.Play3D(SoundType.bullet_impact_sound1, point, Random.Range(0.9f, 1), 0.6f);
             }

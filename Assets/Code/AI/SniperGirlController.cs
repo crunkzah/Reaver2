@@ -212,22 +212,7 @@ public class SniperGirlController : MonoBehaviour, INetworkObject, IDamagableLoc
                 
                 break;
             }
-            case(NetworkCommand.DieWithForce):
-            {
-                
-                Vector3 force = (Vector3)args[0];
-                
-                byte limb_id = 0;
-                if(args.Length > 1)
-                {
-                    limb_id = (byte)args[1];
-                }
-                
-                Die(force, limb_id);
-                
-                break;
-            }
-            case(NetworkCommand.TakeDamage):
+            case(NetworkCommand.TakeDamageLimbWithForce):
             {
                 int incomingDamage = (int)args[0];
                 TakeDamage(incomingDamage);

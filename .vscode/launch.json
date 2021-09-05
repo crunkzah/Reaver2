@@ -4,10 +4,11 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
         {
             "name": "Unity Editor",
             "type": "unity",
-            "path": "/e:/UnityProjects_backups/Sokoban 03.09.2019/Sokoban/Library/EditorInstance.json",
+            "path": "X:/UnityProjects_ssd/Reaver2/Library/EditorInstance.json",
             "request": "launch"
         },
         {

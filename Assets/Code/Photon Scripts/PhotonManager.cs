@@ -74,7 +74,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
     
     void ConfigureConnection()
     {
-        PhotonNetwork.PhotonServerSettings.AppSettings.FixedRegion = "eu";
+        PhotonNetwork.PhotonServerSettings.AppSettings.FixedRegion = "ru";
     }
     
     void Start()
@@ -88,12 +88,19 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         
         PhotonNetwork.UseRpcMonoBehaviourCache = true;
         
-        
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
         SceneManager.sceneLoaded += OnSceneLoaded;
         
         SetupMyNickName();
     }
     
+    void OnActiveSceneChanged(Scene current, Scene next)
+    {
+        if(current.buildIndex != next.buildIndex)
+        {
+            AudioManager.StopMusic();
+        }
+    }
     
     public void ConnectToPhotonNetwork()
     {
@@ -415,10 +422,47 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
                 PhotonNetwork.CurrentRoom.IsOpen = false;
             }
         }
+        switch(scene.buildIndex)
+        {
+            case(0):
+            {
+                InGameConsole.LogFancy("<color=green>SetMusicMainMenu() from PhotonManager</color>");
+                InGameConsole.LogFancy("<color=green>SetMusicMainMenu() from PhotonManager</color>");
+                InGameConsole.LogFancy("<color=green>SetMusicMainMenu() from PhotonManager</color>");
+                InGameConsole.LogFancy("<color=green>SetMusicMainMenu() from PhotonManager</color>");
+                InGameConsole.LogFancy("<color=green>SetMusicMainMenu() from PhotonManager</color>");
+                
+                AudioManager.SetMusicMainMenu();
+                break;
+            }
+            // case(2):
+            // {
+            //     AudioManager.SetMusicPrologue();
+            //     break;
+            // }
+            // case(7):
+            // {
+            //     AudioManager.SetMusicClouds();
+            //     break;
+            // }
+            default:
+            {
+                break;
+            }
+        }
+        // if(scene.buildIndex == 0)
+        // {
+        // }
+        // else if(scene.buildIndex == 2)
+        // {
+        // }
+        
+        AudioManager.ResetEnemiesAlive();
         
         //OrthoCamera.Hide();
         DeadGUI.Hide();
-        
+        GameStats.Hide();
+        MessagePanel.HideMessage();
         
         wasFirstPlayerSpawned = false;
         PostProcessingController2.SetState(PostProcessingState.Normal);
@@ -463,7 +507,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
     
     public Photon.Realtime.ClientState networkClientState;
     
-    static bool usingSavePoints = true;
+    static bool usingSavePoints = false;
     
     void OnLoadedOnSavePoint()
     {
@@ -587,12 +631,12 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
                 }
                 else
                 {
-                    if(!PhotonNetwork.OfflineMode && (PhotonNetwork.CurrentRoom.MaxPlayers != PhotonNetwork.CurrentRoom.PlayerCount))
-                    {
-                        InGameConsole.LogOrange("Can't spawn local player because <color=red>not all</color> players have joined !!!");
-                        InGameConsole.LogOrange(string.Format("Players in room: <color=yellow>{0}</color>, maxPlayers: <color=green>{1}</color>", PhotonNetwork.CurrentRoom.PlayerCount, PhotonNetwork.CurrentRoom.MaxPlayers));
-                        return;
-                    }
+                    // if(!PhotonNetwork.OfflineMode) && (PhotonNetwork.CurrentRoom.MaxPlayers != PhotonNetwork.CurrentRoom.PlayerCount))
+                    // {
+                    //     InGameConsole.LogOrange("Can't spawn local player because <color=red>not all</color> players have joined !!!");
+                    //     InGameConsole.LogOrange(string.Format("Players in room: <color=yellow>{0}</color>, maxPlayers: <color=green>{1}</color>", PhotonNetwork.CurrentRoom.PlayerCount, PhotonNetwork.CurrentRoom.MaxPlayers));
+                    //     return;
+                    // }
                     
                     if(canSpawnPlayer_offlineMode == false)
                     {
@@ -712,6 +756,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
 
     void OnGUI()
     {
+        return;
         string text = string.Format("<color=green>CanSpawnPlayer_OfflineMode:</color> <color=yellow>{0}</color>", canSpawnPlayer_offlineMode.ToString());
         GUIStyle style = GUIStyle.none;
         

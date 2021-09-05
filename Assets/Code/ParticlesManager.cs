@@ -44,7 +44,8 @@ public enum ParticleType : int
     gibs1_ps,
     shotStar_ps,
     bullet_impact_dusty,
-    bullet_onReflect
+    bullet_onReflect,
+    gibs_explosion_ps
 }
 
 public enum LineType : int
@@ -292,6 +293,24 @@ public class ParticlesManager : MonoBehaviour
     
     public static ParticleSystem PlayPooled(ParticleType type, Vector3 pos, Vector3 forwardDir)
     {
+        if((type == ParticleType.hurt1_ps) || (type == ParticleType.blood_cloud1) || (type == ParticleType.limb_headshot_ps) || (type == ParticleType.gibs_explosion_ps))
+        {
+            if(!UberManager.UseGore)
+            {
+                
+                return null;
+            }
+            else
+            {
+                if(UberManager.UseBloodSplashesOnScreen)
+                {
+                    BloodOnCamera.MakeSplashOnScreen(pos);
+                }
+            }
+        }
+        
+        
+        
         return Instance._PlayPooled((int)type, pos, forwardDir);
     }
     

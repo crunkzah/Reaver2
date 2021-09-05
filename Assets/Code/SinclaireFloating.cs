@@ -11,6 +11,7 @@ public class SinclaireFloating : MonoBehaviour, INetworkObject
     public ParticleSystem die_ps;
     public ParticleSystem floating_ps;
     public Renderer[] rends;
+    public Transform[] godRays;
     public Light floating_light;
     
     
@@ -24,7 +25,7 @@ public class SinclaireFloating : MonoBehaviour, INetworkObject
     
     void DestroyLight()
     {
-        Destroy(floating_light, 0.1f);
+        Destroy(floating_light.gameObject, 0.1f);
     }
     
     const float flick_freq = 0.125F;
@@ -50,6 +51,29 @@ public class SinclaireFloating : MonoBehaviour, INetworkObject
             floating_light.intensity = Random.Range(0.7f, 1.2f) * light_baseIntensity;
             floating_light.range = Random.Range(0.85f, 1.15f) * light_baseRange;
             
+        }
+    }
+    
+    void DoLight(Vector3 pos)
+    {
+        GameObject g = ObjectPool2.s().Get(ObjectPoolKey.LightPooled, false);
+        LightPooled light = g.GetComponent<LightPooled>();
+        Color color = new Color(1f, 1f, 1f, 1f);
+        
+        float lightRadius = 16;
+        float decay_speed = lightRadius / 3;
+        light.DoLight(pos, color, 5, 1.2f, lightRadius, decay_speed);
+    }
+    
+    IEnumerator ShrinkGodRays()
+    {
+        for(;;)
+        {
+            for(int i = 0; i < godRays.Length; i++)
+            {
+                godRays[i].localScale = Vector3.MoveTowards(godRays[i].localScale, Vector3.zero, 10 * Time.deltaTime);        
+            }
+            yield return null;
         }
     }
     
@@ -88,7 +112,11 @@ public class SinclaireFloating : MonoBehaviour, INetworkObject
                 
                 Invoke(nameof(DestroyLight), 0.1f);
                 
-                Destroy(this.gameObject, 5);
+                
+                StartCoroutine(ShrinkGodRays());
+                DoLight(transform.position + Vector3.down * 14);
+                
+                Destroy(this.gameObject, 10);
                 
                 
                 break;
@@ -98,5 +126,9 @@ public class SinclaireFloating : MonoBehaviour, INetworkObject
                 break;
             }
         }
+    }
+    void OnDestroy()
+    {
+        StopAllCoroutines();
     }
 }

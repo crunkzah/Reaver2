@@ -62,7 +62,7 @@ public class DamagableLimb : MonoBehaviour
     
     public ParticleSystem deadLimb_ps;
     
-    public byte limb_id;
+    public byte limb_id; // if limb_id == 0 we consider it invalid!
     public List<DamagableLimb> adjacentLimbs = new List<DamagableLimb>(4);
     
     void Awake()
@@ -161,6 +161,49 @@ public class DamagableLimb : MonoBehaviour
         }
     }
     
+    
+    
+    public void ExplodeLimbWhenMasterAlive()
+    {
+        if(!canBeDestroyed)
+        {
+            return;
+        }
+        
+        Vector3 limbPos = thisTransform.position;
+        
+        int len = rbs.Length;
+        int joints_len = joints.Length;
+        
+        for(int i = 0; i < len; i++)
+        {
+            if(i < joints_len)
+            {
+                Destroy(joints[i]);
+            }
+            Destroy(rbs[i]);
+        }
+        
+        thisTransform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
+        col.enabled = false;
+        Destroy(col);
+        
+        
+        
+        if(isRootLimb)
+        {
+            rb.AddForce(Random.onUnitSphere * Random.Range(150f, 250f), ForceMode.Force);
+            Destroy(net_comp_from_parent.gameObject, 5);
+        }
+        //Effects:
+        {
+//            AudioManager.Play3D(SoundType.limb_gib1, limbPos, Random.Range(0.75f, 1.05f));
+            ParticlesManager.PlayPooled(ParticleType.gibs_explosion_ps, limbPos, vForward);
+            ParticlesManager.PlayPooled(ParticleType.hurt1_ps, limbPos, vForward);
+            ObjectPool.s().Get(ObjectPoolKey.BloodSprayer, false).GetComponent<BloodStainSprayer>().MakeStains(limbPos);
+        }
+    }
+    
     void DestroyLimb()
     {
         if(deadLimb_ps)
@@ -198,8 +241,8 @@ public class DamagableLimb : MonoBehaviour
         //Effects:
         {
             AudioManager.Play3D(SoundType.limb_gib1, limbPos, Random.Range(0.75f, 1.05f));
-            ParticlesManager.PlayPooled(ParticleType.gibs1_ps, limbPos, Vector3.forward);
-            ParticlesManager.PlayPooled(ParticleType.hurt1_ps, limbPos, Vector3.forward);
+            ParticlesManager.PlayPooled(ParticleType.gibs1_ps, limbPos, vForward);
+            ParticlesManager.PlayPooled(ParticleType.hurt1_ps, limbPos, vForward);
             ObjectPool.s().Get(ObjectPoolKey.BloodSprayer, false).GetComponent<BloodStainSprayer>().MakeStains(limbPos);
         }
     }

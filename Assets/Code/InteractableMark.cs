@@ -35,7 +35,7 @@ public class InteractableMark : MonoBehaviour, INetworkObject
     {
         switch(command)
         {
-            case(NetworkCommand.TakeDamage):
+            case(NetworkCommand.TakeDamageLimbWithForce):
             {
                 InteractHitScan();
                 break;

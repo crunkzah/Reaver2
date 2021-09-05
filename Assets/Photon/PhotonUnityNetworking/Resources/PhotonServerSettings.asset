@@ -68,4 +68,6 @@ MonoBehaviour:
   - OnPlayerSpawned
   - SetSavePointPriority
   - GC_RPC
+  - GS
+  - CallFuncRPCUnreliable
   DisableAutoOpenWizard: 1

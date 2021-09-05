@@ -7,18 +7,22 @@ public class HealthCrystal : MonoBehaviour, IPooledObject
     
     void Awake()
     {
+        if(groundLayer == -1)
+        {
+            groundLayer = LayerMask.GetMask("Ground");
+        }
         thisTransform = transform;
     }
     
     
-    const float maxSpeed = 8F;
-    const float acceleration = 4F;
+    const float maxSpeed = 720000f;
+    const float acceleration = 20f;
     
     float currentSpeed = 0;
     
     float lifeTimer = 0;
     
-    const float LifeTime = 5;
+    const float LifeTime = 7.3f;
     
     public int hp = 20;
     
@@ -32,16 +36,19 @@ public class HealthCrystal : MonoBehaviour, IPooledObject
         // vel = Vector3.zero;        
     }
     
-    Vector3 offsetVelocity;
+    bool isNotFlyingToPlayer = true;
     
-    const float offsetZeroingSpeed = 0.7F;
+    static int groundLayer = -1;
     
-    const float offsetVelocityMult = 0.2f;
+    const float GRAVITY_Y = -9.8f * 1.5f;
+    Vector3 velocity;
+    const float startVelY = 9f;
     
     public void Launch(Vector3 pos, int _hp)
     {
         this.gameObject.SetActive(true);
         
+        isNotFlyingToPlayer = true;
         
         isWorking = true;
         
@@ -49,18 +56,23 @@ public class HealthCrystal : MonoBehaviour, IPooledObject
         ps.Play();
         hp = _hp;
         
-        lifeTimer = Random.Range(LifeTime - 0.3f, LifeTime + 0.3f);
-        // lifeTimer = LifeTime;
+        lifeTimer = Random.Range(LifeTime - 0.2f, LifeTime + 0.2f);
         
-        offsetVelocity = Random.onUnitSphere * offsetVelocityMult;
+        velocity.x = Random.Range(-1f, 1f);
+        velocity.z = Random.Range(-1f, 1f);
+        velocity.y = startVelY;
+        
+        touchedGround = false;
         
         vel = Vector3.zero;
-        currentSpeed = 0;
-        
-        thisTransform.localPosition = pos + Random.onUnitSphere * 0.15f;
+        currentSpeed = 16;
+        Vector3 randV = Random.onUnitSphere;
+        randV.y = 0;
+        thisTransform.localPosition = pos + randV * 0.15f;
     }
     
     bool isWorking = false;
+    bool touchedGround = false;
 
     // Update is called once per frame
     void Update()
@@ -79,17 +91,16 @@ public class HealthCrystal : MonoBehaviour, IPooledObject
             Vector3 playerPos = PhotonManager.Singleton().local_controller.GetGroundPosition();
             playerPos.y += 1.15F;
             
-            if(Math.SqrDistance(thisTransform.localPosition, playerPos) < 0.9F * 0.9F)
-            {
-                currentSpeed = 100f;
-            }
-            
-            if(lifeTimer < LifeTime - 0.25f && Math.SqrDistance(thisTransform.localPosition, playerPos) < 0.4F * 0.4F)
+            if(Math.SqrDistance(thisTransform.localPosition, playerPos) < 0.225F * 0.225F)
             {
                 PhotonManager.Singleton().local_controller.Heal(hp);
                 EndLife();
             }
             
+            if(Math.SqrDistance(thisTransform.localPosition, playerPos) < 4f * 4f)
+            {
+                isNotFlyingToPlayer = false;
+            }
                                     
             if(lifeTimer <= 0)
             {
@@ -100,18 +111,44 @@ public class HealthCrystal : MonoBehaviour, IPooledObject
                 lifeTimer -= dt;
             }
             
-            Vector3 updatedPos = Vector3.MoveTowards(thisTransform.localPosition, playerPos, dt * currentSpeed);
-            updatedPos += offsetVelocity * dt;
             
-            offsetVelocity = Vector3.MoveTowards(offsetVelocity, Vector3.zero, offsetZeroingSpeed * dt);
-            
-            thisTransform.localPosition = updatedPos;
-            
-            
-            currentSpeed += acceleration * dt;
-            if(currentSpeed > maxSpeed)
+            if(!isNotFlyingToPlayer)
             {
-                currentSpeed = maxSpeed;
+                Vector3 updatedPos = Vector3.MoveTowards(thisTransform.localPosition, playerPos, dt * currentSpeed);
+                
+                thisTransform.localPosition = updatedPos;
+            
+                currentSpeed += acceleration * dt;
+                if(currentSpeed > maxSpeed)
+                {
+                    currentSpeed = maxSpeed;
+                }
+            }
+            else
+            {
+                if(!touchedGround)
+                {
+                    velocity.y += GRAVITY_Y * dt;
+                    Vector3 updatedPos = thisTransform.localPosition;
+                    updatedPos.x += velocity.x * dt;
+                    updatedPos.z += velocity.z * dt;
+                    updatedPos.y += velocity.y * dt;
+                    
+                    float rayDistance = Math.Magnitude(velocity) * dt;
+                    
+                    Ray ray = new Ray(thisTransform.localPosition, velocity.normalized);
+                    RaycastHit hit;
+                    if(Physics.Raycast(ray, out hit, rayDistance, groundLayer))
+                    {
+                        thisTransform.localPosition = hit.point;
+                        velocity.x = velocity.z  = velocity.y = 0;
+                        touchedGround = true;
+                    }
+                    else
+                    {
+                        thisTransform.localPosition = updatedPos;
+                    }
+                }
             }
         }
         else

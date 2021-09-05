@@ -681,7 +681,7 @@ public class GunController : MonoBehaviour
                     
                     if(photonView.IsMine)
                     {
-                        NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.TakeDamage, dmg);
+                        NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.TakeDamageLimbWithForce, dmg);
                     }
                                                             
                                         

@@ -7,15 +7,33 @@ public class SinclaireSword : MonoBehaviour
     public Rigidbody rb;
     public Collider col;
     public TrailRendererController trail_controller;
+    MeshRenderer rend;
     
     void Awake()
     {
         col.enabled = false;
+        rend = GetComponent<MeshRenderer>();
     }
     
     public void OnSwing()
     {
         trail_controller.EmitFor(0.65f);
+    }
+    
+    public void Hide()
+    {
+        rend.enabled = false;
+    }
+    
+    public ParticleSystem onAppearSword;
+    
+    public void Appear()
+    {
+        rend.enabled = true;
+        if(onAppearSword)
+        {
+            onAppearSword.Play();
+        }
     }
     
     public void Drop()
@@ -28,5 +46,6 @@ public class SinclaireSword : MonoBehaviour
            
         col.enabled = true;
         rb.detectCollisions = true;
+        Destroy(this, 10);
     }
 }

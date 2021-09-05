@@ -60,19 +60,47 @@ public class PlayerInventory : MonoBehaviour
     //     }
         
     // }
+    //[SerializeField]
+    public GunType[][] playerGunSlots;
+    
+    
+    bool wasInit = false;
+    
+    public void Init()
+    {
+        if(wasInit)
+        {
+            return;
+        }
+        
+        wasInit = true;
+        
+        playerGunSlots = new GunType[4][];
+        for(int i = 0; i < playerGunSlots.Length; i++)
+        {
+            playerGunSlots[i] = new GunType[2];
+            for(int j = 0; j < playerGunSlots[i].Length; j++)
+            {
+                playerGunSlots[i][j] = GunType.None;
+            }
+        }
+    }
     
     void Start()
     {
+        Init();
         //We already do this in UberManager
         //DontDestroyOnLoad(this);
-        playerGunSlots[0] = GunType.Revolver;
-        playerGunSlots[1] = GunType.Shotgun;
-        playerGunSlots[2] = GunType.AR;
-        playerGunSlots[3] = GunType.RocketLauncher;
+        playerGunSlots[0][0] = GunType.Revolver;    
+        playerGunSlots[0][1] = GunType.Revolver_blue;
+        playerGunSlots[1][0] = GunType.Shotgun;
+        playerGunSlots[1][1] = GunType.Shotgun_blue;
+        playerGunSlots[2][0] = GunType.AR;
+        playerGunSlots[2][1] = GunType.MP5_alt;
+        playerGunSlots[3][0] = GunType.RocketLauncher;
     }
     
     
-    public GunType[] playerGunSlots = new GunType[4];
     
     
     
@@ -83,7 +111,7 @@ public class PlayerInventory : MonoBehaviour
         {
             case(GunType.Revolver):
             {
-                playerGunSlots[0] = gunToGive;
+                playerGunSlots[0][0] = gunToGive;
                 
                 if(localPlayer)
                 {
@@ -95,7 +123,7 @@ public class PlayerInventory : MonoBehaviour
             }
             case(GunType.Shotgun):
             {
-                playerGunSlots[1] = gunToGive;
+                playerGunSlots[1][0] = gunToGive;
                 
                 if(localPlayer)
                 {
@@ -108,7 +136,7 @@ public class PlayerInventory : MonoBehaviour
             }
             case(GunType.RocketLauncher):
             {
-                playerGunSlots[2] = gunToGive;
+                playerGunSlots[2][0] = gunToGive;
                 
                 if(localPlayer)
                 {
@@ -120,7 +148,7 @@ public class PlayerInventory : MonoBehaviour
             }
             case(GunType.AR):
             {
-                playerGunSlots[3] = gunToGive;
+                playerGunSlots[3][0] = gunToGive;
                 if(localPlayer)
                 {
                     FPSGunController localFPSGunController = localPlayer.GetComponent<FPSGunController>();
@@ -132,13 +160,23 @@ public class PlayerInventory : MonoBehaviour
             }
             case(GunType.MP5_alt):
             {
-                playerGunSlots[3] = gunToGive;
-                playerGunSlots[3] = gunToGive;
+                playerGunSlots[3][1] = gunToGive;
                 if(localPlayer)
                 {
                     FPSGunController localFPSGunController = localPlayer.GetComponent<FPSGunController>();
                     localFPSGunController.ReadPlayerInventory();
                     localFPSGunController.WieldMP5_alt();
+                }
+                break;
+            }
+            case(GunType.Revolver_blue):
+            {
+                playerGunSlots[0][1] = gunToGive;
+                if(localPlayer)
+                {
+                    FPSGunController localFPSGunController = localPlayer.GetComponent<FPSGunController>();
+                    localFPSGunController.ReadPlayerInventory();
+                 //   localFPSGunController.WieldMP5_alt();
                 }
                 break;
             }

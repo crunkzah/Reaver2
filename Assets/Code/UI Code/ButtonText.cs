@@ -15,13 +15,27 @@ public class ButtonText : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     
     public AudioClip onPointerEnterAudioClip;
     public AudioClip onButtonClickAudioClip;
+    Button btn;
     
     
     void Awake()
     {
         tmp = GetComponentInChildren<TextMeshProUGUI>();
+        btn = GetComponent<Button>();
+        if(btn)
+        {
+            btn.onClick.AddListener(OnPointerClick);
+        }
         
         unselectedColor = tmp.color;
+    }
+    
+    public void OnPointerClick()
+    {
+        if(onButtonClickAudioClip)    
+        {
+            AudioManager.Singleton().source2.PlayOneShot(onButtonClickAudioClip, 1f);
+        }
     }
     
     void OnEnable()
@@ -33,6 +47,32 @@ public class ButtonText : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         }
     }
     
+    float scaleSpeed = 5f;
+    float colorSpeed = 7f;
+    
+    bool isPointerOnThisButton = false;
+    
+    
+    Vector4 ColorToVec4(Color col)
+    {
+        return new Vector4(col.r, col.g, col.b, col.a);
+    }
+    
+    void Update()
+    {
+        float dt = UberManager.DeltaTime();
+        if(isPointerOnThisButton)
+        {
+            tmp.color = Vector4.MoveTowards(tmp.color, selectedColor, dt * colorSpeed);//. unselectedColor;
+            transform.localScale = Vector3.MoveTowards(transform.localScale, new Vector3(1.15f, 1.15f, 1.15f), dt * scaleSpeed);
+        }
+        else
+        {
+            tmp.color = Vector4.MoveTowards(tmp.color, unselectedColor, dt * colorSpeed);//. unselectedColor;
+            transform.localScale = Vector3.MoveTowards(transform.localScale, new Vector3(1f, 1f, 1f), dt * scaleSpeed);
+        }
+    }
+    
     
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -40,10 +80,11 @@ public class ButtonText : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         {
             if(onPointerEnterAudioClip)    
             {
-                AudioManager.Singleton().source2.PlayOneShot(onPointerEnterAudioClip, 0.1f);
+                AudioManager.Singleton().source2.PlayOneShot(onPointerEnterAudioClip, 1f);
             }
-            tmp.color = selectedColor;
-            transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
+            isPointerOnThisButton = true;
+           // tmp.color = selectedColor;
+            //transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
         }
         
         
@@ -53,11 +94,11 @@ public class ButtonText : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     
     public void OnPointerExit(PointerEventData eventData)
     {
-        
         if(tmp)
         {
-            tmp.color = unselectedColor;
-            transform.localScale = new Vector3(1, 1, 1);
+            isPointerOnThisButton = false;
+            //tmp.color = unselectedColor;
+            //transform.localScale = new Vector3(1, 1, 1);
         }
     }
     

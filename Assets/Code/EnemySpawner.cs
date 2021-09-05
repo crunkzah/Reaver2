@@ -135,6 +135,11 @@ public class EnemySpawner : MonoBehaviour, Interactable
 			state = EnemySpawnerState.Spawning;
 		}
 		
+		if(PhotonNetwork.IsMasterClient)
+		{
+			NetworkObjectsManager.CallGlobalCommand(GlobalCommand.AddEnemiesAlive, RpcTarget.All, 1);
+		}
+		//AudioManager.AddEnemiesAlive();
 		
 	}
 	
@@ -202,6 +207,11 @@ public class EnemySpawner : MonoBehaviour, Interactable
 		{
 			if(things_to_call[i].net_comp)
 				NetworkObjectsManager.CallNetworkFunction(things_to_call[i].net_comp.networkId, things_to_call[i].command);
+		}
+		
+		if(PhotonNetwork.IsMasterClient)
+		{
+			NetworkObjectsManager.CallGlobalCommand(GlobalCommand.AddEnemiesAlive, RpcTarget.All, -1);
 		}
 	}
 	

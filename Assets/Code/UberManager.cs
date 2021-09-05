@@ -28,7 +28,8 @@ public enum NPCType : byte
     Olios,
     CatLady,
     Scourge,
-    ScourgeCool
+    ScourgeCool,
+    SinclaireCool
 }
 
 public enum Language : int
@@ -258,11 +259,13 @@ public class UberManager : MonoBehaviour
     public static void PauseGame()
     {
         if(PhotonNetwork.OfflineMode)
+        {
             isGamePaused = true;
+            Time.timeScale = 0;
+        }
         else
             isGamePaused = false;
             
-        Time.timeScale = 0;
         
         // PlayerController local_pc = PhotonManager.GetLocalPlayer();
         // if(local_pc)
@@ -406,39 +409,16 @@ public class UberManager : MonoBehaviour
         }
     }
     
-    // IEnumerator LoadLevelAsync(int level_index)
-    // {
-        
-    //     if(readyToSwitchLevel)
-    //     {
-    //         readyToSwitchLevel = false;
-            
-    //         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(level_index, LoadSceneMode.Additive);
-            
-            
-
-    //         // Wait until the asynchronous scene fully loads
-    //         while (!asyncLoad.isDone)
-    //         {
-    //             yield return null;
-    //         }     
-            
-    //         //PhotonNetwork.LoadLevel(level_index);
-    //     }
-    //     else
-    //     {
-    //         InGameConsole.LogFancy("Can't switch level, we are <color=red>not</color> done with previous <color=green>LoadLevel()</color> command.");
-    //     }
-
-       
-    // }
     
+    [Header("Performance settings")]
+    public static bool UseBloodStains           = true;
+    public static bool UseGore                  = true;
+    public static bool UseBloodSplashesOnScreen = true;
+    public static bool RenderCoats              = true;
+    public static bool RenderCorpses            = true;
+    public static bool RenderHitpoints          = false;
     
-    
-    // ObjectPoolKey[] spawn_items = {ObjectPoolKey.Chaser2, ObjectPoolKey.RobotBasicShooter_npc, ObjectPoolKey.RobotBasicShooter_shotgun_npc, ObjectPoolKey.RobotCharger};
-    // ObjectPoolKey[] spawn_items = {ObjectPoolKey.Witch, ObjectPoolKey.Shooter2, ObjectPoolKey.Shooter3_shotgunner};
-    
-    NPCType[] spawn_npcs = {NPCType.Scourge, NPCType.PadlaLong, NPCType.ScourgeCool, NPCType.SniperGirl, NPCType.Sinclaire, NPCType.Padla, NPCType.Stepa, NPCType.CatLady, NPCType.Olios};
+    NPCType[] spawn_npcs = {NPCType.Padla, NPCType.PadlaLong, NPCType.ScourgeCool, NPCType.Sinclaire, NPCType.Scourge   , NPCType.Stepa, NPCType.Olios, NPCType.SinclaireCool};
     int spawn_index = 0;
     
     void SpawnIndexIncrement()
@@ -502,11 +482,11 @@ public class UberManager : MonoBehaviour
         // style.alignment = TextAnchor.MiddleCenter;
         
         float rectWidth = 200;
-        string restartsString = string.Format("<color=cyan>Restarts:<color=yellow><b>{0}</b></color></color>", this.RestartsOnThisLevel);
-        GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 100, rectWidth, 50), restartsString,style);
+        // string restartsString = string.Format("<color=cyan>Restarts:<color=yellow><b>{0}</b></color></color>", this.RestartsOnThisLevel);
+        // GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 100, rectWidth, 50), restartsString,style);
         
-        string inGameTimerString = string.Format("<color=cyan>IGT:<color=yellow><b>{0}</b></color></color>", this.InGameTimer.ToString("f"));
-        GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 75, rectWidth, 50), inGameTimerString, style);
+        // string inGameTimerString = string.Format("<color=cyan>IGT:<color=yellow><b>{0}</b></color></color>", this.InGameTimer.ToString("f"));
+        // GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 75, rectWidth, 50), inGameTimerString, style);
         
         // string text_currentSavePriority = string.Format("<color=cyan>currentSavePriority:<color=green>{0}</color></color>", this.currentSavePointPriorityLevel);
         // float rectWidth = 200;
@@ -596,6 +576,11 @@ public class UberManager : MonoBehaviour
     public int RestartsOnThisLevel  = 0;
     public InGameTimerState timerState = InGameTimerState.NotCounting;
     
+    
+    public int infernoCircle;
+    public int difficulty = 3; // 0, 1, 2, 3
+    public const int HEALING_DMG_THRESHOLD = 35;
+    
     public static void ResetRestartsCount()
     {
         Singleton().RestartsOnThisLevel = 0;
@@ -620,6 +605,8 @@ public class UberManager : MonoBehaviour
     
     public static void StopInGameTimer()
     {
+        GameStats.SetStats(Singleton().RestartsOnThisLevel, Singleton().InGameTimer, Singleton().difficulty);
+        GameStats.Show();
         Singleton()._StopInGameTimer();
     }
     

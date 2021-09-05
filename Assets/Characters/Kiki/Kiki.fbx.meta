@@ -1,0 +1,239 @@
+fileFormatVersion: 2
+guid: ab6d85afcd6e0494998a3583baa3fbf0
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: Arm1.l
+    100002: Arm1.r
+    100004: Arm2.l
+    100006: Arm2.r
+    100008: Belly
+    100010: Chest
+    100012: Hand1.l
+    100014: Hand1.r
+    100016: Head
+    100018: Index1.l
+    100020: Index1.r
+    100022: Index2.l
+    100024: Index2.r
+    100026: //RootNode
+    100028: Kiki_armature
+    100030: Kiki_mesh
+    100032: Leg1.l
+    100034: Leg1.r
+    100036: Leg2.l
+    100038: Leg2.r
+    100040: Leg3.l
+    100042: Leg3.r
+    100044: MiddleFinger1.l
+    100046: MiddleFinger1.r
+    100048: MiddleFinger2.l
+    100050: MiddleFinger2.r
+    100052: Neck
+    100054: Pinky1.l
+    100056: Pinky1.r
+    100058: Pinky2.l
+    100060: Pinky2.r
+    100062: RingFinger1.l
+    100064: RingFinger1.r
+    100066: RingFinger2.l
+    100068: RingFinger2.r
+    100070: Root
+    100072: Thumb1.l
+    100074: Thumb1.r
+    100076: Thumb2.l
+    100078: Thumb2.r
+    400000: Arm1.l
+    400002: Arm1.r
+    400004: Arm2.l
+    400006: Arm2.r
+    400008: Belly
+    400010: Chest
+    400012: Hand1.l
+    400014: Hand1.r
+    400016: Head
+    400018: Index1.l
+    400020: Index1.r
+    400022: Index2.l
+    400024: Index2.r
+    400026: //RootNode
+    400028: Kiki_armature
+    400030: Kiki_mesh
+    400032: Leg1.l
+    400034: Leg1.r
+    400036: Leg2.l
+    400038: Leg2.r
+    400040: Leg3.l
+    400042: Leg3.r
+    400044: MiddleFinger1.l
+    400046: MiddleFinger1.r
+    400048: MiddleFinger2.l
+    400050: MiddleFinger2.r
+    400052: Neck
+    400054: Pinky1.l
+    400056: Pinky1.r
+    400058: Pinky2.l
+    400060: Pinky2.r
+    400062: RingFinger1.l
+    400064: RingFinger1.r
+    400066: RingFinger2.l
+    400068: RingFinger2.r
+    400070: Root
+    400072: Thumb1.l
+    400074: Thumb1.r
+    400076: Thumb2.l
+    400078: Thumb2.r
+    2100000: Eyes_mat
+    2100002: Hips_mat
+    2100004: Metal_mat
+    2300000: //RootNode
+    3300000: //RootNode
+    4300000: Kiki_mesh
+    7400000: Kiki_armature|_T_Pose
+    7400002: Kiki_armature|Kneel
+    7400004: Kiki_armature|Sitting1
+    9500000: //RootNode
+    13700000: Kiki_mesh
+    2186277476908879412: ImportLogs
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Kiki_armature|_T_Pose
+      takeName: Kiki_armature|_T_Pose
+      firstFrame: 0
+      lastFrame: 1
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Kiki_armature|Sitting1
+      takeName: Kiki_armature|Sitting1
+      firstFrame: 0
+      lastFrame: 20
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 0.01
+    hasPreviousCalculatedGlobalScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

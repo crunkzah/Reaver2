@@ -20,6 +20,11 @@ public class BloodStainSprayer : MonoBehaviour
     
     public void MakeStains(Vector3 pos)
     {
+        if(!UberManager.UseBloodStains)
+        {
+            return;
+        }
+        
         thisTransform.localPosition = pos;
         
         isWorking = true;

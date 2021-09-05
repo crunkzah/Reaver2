@@ -99,6 +99,7 @@ MonoBehaviour:
   isRootLimb: 0
   isHeadshot: 0
   canBeDestroyed: 0
+  isMasterAlive: 1
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
@@ -270,6 +271,7 @@ GameObject:
   - component: {fileID: 9012589167191670753}
   - component: {fileID: 651949051404160131}
   - component: {fileID: 6287899876825344905}
+  - component: {fileID: 6318550740740883685}
   m_Layer: 26
   m_Name: MrCoal
   m_TagString: Untagged
@@ -344,7 +346,8 @@ MonoBehaviour:
   gate: {fileID: 0}
   path_holder: {fileID: 0}
   ps_explode: {fileID: 832207387998220128}
-  laser_ps: {fileID: 0}
+  lasers_ps: []
+  onDieMessages: []
 --- !u!82 &2509389795073737343
 AudioSource:
   m_ObjectHideFlags: 0
@@ -511,6 +514,30 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 0
+--- !u!114 &6318550740740883685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 683386334361383726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b806900e5e3c434e9322bced6e67e5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  net_comp_from_parent: {fileID: 6119571410591165817}
+  rbs: []
+  joints: []
+  react: 0
+  isRootLimb: 0
+  isHeadshot: 0
+  canBeDestroyed: 0
+  isMasterAlive: 1
+  deadLimb_ps: {fileID: 0}
+  limb_id: 0
+  adjacentLimbs: []
+  limb_HitPoints: 2147483647
 --- !u!1 &683386334361383728
 GameObject:
   m_ObjectHideFlags: 0

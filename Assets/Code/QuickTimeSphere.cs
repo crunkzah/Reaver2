@@ -19,6 +19,12 @@ public class QuickTimeSphere : MonoBehaviour
     public ParticleSystem ps;
     public SphereCollider col;
     
+    public Transform thisTransform;
+    
+    void Awake()
+    {
+        thisTransform = this.transform;
+    }
     
     
     public void OnAppearance()
@@ -93,6 +99,12 @@ public class QuickTimeSphere : MonoBehaviour
         {
             case(QuickTimeType.Default):
             {
+                PlayerController local_pc = PhotonManager.GetLocalPlayer();
+                if(local_pc)
+                {
+                    thisTransform.LookAt(local_pc.GetHeadPosition());
+                }
+                
                 lifeTimer -= dt;
                 if(lifeTimer <= 0f)
                 {

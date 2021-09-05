@@ -12,7 +12,7 @@ public enum PadlaLongState : byte
     Dead
 }
 
-public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLocal
+public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLocal, IKillableThing
 {
     public GameObject remoteAgent_prefab;
     public GameObject stomp_prefab;
@@ -72,12 +72,41 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
         remoteAgentTransform = remoteAgent.transform;
     }
     
+    Transform head;
+    
+    public Vector3 GetHitSpot()
+    {
+        return head.position;
+    }
+    
+    public NetworkObject GetNetComp()
+    {
+        return net_comp;
+    }
+    
+    public byte GetHitSpotLimbId()
+    {
+        return 7;
+    }
+    
+    public bool CanBeBounceHit()
+    {
+        if(state != PadlaLongState.Dead)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+    
     void Start()
     {
         if(PhotonNetwork.IsMasterClient)
         {
             InitAsMaster();
         }
+        
+        NPCManager.RegisterKillable(this);
         
         HitPoints = MaxHealth;
         SetMovePos(thisTransform.localPosition);
@@ -204,24 +233,40 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
                 
                 break;
             }
-            case(NetworkCommand.DieWithForce):
+            case(NetworkCommand.TakeDamageExplosive):
             {
-                Vector3 force = (Vector3)args[0];
+                int incomingDamage = (int)args[0];
                 
-                byte limb_id = 0;
-                if(args.Length > 1)
-                {
-                    limb_id = (byte)args[1];
-                }
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
                 
-                Die(force, limb_id);
+                TakeDamageExplosive(incomingDamage);
                 
                 break;
             }
-            case(NetworkCommand.TakeDamage):
+            case(NetworkCommand.TakeDamageLimbNoForce):
             {
                 int incomingDamage = (int)args[0];
-                TakeDamage(incomingDamage);
+                
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
+                
+                byte limb_id = (byte)args[1];
+                TakeDamage(incomingDamage, limb_id);
+                //TakeDamageForce(incomingDamage, force, limb_id);
+                
+                break;
+            }
+            case(NetworkCommand.TakeDamageLimbWithForce):
+            {
+                int incomingDamage = (int)args[0];
+                
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
+                
+                Vector3 force = (Vector3)args[1];
+                byte limb_id = (byte)args[2];
+                TakeDamageForce(incomingDamage, force, limb_id);
                 
                 break;
             }
@@ -267,14 +312,105 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
     
     float damage_taken_timeStamp;
     
-    void TakeDamage(int dmg)
+    void TakeDamage(int dmg, byte limb_id)
     {
+        //InGameConsole.LogOrange("TakeDamage()");
         HitPoints -= dmg;
-        // if(HitPoints <= 0)
-        // {
-        //    Die(Vector3.zero);
-        //    HitPoints = 0;
-        // }
+         
+        if(HitPoints <= 0)
+        {
+            Die(Vector3.zero, limb_id);
+            HitPoints = 0;
+        }
+    }
+    
+    void TakeDamageForce(int dmg, Vector3 force, byte limb_id)
+    {
+        //InGameConsole.LogOrange("TakeDamageForce()");
+        HitPoints -= dmg;
+         
+        if(HitPoints <= 0)
+        {
+            Die(force, limb_id);
+            HitPoints = 0;
+        }
+    }
+    
+    void TakeDamageExplosive(int dmg)
+    {
+        //InGameConsole.LogOrange("TakeDamageExplosive()");
+        HitPoints -= dmg;
+        if(HitPoints <= 0)
+        {
+            DieFromExplosion();
+            HitPoints = 0;
+        }
+    }
+    
+    void DieFromExplosion()
+    {
+        if(state == PadlaLongState.Dead)
+        {
+            return;
+        }
+        
+        //InGameConsole.LogOrange("DieFromExplosion()");
+        
+        SetState(PadlaLongState.Dead);
+        
+        if(spawnedObjectComp)
+            spawnedObjectComp.OnObjectDied();
+        
+        HitPoints = -1;
+        
+        anim.enabled = false;
+        col.enabled = false;
+        
+        NetworkObjectsManager.UnregisterNetObject(net_comp);
+        if(remoteAgent)
+            Destroy(remoteAgent.gameObject, 0.1f);
+            
+        
+        
+        audio_src.PlayOneShot(clipDeath, 0.5f);
+        HitPoints = 0;
+        
+        EnableSkeleton();  
+        AudioManager.Play3D(SoundType.death_impact_gib_distorted, thisTransform.localPosition);
+        
+        int len = limbs.Length;
+        for(int i = 0; i < len; i++)
+        {
+            limbs[i].MakeLimbDead();
+        }
+        int limb_to_destroy = 3;
+        
+        
+        if(limb_to_destroy != 0)
+        {
+            if(limbs != null)
+            {
+                for(int i = 0; i < len; i++)
+                {
+                    if(limbs[i].limb_id == limb_to_destroy)
+                    {
+                        //Vector3 f = force;
+                        //InGameConsole.LogOrange(string.Format("Apply force {0} to limb {1}", f, limb_to_destroy));
+                        
+                        //limbs[i].ApplyForceToAdjacentLimbs(f);
+                        if(!limbs[i].isRootLimb)
+                        {
+                            limbs[i].TakeDamageLimb(2500);
+                            
+                        }
+                        //limbs[i].AddForceToLimb(f);
+                        
+                        //break;
+                    }
+                }
+            }
+        }
+        DropHealthCrystals();
     }
     
     void Die(Vector3 force, byte limb_to_destroy)
@@ -298,14 +434,17 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
         if(remoteAgent)
             Destroy(remoteAgent.gameObject, 0.1f);
             
-        int len = joint_rbs.Length;
-        
-        
-        //audio_src.PlayOneShot(clipDeath, 0.5f);
+        audio_src.PlayOneShot(clipDeath, 0.5f);
         HitPoints = 0;
         
         EnableSkeleton();  
         AudioManager.Play3D(SoundType.death_impact_gib_distorted, thisTransform.localPosition);
+        
+        int len = limbs.Length;
+        for(int i = 0; i < len; i++)
+        {
+            limbs[i].MakeLimbDead();
+        }
         
         if(limb_to_destroy != 0)
         {
@@ -314,7 +453,6 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
                 len = limbs.Length;
                 for(int i = 0; i < len; i++)
                 {
-                    limbs[i].MakeLimbDead();
                     if(limbs[i].limb_id == limb_to_destroy)
                     {
                         Vector3 f = force;
@@ -324,6 +462,7 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
                         if(!limbs[i].isRootLimb)
                         {
                             limbs[i].TakeDamageLimb(2500);
+                            
                         }
                         //limbs[i].AddForceToLimb(f);
                         

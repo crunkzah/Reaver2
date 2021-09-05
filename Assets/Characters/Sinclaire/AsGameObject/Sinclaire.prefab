@@ -14706,6 +14706,7 @@ MonoBehaviour:
   - {fileID: 931452918608627064}
   - {fileID: 7743097715607970277}
   dash_ps: {fileID: 4696125408786721338}
+  head: {fileID: 8351079454752899399}
   canSendCommands: 1
   sword_attack_timer: 0
   firing_masterTimer: 0
@@ -14715,6 +14716,7 @@ MonoBehaviour:
   inRange2_range: 0
   localStrikeOffset: {x: 0, y: 1.1, z: 1.2}
   qts_transform: {fileID: 5582398361823519099}
+  current_qts: {fileID: 0}
   clipHurt1: {fileID: 8300000, guid: bbabee74ea1d2e2458c7f1e9478a696d, type: 3}
   clipDeath: {fileID: 8300000, guid: e1e4598c368d5eb42970a0c885afde2c, type: 3}
   clipSwordSwing1: {fileID: 8300000, guid: c885a7c52a013a14593409a5276dd06d, type: 3}

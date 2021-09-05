@@ -65,7 +65,8 @@ public enum NetworkCommand : byte
      SwitchStateRemotely,
      Move,
      Attack,
-     TakeDamage,
+     TakeDamageLimbWithForce,
+     TakeDamageLimbNoForce,
      Die,
      GetNotified,
      DoTrigger,
@@ -79,7 +80,7 @@ public enum NetworkCommand : byte
      GoToCover,
      Ability2,
      GlobalCommand,
-     DieWithForce,
+     //DieWithForce,
      LaunchAirborne,
      GroundSlam,
      Blink,
@@ -92,6 +93,7 @@ public enum NetworkCommand : byte
      LockGates,
      Ability3,
      ForceOpenGates,
+     TakeDamageExplosive,
 }
 
 //Object pool keys:
@@ -201,7 +203,12 @@ public enum FPS_Func : byte
      Shoot_mp5,
      Shoot_mp5_grenade,
      Punch1,
-     Punch1_ult
+     Shoot_revolver_blue,
+     Shoot_revolver_blue_stronger,
+     Shoot_revolver_blue_ult,
+     Shoot_shotgun_blue,
+     Hook_shotgun_blue
+     //Punch1_ult
 }
 
 public enum PlayerAnimationCommand : int
@@ -242,5 +249,6 @@ public enum LeverState : int
 public static class EventCodes
 {
      public const byte GiveItem = 1;
+     public const byte Command_Unreliable = 2;
 }
 

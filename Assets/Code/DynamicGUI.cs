@@ -37,7 +37,6 @@ public class DynamicGUI : MonoBehaviour
     
     void Update()
     {
-        
         if(LocalPlayer)
         {
             Transform fpsCamTransform = LocalPlayer.GetFPSCameraTransform();

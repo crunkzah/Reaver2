@@ -224,25 +224,40 @@ public class PadlaHangingController : MonoBehaviour, INetworkObject, IDamagableL
                 
                 break;
             }
-            case(NetworkCommand.DieWithForce):
+            case(NetworkCommand.TakeDamageExplosive):
             {
+                int incomingDamage = (int)args[0];
                 
-                Vector3 force = (Vector3)args[0];
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
                 
-                byte limb_id = 0;
-                if(args.Length > 1)
-                {
-                    limb_id = (byte)args[1];
-                }
-                
-                Die(force, limb_id);
+                TakeDamageExplosive(incomingDamage);
                 
                 break;
             }
-            case(NetworkCommand.TakeDamage):
+            case(NetworkCommand.TakeDamageLimbNoForce):
             {
                 int incomingDamage = (int)args[0];
-                TakeDamage(incomingDamage);
+                
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
+                
+                byte limb_id = (byte)args[1];
+                TakeDamage(incomingDamage, limb_id);
+                //TakeDamageForce(incomingDamage, force, limb_id);
+                
+                break;
+            }
+            case(NetworkCommand.TakeDamageLimbWithForce):
+            {
+                int incomingDamage = (int)args[0];
+                
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
+                
+                Vector3 force = (Vector3)args[1];
+                byte limb_id = (byte)args[2];
+                TakeDamageForce(incomingDamage, force, limb_id);
                 
                 break;
             }
@@ -293,25 +308,73 @@ public class PadlaHangingController : MonoBehaviour, INetworkObject, IDamagableL
     
     float damage_taken_timeStamp;
     
-    void TakeDamage(int dmg)
+    void TakeDamage(int dmg, byte limb_id)
     {
+        //InGameConsole.LogOrange("TakeDamage()");
         HitPoints -= dmg;
-        // if(HitPoints <= 0)
-        // {
-        //    Die(Vector3.zero);
-        //    HitPoints = 0;
-        // }
+         
+        if(HitPoints <= 0)
+        {
+            Die(Vector3.zero, limb_id);
+            HitPoints = 0;
+        }
     }
     
-    void Die(Vector3 force, byte limb_to_destroy)
+    void TakeDamageForce(int dmg, Vector3 force, byte limb_id)
+    {
+        //InGameConsole.LogOrange("TakeDamageForce()");
+        HitPoints -= dmg;
+         
+        if(HitPoints <= 0)
+        {
+            Die(force, limb_id);
+            HitPoints = 0;
+        }
+    }
+    
+    void TakeDamageExplosive(int dmg)
+    {
+        //InGameConsole.LogOrange("TakeDamageExplosive()");
+        HitPoints -= dmg;
+        if(HitPoints <= 0)
+        {
+            DieFromExplosion();
+            HitPoints = 0;
+        }
+    }
+    
+    void DieFromExplosion()
     {
         if(state == PadlaState.Dead)
         {
             return;
         }
-        rope_ps.transform.SetParent(null);
-        rope_ps.transform.localScale = new Vector3(1, 1, 1);
         
+        //InGameConsole.LogOrange("DieFromExplosion()");
+        
+        SetState(PadlaState.Dead);
+        
+        if(spawnedObjectComp)
+            spawnedObjectComp.OnObjectDied();
+        
+        Destroy(rope_ps.gameObject);
+        anim.enabled = false;
+        col.enabled = false;
+        
+        NetworkObjectsManager.UnregisterNetObject(net_comp);
+        
+        audio_src.PlayOneShot(clipDeath, 0.5f);
+        HitPoints = 0;
+        
+        EnableSkeleton();  
+        AudioManager.Play3D(SoundType.death_impact_gib_distorted, thisTransform.localPosition);
+        
+        int len = limbs.Length;
+        for(int i = 0; i < len; i++)
+        {
+            limbs[i].MakeLimbDead();
+        }
+        int limb_to_destroy = 3;
         
         if(PhotonNetwork.IsMasterClient)
         {
@@ -324,29 +387,72 @@ public class PadlaHangingController : MonoBehaviour, INetworkObject, IDamagableL
             }
         }
         
-        
+        if(limb_to_destroy != 0)
+        {
+            if(limbs != null)
+            {
+                for(int i = 0; i < len; i++)
+                {
+                    if(limbs[i].limb_id == limb_to_destroy)
+                    {
+                        //Vector3 f = force;
+                        //InGameConsole.LogOrange(string.Format("Apply force {0} to limb {1}", f, limb_to_destroy));
+                        
+                        //limbs[i].ApplyForceToAdjacentLimbs(f);
+                        if(!limbs[i].isRootLimb)
+                        {
+                            limbs[i].TakeDamageLimb(2500);
+                            
+                        }
+                        //limbs[i].AddForceToLimb(f);
+                        
+                        //break;
+                    }
+                }
+            }
+        }
+        DropHealthCrystals();
+    }
+    
+    void Die(Vector3 force, byte limb_to_destroy)
+    {
+        if(state == PadlaState.Dead)
+        {
+            return;
+        }
+        Destroy(rope_ps.gameObject);
         SetState(PadlaState.Dead);
         
         if(spawnedObjectComp)
             spawnedObjectComp.OnObjectDied();
         
-        HitPoints = -1;
-        
         anim.enabled = false;
         col.enabled = false;
         
         NetworkObjectsManager.UnregisterNetObject(net_comp);
-        //if(remoteAgent)
-        //    Destroy(remoteAgent.gameObject, 0.1f);
             
-        int len = joint_rbs.Length;
-        
-        
         audio_src.PlayOneShot(clipDeath, 0.5f);
         HitPoints = 0;
         
         EnableSkeleton();  
         AudioManager.Play3D(SoundType.death_impact_gib_distorted, thisTransform.localPosition);
+        
+        int len = limbs.Length;
+        for(int i = 0; i < len; i++)
+        {
+            limbs[i].MakeLimbDead();
+        }
+        
+        if(PhotonNetwork.IsMasterClient)
+        {
+            if(onDieMessages != null)
+            {
+                for(int i = 0; i < onDieMessages.Length; i++)
+                {
+                    NetworkObjectsManager.CallNetworkFunction(onDieMessages[i].net_comp.networkId, onDieMessages[i].command);
+                }
+            }
+        }
         
         if(limb_to_destroy != 0)
         {
@@ -364,10 +470,11 @@ public class PadlaHangingController : MonoBehaviour, INetworkObject, IDamagableL
                         if(!limbs[i].isRootLimb)
                         {
                             limbs[i].TakeDamageLimb(2500);
+                            
                         }
                         //limbs[i].AddForceToLimb(f);
                         
-                        break;
+                        //break;
                     }
                 }
             }
@@ -382,7 +489,7 @@ public class PadlaHangingController : MonoBehaviour, INetworkObject, IDamagableL
     }
     
     
-    const int MaxHealth = 600;
+    const int MaxHealth = 300;
     public int HitPoints = MaxHealth;
     
     public int GetCurrentHP()
@@ -636,7 +743,7 @@ public class PadlaHangingController : MonoBehaviour, INetworkObject, IDamagableL
                 if(airbourneTimeStamp > airbourneTimeStamp + 15f)
                 {
                     LockSendingCommands();
-                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.DieWithForce, new Vector3(0, 0, 0));
+                    //NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.DieWithForce, new Vector3(0, 0, 0));
                 }
                 
                 RaycastHit hit;

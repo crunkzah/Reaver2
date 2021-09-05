@@ -87,7 +87,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
     }
     
     public GameObject Dash_prefab;
-    
+    public GameObject debugAvatar;
+    public Animator debugAvatarAnim;
 
     void Start()
     {
@@ -97,6 +98,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
         if(pv.IsMine)
         {
+            debugAvatar.SetActive(false);
             MakePlayerBlob();
             LockCursor();
             wind_audioSource.enabled = true;
@@ -126,8 +128,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
         Revive();
     }
     
-    float bunnyHopDecreaseRate = 0.065F;
-    float bunnyHopIncreasePerJump = 0.125F;
+    float bunnyHopDecreaseRate = 0.045F;
+    float bunnyHopIncreasePerJump = 0.135F;
     
     
     
@@ -199,10 +201,15 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     void OnHealed()
     {
-        playerAudioSource.PlayOneShot(onHealedClip, 0.75f);
-        //InGameConsole.LogFancy("Healed!");
-        HurtGUI.ShowHeal();
+        if(pv.IsMine)
+        {
+            //InGameConsole.LogFancy("Healed!");
+            playerAudioSource.PlayOneShot(onHealedClip, 0.75f);
+            HurtGUI.ShowHeal();
+            OrthoCamera.OnHeal();
+        }
     }
+            
     
     float staminaTimer = 0f;
     
@@ -286,14 +293,14 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         if(stream.IsWriting)
         {
-            stream.SendNext(transform.forward);
-            
-            
             stream.SendNext(transform.position);
+            stream.SendNext(transform.forward);
+            stream.SendNext(fpsVelocity);
+            
+            
             
             // stream.SendNext(velocity);
             //stream.SendNext(finalVelocity);
-            stream.SendNext(fpsVelocity);
           //  stream.SendNext((int)aliveState);
         }
         else
@@ -302,8 +309,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
             syncDelay    = Time.time - lastSyncTime;
             lastSyncTime = Time.time;
 
-            syncEndDirection    = (Vector3)stream.ReceiveNext();
             syncPosition        = (Vector3)stream.ReceiveNext();
+            syncEndDirection    = (Vector3)stream.ReceiveNext();
+            syncVelocity        = (Vector3)stream.ReceiveNext();
 
             
             syncStartDirection  = transform.forward;
@@ -311,7 +319,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
             syncEndPosition     = syncPosition;
             
             //This is used for animation only:
-            syncVelocity        = (Vector3)stream.ReceiveNext();
             
             
          //   aliveState = (PlayerAliveState)stream.ReceiveNext();
@@ -329,18 +336,17 @@ public class PlayerController : MonoBehaviour, IPunObservable
         if(aliveState == PlayerAliveState.Normal)
         {
             syncTime += UberManager.DeltaTime();
-            
             float t = syncTime / syncDelay;
+            float dt = UberManager.DeltaTime();
+            
 
             Vector3 oldPosition = thisTransform.position;
-            // Currently we are slamming the Y coord   -12.08.2019
-            // thisTransform.position = new Vector3(thisTransform.position.x, syncEndPosition.y, thisTransform.position.z);
             
-            float yCoordInterpolated = Mathf.Lerp(syncStartPosition.y, syncEndPosition.y, syncTime / syncDelay); 
             
-            thisTransform.position = new Vector3(thisTransform.position.x, yCoordInterpolated, thisTransform.position.z);
             
-            float fpsSyncMagnitudeXZ = Mathf.Max(Math.Magnitude(syncVelocity), fpsMaxMoveSpeedCurrent);
+            thisTransform.localPosition = Vector3.MoveTowards(thisTransform.localPosition, syncEndPosition, dt * Math.Magnitude(syncVelocity));
+            
+            float fpsSyncMagnitudeXZ = Math.Magnitude(Math.GetXZ(syncVelocity));
             
             if(Math.SqrDistance(thisTransform.position, syncEndPosition) > 8f * 8f)
             {
@@ -351,11 +357,13 @@ public class PlayerController : MonoBehaviour, IPunObservable
             {
                 thisTransform.position = Vector3.MoveTowards(thisTransform.position, syncEndPosition, fpsSyncMagnitudeXZ * UberManager.DeltaTime());
             }
+            
             thisTransform.forward =  Vector3.Slerp(syncStartDirection, syncEndDirection, t);
 
             // This 'velocity' is used for animation (if not controlled locally):
             //velocity = syncVelocity;
             fpsVelocity = syncVelocity;
+            debugAvatarAnim.SetFloat("MoveSpeed", fpsSyncMagnitudeXZ);
         }
         else
         {
@@ -496,13 +504,13 @@ public class PlayerController : MonoBehaviour, IPunObservable
     const float fpsDashStrengthAirForward = 22F;
     const float fpsDashStrengthAir = 22F;
     const float slideGravity = MIN_GRAVITY * 5;
-    float fpsFriction  = 90f;
-    const float fpsAirbourneFrictionMult = 0.66F;//0.33f;
+    float fpsFriction  = 80f;
+    const float fpsAirbourneFrictionMult = 0.75F;//0.33f;
     Vector3 slideVel;
     Vector3 desiredVelWorld;
     bool fpsMouseLookBlocked = false;
     
-    FPSGunController gunController;
+    public FPSGunController gunController;
     
     public float vertClamped;
     
@@ -510,6 +518,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     public Vector3 GetHeadPosition()
     {
+        if(!HeadTarget)
+        {
+            return new Vector3(0, 0, 0);
+        }
         return HeadTarget.position;
     }
     
@@ -596,6 +608,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             fpsCameraPlace.localPosition = duckCameraPlacePosition;
             // fpsCam_camera.fieldOfView = duckingFov;
             slideVel.y = slideGravity;
+            wasLaunchedToSlam = false;
             //Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("NPC2"), true);
         }
         
@@ -803,28 +816,25 @@ public class PlayerController : MonoBehaviour, IPunObservable
         playerAudioSource.PlayOneShot(noStaminaClip, 0.75f);
     }
     
+    bool wasLaunchedToSlam = false;
+    float launchToSlamTimer;
+    
     [PunRPC]
-    void GroundSlam(Vector3 _pos)
+    void GS(Vector3 _pos) //GroundSlam start from air
     {
         if(pv.IsMine)
         {
+            //InGameConsole.LogOrange("GS() GS() GS()");
             if(!tryingToSlam)
             {
-                if(Stamina < groundSlamStaminaCost)
-                {
-                    NotEnoughStamina();
-                    return;
-                }
-                //InGameConsole.LogFancy("GroundSlam()");
-                Stamina -= groundSlamStaminaCost;
-                staminaTimer += staminaRegenDelay;
-                
                 groundSlamStartPos = _pos; 
                 
                 fpsVelocity.y = slamVelocityY;
                 fpsVelocity.x = 0;
                 fpsVelocity.z = 0;
             
+                launchToSlamTimer = 0;
+                wasLaunchedToSlam = true;
                 tryingToSlam = true;
             }
         }
@@ -841,7 +851,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         staminaTimer += staminaRegenDelay;
     }
     
-    const float dashDamageImmune = 0.2F;
+    const float dashDamageImmune = 0.25F;
     float damageImmuneTimer = 0;
     
     public ParticleSystem wind_player_ps;
@@ -864,42 +874,47 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
         
         //InGameConsole.LogFancy("FPSDash()");
-        if(dashDirWorldSpace.x == 0 && dashDirWorldSpace.z == 0)
+        if(pv.IsMine)
         {
-            dashDirWorldSpace = thisTransform.forward;
-            
-            fpsVelocity.y = 0;
-            
-            if(controller.isGrounded)
+            MakeImmuneForDamageForXTime(dashDamageImmune);
+            if(dashDirWorldSpace.x == 0 && dashDirWorldSpace.z == 0)
             {
-                fpsVelocity.x = dashDirWorldSpace.x * fpsDashStrengthGrounded;
-                fpsVelocity.z = dashDirWorldSpace.z * fpsDashStrengthGrounded;
+                dashDirWorldSpace = thisTransform.forward;
+                
+                fpsVelocity.y = 0;
+                
+                if(controller.isGrounded)
+                {
+                    fpsVelocity.x = dashDirWorldSpace.x * fpsDashStrengthGrounded;
+                    fpsVelocity.z = dashDirWorldSpace.z * fpsDashStrengthGrounded;
+                }
+                else
+                {
+                    fpsVelocity.x = dashDirWorldSpace.x * fpsDashStrengthAirForward;
+                    fpsVelocity.y = 1;
+                    fpsVelocity.z = dashDirWorldSpace.z * fpsDashStrengthAirForward;
+                }
             }
             else
             {
-                fpsVelocity.x = dashDirWorldSpace.x * fpsDashStrengthAirForward;
-                fpsVelocity.y = 1;
-                fpsVelocity.z = dashDirWorldSpace.z * fpsDashStrengthAirForward;
-            }
-        }
-        else
-        {
-            fpsVelocity.y = 0;
-            
-            if(controller.isGrounded)
-            {
-                fpsVelocity.x = dashDirWorldSpace.x * fpsDashStrengthGrounded;
-                fpsVelocity.z = dashDirWorldSpace.z * fpsDashStrengthGrounded;
-            }
-            else
-            {
-                fpsVelocity.x = dashDirWorldSpace.x * fpsDashStrengthAir;
-                fpsVelocity.y = 1;
-                fpsVelocity.z = dashDirWorldSpace.z * fpsDashStrengthAir;
+                fpsVelocity.y = 0;
+                
+                if(controller.isGrounded)
+                {
+                    fpsVelocity.x = dashDirWorldSpace.x * fpsDashStrengthGrounded;
+                    fpsVelocity.z = dashDirWorldSpace.z * fpsDashStrengthGrounded;
+                }
+                else
+                {
+                    fpsVelocity.x = dashDirWorldSpace.x * fpsDashStrengthAir;
+                    fpsVelocity.y = 1;
+                    fpsVelocity.z = dashDirWorldSpace.z * fpsDashStrengthAir;
+                }
             }
         }
         
-        pv.RPC("FPSDashFX", RpcTarget.All);
+        FPSDashFX();
+        pv.RPC("FPSDashFX", RpcTarget.Others);
     }
     
     public AudioClip dashAudioClip;
@@ -913,7 +928,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
     void FPSDashFX()
     {
         playerAudioSource.PlayOneShot(dashAudioClip, 0.5f);
-        MakeImmuneForDamageForXTime(dashDamageImmune);
     }
     
     Vector3 GetTopCapsuleP()
@@ -952,8 +966,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     int slamMask = -1;
     
-    
-    
     void DoDamageSlamAirbourne(float dt)
     {
         if(fpsVelocity.y != slamVelocityY)
@@ -967,7 +979,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         p2.y += 0.1f;
         
         RaycastHit hit;
-        if(Physics.CapsuleCast(p1, p2, controller.radius * 1.1f, Vector3.down, out hit, dt * Math.Abs(slamVelocityY), npc2Mask))
+        if(Physics.CapsuleCast(p1, p2, controller.radius * 1.25f, Vector3.down, out hit, dt * Math.Abs(slamVelocityY), npc2Mask))
         {
             NetworkObject npc_net_comp = hit.collider.GetComponent<NetworkObject>();
             if(npc_net_comp != null)
@@ -979,33 +991,29 @@ public class PlayerController : MonoBehaviour, IPunObservable
                     LimbForExplosions lfe = npc_net_comp.GetComponent<LimbForExplosions>();
                     lfe.OnExplodeAffected();
                     
-                    if(npc_hp - SlamDirectDamage <= 0)
-                    {
-                        Physics.IgnoreCollision(controller, hit.collider, true);
-                        idl.TakeDamageLocally(SlamDirectDamage, thisTransform.localPosition, Vector3.down);
-                        byte limb_to_destroy = (byte)Random.Range(1, 4);
-                        NetworkObjectsManager.CallNetworkFunction(npc_net_comp.networkId, NetworkCommand.DieWithForce, Vector3.down * 250, limb_to_destroy);                       
-                        InGameConsole.Log("<color=green>DOING SLAM DIRECT DAMAGE 1</color>");
-                    }
-                    else
-                    {
-                        idl.TakeDamageLocally(SlamDirectDamage, thisTransform.localPosition, Vector3.down);
-                        NetworkObjectsManager.CallNetworkFunction(npc_net_comp.networkId, NetworkCommand.TakeDamage, SlamDirectDamage);
+                    idl.TakeDamageLocally(SlamDirectDamage, thisTransform.localPosition, Vector3.down);
+                    NetworkObjectsManager.CallNetworkFunction(npc_net_comp.networkId, NetworkCommand.TakeDamageExplosive, SlamDirectDamage);                       
+                    
+                    // if(npc_hp - SlamDirectDamage <= 0)
+                    // {
+                    //     Physics.IgnoreCollision(controller, hit.collider, true);
+                    //     byte limb_to_destroy = (byte)Random.Range(1, 4);
+                    //     NetworkObjectsManager.CallNetworkFunction(npc_net_comp.networkId, NetworkCommand.TakeDamageExplosive, Vector3.down * 125);                       
+                    //     //InGameConsole.Log("<color=green>DOING SLAM DIRECT DAMAGE 1</color>");
+                    // }
+                    // else
+                    // {
+                    //     idl.TakeDamageLocally(SlamDirectDamage, thisTransform.localPosition, Vector3.down);
+                    //     NetworkObjectsManager.CallNetworkFunction(npc_net_comp.networkId, NetworkCommand.TakeDamageLimbWithForce, SlamDirectDamage);
                         
-                        tryingToSlam = false;
-                        
-                        
-                        PlayDirSlam();
-                        
-                        pv.RPC("PlayDirSlam", RpcTarget.Others);
-                        InGameConsole.Log("<color=yellow>DOING SLAM DIRECT DAMAGE 2</color>");
-                        //Vector3 randomOffset = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
-                        //Vector3 playerBoostDir = 0.5f * randomOffset + hit.normal;
-                        //playerBoostDir.Normalize();
-                        //BoostVelocity(playerBoostDir * 20);
+                    //     tryingToSlam = false;
                         
                         
-                    }
+                    //     //PlayDirSlam();
+                        
+                    //     pv.RPC("PlayDirSlam", RpcTarget.Others);
+                    //     InGameConsole.Log("<color=yellow>DOING SLAM DIRECT DAMAGE 2</color>");
+                    // }
                 }
             }
         }
@@ -1018,7 +1026,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
     }
     
     float groundSlammed_timeStamp;
-    const float slamJumpTimeWindow = 1.15f;
+    float onBecomeGrounded_timeStamp;
+    const float slamBoostTimeWindow = 0.75f;
     
     float GetGroundSlamDelay()
     {
@@ -1072,14 +1081,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
         if(pv.IsMine)
         {
-            tryingToSlam = false;
-            CameraShaker.ShakeY(7.5f);
-            CameraShaker.MakeTrauma(0.85f);
-            
-            
-            groundSlammed_timeStamp = Time.time;
+            //tryingToSlam = false;
+            CameraShaker.ShakeY(6.2f);
+            CameraShaker.MakeTrauma(1f);
         }
-        
     }
     
     public bool tryingToSlam = false;
@@ -1152,18 +1157,21 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         if(pv.IsMine)
         {
-            CameraShaker.ShakeY(4.4f);
+            onBecomeGrounded_timeStamp = Time.time;
+            //InGameConsole.LogFancy("onBecomeGrounded_timeStamp: " + onBecomeGrounded_timeStamp);
+            CameraShaker.ShakeY(2.5f);
             
             velocityBeforeGrounded = fpsVelocity;
-            //InGameConsole.LogOrange(string.Format("<b>VelocityBeforeGrounded:</b> <color=blue>{0}</color>", velocityBeforeGrounded));
+            //InGameConsole.LogOrange(string.Format("<b>VelocityBeforeGrounded:</b> <color=yellow>{0}</color>", velocityBeforeGrounded));
+            
+            if(tryingToSlam)
+                groundSlammed_timeStamp = Time.time;
             
             if(Math.SqrMagnitude(velocityBeforeGrounded) > 8f * 8f)
             {
                 playerAudioSource.PlayOneShot(OnBecomeGroundedClip, 0.2f);
             }
         }
-        
-        
     }
     
     Vector3 velocityBeforeGrounded;
@@ -1172,8 +1180,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
     void OnBecomeAirbourne()
     {
         if(fpsVelocity.y < 0)
-            fpsVelocity.y = 0;
+           fpsVelocity.y = 0;
             
+        //InGameConsole.LogWarning("OnBecomeAibourne cancel trying to slam!");
+        tryingToSlam = false;
         timeInAir = 0;
     }
     
@@ -1272,6 +1282,14 @@ public class PlayerController : MonoBehaviour, IPunObservable
                 wasGroundedBefore = true;
             }
             
+            if(wasLaunchedToSlam)
+            {
+                launchToSlamTimer += dt;
+                if(launchToSlamTimer >= slamBoostTimeWindow)
+                {
+                    wasLaunchedToSlam = false;
+                }
+            }
             
             secondJumpHappened = false;
             
@@ -1341,7 +1359,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
         else
         {
-            
             if(wasGroundedBefore)
             {
                 OnBecomeAirbourne();
@@ -1365,17 +1382,18 @@ public class PlayerController : MonoBehaviour, IPunObservable
             
             if(Input.GetKeyDown(KeyCode.LeftControl) && !isSliding)
             {
-                if(fpsVelocity.y > -39)
-                {
-                    Vector3 slamPosition = thisTransform.localPosition;
-                    GroundSlam(slamPosition);
-                    pv.RPC("GroundSlam", RpcTarget.All, slamPosition);
-                }
+                Vector3 slamStartPosition = thisTransform.localPosition;
+                GS(slamStartPosition);
+                pv.RPC(nameof(GS), RpcTarget.Others, slamStartPosition);
             }
             
+            float _fpsGravity = fpsGravity;
+            if(gunController.hook && gunController.hook.state == HookState.Hooked)
+            {
+                _fpsGravity = 0;
+            }
             
-            
-            fpsVelocity.y += fpsGravity * dt * player_gravity_multiplier;
+            fpsVelocity.y += _fpsGravity * dt * player_gravity_multiplier;
             fpsVelocity.y = Mathf.Clamp(fpsVelocity.y, MAX_NEGATIVE_GRAVITY, 200);
             
             Vector3 fpsVelocityXZ = Math.GetXZ(fpsVelocity);
@@ -1413,7 +1431,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
                 }
                 else
                 {
-                    if(!secondJumpHappened && Stamina >= secondJumpStaminaCost && Inputs.GetJumpKeyDown() && timeInAir > 0.25f /*&& fpsVelocity.y < 0*/)
+                    if(!secondJumpHappened && Stamina >= secondJumpStaminaCost && Inputs.GetJumpKeyDown() && timeInAir > 0.225f /*&& fpsVelocity.y < 0*/)
                     {
                         jumpedThisFrame = true;
                         SecondJumpFPS();
@@ -1424,23 +1442,27 @@ public class PlayerController : MonoBehaviour, IPunObservable
             RaycastHit capsuleCastHit;
             
             Vector3 capsuleDir = Math.Normalized(fpsVelocity);
-            
-            if(Physics.CapsuleCast(capsuleP1, capsuleP2, controller.radius * 1.0F, capsuleDir, out capsuleCastHit, fpsVelMagnitude * dt, groundMask))
+            float capsuleDir_v3down_dot = Vector3.Dot(capsuleDir, vDown);
+            //InGameConsole.LogOrange("Dot: " + capsuleDir_v3down_dot.ToString("f"));
+            if(capsuleDir_v3down_dot < 0.9f)
             {
-                float dot = Vector3.Dot(capsuleCastHit.normal, capsuleDir);
-                
-                Vector3 calculatedV = fpsVelocity + capsuleCastHit.normal * fpsVelMagnitude * Math.Abs(dot);
-                if(fpsVelocity.y < 0)
+                if(Physics.CapsuleCast(capsuleP1, capsuleP2, controller.radius * 1.0F, capsuleDir, out capsuleCastHit, fpsVelMagnitude * dt, groundMask))
                 {
-                    if(calculatedV.y == 0)
+                    float dot = Vector3.Dot(capsuleCastHit.normal, capsuleDir);
+                    
+                    Vector3 calculatedV = fpsVelocity + capsuleCastHit.normal * fpsVelMagnitude * Math.Abs(dot);
+                    if(fpsVelocity.y < 0)
                     {
-                        calculatedV.y = MIN_GRAVITY;
+                        if(calculatedV.y == 0)
+                        {
+                            calculatedV.y = MIN_GRAVITY;
+                        }
                     }
+                    
+                    //InGameConsole.LogFancy(string.Format("PlayerController(): hit something, <color=green>v1{0}</color>, <color=yellow>v2{1}</color>", fpsVelocity, calculatedV));
+                    fpsVelocity = calculatedV;
+                    //InGameConsole.LogFancy(string.Format("PlayerController(): dot: <color=green>{0}</color> magnitude<color=yellow>{1}</color>", dot, fpsVelMagnitude));
                 }
-                
-                //InGameConsole.LogFancy(string.Format("PlayerController(): hit something, <color=green>v1{0}</color>, <color=yellow>v2{1}</color>", fpsVelocity, calculatedV));
-                fpsVelocity = calculatedV;
-                //InGameConsole.LogFancy(string.Format("PlayerController(): dot: <color=green>{0}</color> magnitude<color=yellow>{1}</color>", dot, fpsVelMagnitude));
             }
         }
         
@@ -1455,9 +1477,22 @@ public class PlayerController : MonoBehaviour, IPunObservable
             if(Physics.Raycast(ray, out slamHit, Math.Abs(slamVelocityY) * dt, groundAndNPCMask))
             {
                 bool isKeyPressed = Inputs.GetSlamAndSlide_Key();
-                if(isKeyPressed && timeInAir > 0.125f)
+                float time_diff = Math.Abs(Time.time - onBecomeGrounded_timeStamp);
+                
+                //InGameConsole.LogFancy("TIME_DIFF: " + time_diff.ToString("f"));
+                //InGameConsole.LogFancy("Is time_diff more than 0.5?  " + (time_diff > 0.5f));
+                
+                if((isKeyPressed && timeInAir > 0.125f) && (time_diff) > 0.5f)
                 {
-                    pv.RPC("OnGroundSlammed", RpcTarget.All, slamHit.point);
+                    if(Stamina < groundSlamStaminaCost)
+                    {
+                        tryingToSlam = false;
+                        NotEnoughStamina();
+                        return;
+                    }
+                    
+                    ConsumeStamina(groundSlamStaminaCost);
+                    pv.RPC(nameof(OnGroundSlammed), RpcTarget.All, slamHit.point);
                 }
                 else
                 {
@@ -1485,7 +1520,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
         if(isSliding)
         {
-            fpsVelocity.y = fpsJumpForce * 0.45f;
+            fpsVelocity.y = fpsJumpForce * 0.75f;
             fpsVelocity.x = slideVel.x * 1.45f;
             fpsVelocity.z = slideVel.z * 1.45f;
             
@@ -1501,27 +1536,48 @@ public class PlayerController : MonoBehaviour, IPunObservable
             //     fpsVelocity.x *= bunnyHopMult;
             //     fpsVelocity.z *= bunnyHopMult;
             // }
-            
-            
-            if((Math.Abs(Time.time  - groundSlammed_timeStamp) > slamJumpTimeWindow))
+            if(wasLaunchedToSlam)
             {
-                fpsVelocity.y = fpsJumpForce;
+                //InGameConsole.LogFancy("Launching!");
+                playerAudioSource.PlayOneShot(launchClip, 0.33f);
+                float y_diff_between_launchStart = Math.Abs(thisTransform.localPosition.y - groundSlamStartPos.y);
+                //y_diff_between_launchStart = 0;
+                //float _slamLaunchForce =  y_diff_between_launchStart - (fpsGravity * timeInAir) / 2f;
+                float _slamLaunchForce = Mathf.Sqrt(y_diff_between_launchStart * Math.Abs(fpsGravity) * 2) * 1.05f;
+                if(_slamLaunchForce < fpsJumpForce * 2.25f)
+                    _slamLaunchForce = fpsJumpForce * 2.25f;
+                wasLaunchedToSlam = false;
+                
+                //if(_slamLaunchForce > fpsJumpForce * 2.5f)
+                    //InGameConsole.LogFancy(string.Format("_slamLaunchForce is {0}, timeInAir is {1}, y_diff is {2}", _slamLaunchForce, timeInAir, y_diff_between_launchStart));
+                float slamLaunchForce = Math.Max(fpsJumpForce * 2.5f, _slamLaunchForce);
+                fpsVelocity.y = slamLaunchForce;
+                slamLaunch_ps.Play();
             }
             else
             {
-                // if((velocityBeforeGrounded.y <= MAX_NEGATIVE_GRAVITY))
-                // {
-                    float slamLaunchForce = Math.Max(fpsJumpForce * 2.5f * moveSpeedMultiplier, 28f);
-                    fpsVelocity.y = slamLaunchForce;
-                    slamLaunch_ps.Play();
-                    
-                    // if(thisTransform.localPosition.y < groundSlamStartPos.y)
-                    // {
-                    //     float height_travelled = Math.Abs(thisTransform.localPosition.y - groundSlamStartPos.y);
-                    //     slamLaunchForce = fpsGravity * 0.5f * 0.5f + height_travelled / 0.5f;
-                    // }
-                // }
+                fpsVelocity.y = fpsJumpForce;
             }
+            
+            // if((Math.Abs(Time.time  - groundSlammed_timeStamp) > slamJumpTimeWindow))
+            // {
+            //     fpsVelocity.y = fpsJumpForce;
+            // }
+            // else
+            // {
+            //     // if((velocityBeforeGrounded.y <= MAX_NEGATIVE_GRAVITY))
+            //     // {
+            //         float slamLaunchForce = Math.Max(fpsJumpForce * 2.5f * moveSpeedMultiplier, 28f);
+            //         fpsVelocity.y = slamLaunchForce;
+            //         slamLaunch_ps.Play();
+                    
+            //         // if(thisTransform.localPosition.y < groundSlamStartPos.y)
+            //         // {
+            //         //     float height_travelled = Math.Abs(thisTransform.localPosition.y - groundSlamStartPos.y);
+            //         //     slamLaunchForce = fpsGravity * 0.5f * 0.5f + height_travelled / 0.5f;
+            //         // }
+            //     // }
+            // }
             playerAudioSource.PlayOneShot(jumpLocalClip, 0.275f);
         }
         
@@ -1529,17 +1585,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
         //InGameConsole.LogFancy("FPSJump()");
     }
     
-    int secondJumpStaminaCost;
+    const int secondJumpStaminaCost = 0;
     
     public void SecondJumpFPS()
     {
-        if(tryingToSlam)
-        {
-            return;
-        }
-        
-        ConsumeStamina(secondJumpStaminaCost);
-        
         secondJumpHappened = true;
         if(fpsVelocity.y < fpsJumpForceSecond)
         {
@@ -1645,17 +1694,24 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     public Vector3 GetFPSPositionPredicted()
     {
+        if(!thisTransform)
+            return new Vector3(0, 0, 0);
         return GetFPSPosition() + GetFPSVelocity() * rttInSeconds;
     }
     
     public Vector3 GetCenterPosition()
     {
+        if(!thisTransform)
+            return new Vector3(0, 0, 0);
         return thisTransform.localPosition + new Vector3(0, controller.height/2 , 0);
     }
     
     
     public Vector3 GetGroundPosition()
     {
+        if(!thisTransform)
+            return new Vector3(0, 0, 0);
+            
         return thisTransform.localPosition;
     }
     
@@ -1674,26 +1730,39 @@ public class PlayerController : MonoBehaviour, IPunObservable
         return ray.origin + ray.direction * 0.33f;
     }
     
-    void OnGUI()
-    {
-        return;
+    // void OnGUI()
+    // {
+    //     if(pv.IsMine)
+    //     {
+            
+    //         GUIStyle style = new GUIStyle();
+    //         style.alignment = TextAnchor.MiddleCenter;
+            
+    //         float w = 350;
+    //         float h = 50;
+            
+    //         style.normal.textColor = Color.green;
+    //         GUI.Label(new Rect(Screen.width/2 - w/2, Screen.height - h*2.75f, w, h), "wasLaunchedToSlam: " + wasLaunchedToSlam.ToString(), style);
+    //         GUI.Label(new Rect(Screen.width/2 - w/2, Screen.height - h*2.25f, w, h), "tryingToSlam: " + tryingToSlam.ToString(), style);
+    //     }
+    //     return;
         
-        if(pv.IsMine)
-        {
+    //     if(pv.IsMine)
+    //     {
             
-            GUIStyle style = new GUIStyle();
-            style.alignment = TextAnchor.MiddleCenter;
+    //         GUIStyle style = new GUIStyle();
+    //         style.alignment = TextAnchor.MiddleCenter;
             
-            float w = 300;
-            float h = 50;
+    //         float w = 300;
+    //         float h = 50;
             
-            style.normal.textColor = Color.green;
-            GUI.Label(new Rect(Screen.width/2, Screen.height - h*1.6f, w, h), "bunnyHopSpeedMult: " + bunnyHopSpeedMult.ToString(), style);
-            GUI.Label(new Rect(Screen.width/2, Screen.height - h*1.3f, w, h), "currentARFireRate: " + gunController.currentARFireRate.ToString(), style);
-        }
-    }
+    //         style.normal.textColor = Color.green;
+    //         GUI.Label(new Rect(Screen.width/2, Screen.height - h*1.6f, w, h), "bunnyHopSpeedMult: " + bunnyHopSpeedMult.ToString(), style);
+    //         GUI.Label(new Rect(Screen.width/2, Screen.height - h*1.3f, w, h), "currentARFireRate: " + gunController.currentARFireRate.ToString(), style);
+    //     }
+    // }
     
-    
+    //GrapplingHook hook;
     
     void DoImpact(Vector3 pos, Vector3 upDir)
     {
@@ -1798,6 +1867,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
                 }
             }
             
+            UpdateMaxHealth(dt);
+            
             
             CheckOutOfBounds();
             WindTick();
@@ -1805,7 +1876,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
             {
                 case PlayerAliveState.Normal:
                 {
-                    // LocalNormalState_Update();
                     LocalNormalState_UpdateFPS();
                     break;    
                 }
@@ -1924,7 +1994,26 @@ public class PlayerController : MonoBehaviour, IPunObservable
     }
     
     [Header("Stats:")]
-    const int MaxHealth = 100;
+    const int MaxHealthBase = 100;
+    
+    int GetMaxHealthNoPenalty()
+    {
+        return MaxHealthBase;
+    }
+    int MaxHealth = 100;
+    public float MaxHP_mult = 1;
+    float maxHealthPenalty = 0;
+    public float GetCurrentMaxHealthPenalty()
+    {
+        return GetCurrentMaxHealth() - GetCurrentMaxHealth() * maxHealthPenalty;
+    }
+    
+    public int GetCurrentMaxHealth()
+    {
+        int result = (int)(MaxHealth * MaxHP_mult);
+        return result;
+    }
+    
     public int HitPoints;
     const float MaxStamina = 100;
     public float Stamina;
@@ -1935,6 +2024,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
     const float timeForHurtMaterial = 0.225f;
     
     public int GetMaxHealth()
+    {
+        return MaxHealth;
+    }
+    
+    public int GetWhiteHealth()
     {
         return MaxHealth;
     }
@@ -1958,9 +2052,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
     }
     
-    
-    [PunRPC]
-    public void BoostVelocity(Vector3 boostVel)
+    //[PunRPC]
+    public void BoostVelocity(Vector3 boostVel, bool shake = true)
     {
         if(pv.IsMine)
         {
@@ -1968,8 +2061,13 @@ public class PlayerController : MonoBehaviour, IPunObservable
             {
                 OnSlideEnded();
             }
+            if(boostVel.y < MAX_NEGATIVE_GRAVITY)
+            {
+                boostVel.y = MAX_NEGATIVE_GRAVITY;
+            }
             float magnitude = Math.Magnitude(boostVel);
-            CameraShaker.MakeTrauma(0.15f * Mathf.InverseLerp(0, 10, magnitude));
+            if(shake)
+                CameraShaker.MakeTrauma(0.15f * Mathf.InverseLerp(0, 10, magnitude));
             tryingToSlam = false;
             fpsVelocity = boostVel;
         }
@@ -1982,7 +2080,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     
     float TimeWhenTookDamage = 0;
-    const float takeDamageImmunityDuration = 0.2F;
+    const float takeDamageImmunityDuration = 0.25F;
     
     public bool CanTakeDamageFromProjectile()
     {
@@ -2015,6 +2113,29 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
     }
     
+    float maxHealthTimer = 0;
+    
+    void UpdateMaxHealth(float dt)
+    {
+        if(!isAlive)
+            return;
+            
+        if(Math.Abs(Time.time - TimeWhenTookDamage) > 4)
+        {
+            maxHealthTimer += dt * 10;
+            if(maxHealthTimer > 1)
+            {
+                maxHealthTimer %= 1f;
+                
+                if(MaxHealth < GetMaxHealthNoPenalty())
+                    MaxHealth++;
+                
+                PlayerGUI_In_Game.Singleton().ProcessHealth();
+                //MaxHealth = MaxHealthBase;
+            }
+        }
+    }
+    
     [PunRPC]
     public void TakeDamage(int dmg)
     {
@@ -2030,9 +2151,17 @@ public class PlayerController : MonoBehaviour, IPunObservable
             return;
         }
         
+        //InGameConsole.LogOrange("Time since last damage taken " + (Time.time - TimeWhenTookDamage).ToString("f"));
         TimeWhenTookDamage = Time.time;
         dmg = 0;
         HitPoints -= dmg;
+        MaxHealth -= dmg / 5;
+        if(MaxHealth <= 1)
+        {
+            MaxHealth = 1;
+        } 
+        //InGameConsole.LogOrange("MaxHealth is " + MaxHealth.ToString("f"));
+        
         if(HitPoints <= 0)
         {
             // InGameConsole.LogOrange("HitPoints <= 0");
@@ -2049,6 +2178,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     OnDamageTakenEffects damage_fx;
     
     public AudioClip hurtLocalClip;
+    public AudioClip launchClip;
     public AudioClip jumpLocalClip;
     public AudioClip jumpSlideLocalClip;
     public AudioClip jumpSecondLocalClip;
@@ -2062,6 +2192,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             CameraShaker.MakeTrauma(0.45f * Mathf.InverseLerp(1, 100, dmg));
             playerAudioSource.PlayOneShot(hurtLocalClip, 0.4f);
             HurtGUI.ShowHurt();
+            OrthoCamera.OnTakeDamage();
         }
         
         timeSinceHurt = 0f;
@@ -2082,6 +2213,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             _camTr.SetParent(null);
             _camTr.localPosition  = new Vector3(0, 8, 0);
             _camTr.localRotation  = Quaternion.Euler(45f, 0, 0);
+            OrthoCamera.HideDeathScreen();
             
             if(_camTr)
             {
@@ -2095,6 +2227,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             // fpsCam_transform = null;
             fpsCam_camera = null;
             fpsCam_weaponView_cam = null;
+            GameStats.Hide();
        }
         
        if(playerLight)
@@ -2210,6 +2343,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
         pv.RPC("DashFXStart", RpcTarget.All);
     }
     
+    void OnDieDestroyFPSGUNS()
+    {
+        gunController.DestroyFPSGuns();
+    }
+    
     //[PunRPC]
     void Die()
     {
@@ -2223,10 +2361,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
         if(pv.IsMine)
         {
-            gunController.DestroyFPSGuns();
+            Invoke(nameof(OnDieDestroyFPSGUNS), 0.1f);
             PlayerGUI_In_Game.Singleton().ReleasePlayerGUI();
             PostProcessingController2.SetState(PostProcessingState.PlayerDead);
-            OrthoCamera.Show();
+            OrthoCamera.ShowDeathScreen();
             DeadGUI.Show();
             Transform _camTr = FollowingCamera.Singleton().transform;
             Rigidbody _camRb = _camTr.gameObject.AddComponent<Rigidbody>();

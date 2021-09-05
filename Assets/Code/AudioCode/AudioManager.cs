@@ -24,6 +24,14 @@ public enum AudioState
     PlayerDead
 }
 
+public enum MusicMode
+{
+    Static,
+    Dynamic_1,
+    LowPass,
+    TwoTracks
+}
+
 public class AudioManager : MonoBehaviour
 {
     static AudioManager instance;
@@ -84,7 +92,7 @@ public class AudioManager : MonoBehaviour
             if(diff < 0.033f)
             {
                 
-                InGameConsole.LogFancy(string.Format("TOO MUCH GIB AUDIO, diff: <color=yellow>{0}</color>", diff));
+                //InGameConsole.LogFancy(string.Format("TOO MUCH GIB AUDIO, diff: <color=yellow>{0}</color>", diff));
                 return;
             }
             
@@ -151,24 +159,15 @@ public class AudioManager : MonoBehaviour
     const float LOUD = 1;
     
     public AudioMixerGroup masterMixer;
-    public AudioMixerGroup musicMixer;
-    public AudioMixerGroup effectsMixer;
-    // public Mixe
     
-    // public void ReceiveCommand(NetworkCommand command, params object[] args)
-    // {
-    //     switch(command)
-    //     {
-    //         case(NetworkCommand.Ability1):
-    //         {
-    //             string arg = (string)args[0];
-                
-    //             SetMusic(arg);
-                
-    //             break;
-    //         }
-    //     }
-    // }
+    public AudioMixerGroup musicMasterMixer;
+    
+    public AudioMixerGroup musicCalmNoFilterMixer;
+    public AudioMixerGroup musicCalmLowPassMixer;
+    public AudioMixerGroup musicBattleMixer;
+    
+    
+    public AudioMixerGroup effectsMixer;
     
     public ClipAndType[] clipsAndTypes;
     
@@ -202,7 +201,7 @@ public class AudioManager : MonoBehaviour
         
         explosion_audio.transform.localPosition = pos;
         
-        explosion_audio.volume = vol / 4;
+        explosion_audio.volume = vol;
         explosion_audio.pitch = pitch;
         
         explosion_audio.Play();
@@ -228,15 +227,16 @@ public class AudioManager : MonoBehaviour
     
     
     
-    [Header("Audio settings:")]
-    public AudioClip ambience01;
-    [Header("Music:")]
-    public AudioClip children_of_the_omnissiah;
-    public AudioClip daycore;
-    public AudioClip haze;
-    public AudioClip cyber_grind;
+    [Header("Main menu theme:")]
     public AudioClip mainMenu_theme;
-    public AudioSource music_src;
+    [Header("Clouds:")]
+    public AudioClip clouds_main;
+    [Header("Prologue:")]
+    public AudioClip prologue_music;
+    
+    
+    public AudioSource main_MusicSrc;
+    public AudioSource battle_MusicSrc;
     public AudioSource source2;
     [Header("Globals clips:")]
     public AudioClip[] globalClips;
@@ -251,7 +251,7 @@ public class AudioManager : MonoBehaviour
         {
             _EmissionShaderID = Shader.PropertyToID("_Emission");
             
-            music_src = GetComponent<AudioSource>();
+            //  
             
             InitAudioLib();
             InitAudioPool();
@@ -310,12 +310,11 @@ public class AudioManager : MonoBehaviour
     
     
     
-    void PitchInterpolation()
+    void PitchInterpolation(float dt)
     {
         //Master:
         if(currentMasterPitch != targetMasterPitch)
         {
-            float dt  = UberManager.DeltaTime();
             float dPitch = pitchInterpStartSpeed * dt;
             
             pitchInterpStartSpeed += pitchInterpAcceleration * dt;
@@ -497,7 +496,7 @@ public class AudioManager : MonoBehaviour
         }
     }
     
-    public float freqSmoothRate = 1;
+    public float freqSmoothRate = 1.33f;
     
     void CalculateSmoothFreqBands(float dt)
     {
@@ -574,44 +573,220 @@ public class AudioManager : MonoBehaviour
         audio_mat.SetFloat(_EmissionShaderID, audio_emission);
     }
     
+    //static bool dynamicMusicMode = false;
+    public MusicMode mode;
+    
+    public static void SetMusicMode(MusicMode _mode)
+    {
+        Singleton()._SetMusicMode(_mode);
+    }
+    
+    public void _SetMusicMode(MusicMode _mode)
+    {
+        mode = _mode;
+        
+        switch(_mode)
+        {
+            case(MusicMode.Static):
+            {
+                main_MusicSrc.outputAudioMixerGroup = musicCalmNoFilterMixer;
+                snapshotCalmNoFilter.TransitionTo(0.1f);
+                
+                break;
+            }
+            case(MusicMode.Dynamic_1):
+            {
+                snapshotCalmNoFilter.TransitionTo(0.1f);
+                
+                break;
+            }
+            case(MusicMode.LowPass):
+            {
+                lowPassFlag = false;
+                main_MusicSrc.outputAudioMixerGroup = musicCalmLowPassMixer;
+                battle_MusicSrc.outputAudioMixerGroup = musicBattleMixer;
+                snapshotCalmLowPass.TransitionTo(0.1f);
+                
+                break;
+            }
+            case(MusicMode.TwoTracks):
+            {
+                main_MusicSrc.outputAudioMixerGroup = musicCalmNoFilterMixer;
+                battle_MusicSrc.outputAudioMixerGroup = musicBattleMixer;
+                snapshotTwoTracksCalm.TransitionTo(0.1f);
+                
+                break;
+            }
+        }
+    }
+    
+    static int enemies_alive = 0;
+    
+    public static void ResetEnemiesAlive()
+    {
+        enemies_alive = 0;
+        timeStampWhenEnemiesDiedOrSpawned = Time.time;
+    }
+    
+    public static void AddEnemiesAlive(int x = 1)
+    {
+        if(enemies_alive <= 0)
+        {
+            timeStampWhenEnemiesDiedOrSpawned = Time.time;
+        }
+        enemies_alive += x;
+    }
+    
+    public static void RemoveEnemiesAlive(int x = -1)
+    {
+        enemies_alive += x;
+        if(enemies_alive <= 0)
+        {
+            timeStampWhenEnemiesDiedOrSpawned = Time.time;
+        }
+    }
+    
+    const float crossFadeSpeedToBattle = 3.0f;
+    const float crossFadeTimeToBattle = 1 / crossFadeSpeedToBattle;
+    float battleVel1;
+    float battleVel2;
+    
+    const float crossFadeSpeedToCalm = 3f;
+    const float crossFadeTimeToCalm = 1 / crossFadeSpeedToCalm;
+    float calmVel1;
+    float calmVel2;
+    
+    const float crossFadeDelay = 0f;
+    const float decreaseFadeMult = 1.0f;
+    static float timeStampWhenEnemiesDiedOrSpawned = float.MaxValue;
+    
+    
+    // void CrossFadeDynamicMusic(float dt)
+    // {
+    //     if(enemies_alive > 0)
+    //     {
+    //         battle_MusicSrc.volume = Mathf.SmoothDamp(battle_MusicSrc.volume, 1, ref battleVel1, crossFadeTimeToBattle);
+    //         calm_MusicSrc.volume = Mathf.SmoothDamp(calm_MusicSrc.volume, 0, ref battleVel2, crossFadeTimeToBattle);
+    //     }
+    //     else
+    //     {
+    //         if(Time.time - timeStampWhenEnemiesDiedOrSpawned < crossFadeDelay)
+    //         {
+    //             return;
+    //         }
+    //         battle_MusicSrc.volume = Mathf.SmoothDamp(battle_MusicSrc.volume, 0, ref calmVel1, crossFadeTimeToCalm);
+    //         calm_MusicSrc.volume = Mathf.SmoothDamp(calm_MusicSrc.volume, 1, ref calmVel2, crossFadeTimeToCalm);
+    //     }
+    // }
+    
+    
+    
+    [Header("DIMA DIMA:")]
+    float lowPassTransitionDurationToBattle = 0f;
+    float lowPassTransitionDurationToCalm = 0.1f;
+    bool lowPassFlag = false;
+    
+    void CrossFadeLowPassMusic()
+    {
+        if(enemies_alive > 0)
+        {
+            if(!lowPassFlag)
+            {
+                InGameConsole.LogFancy("Transitioning to BATTLE MUSIC!!!!");
+                InGameConsole.LogFancy(snapshotBattle.name);
+                
+                
+                snapshotBattle.TransitionTo(lowPassTransitionDurationToBattle);
+                
+                lowPassFlag = true;
+            }
+        }
+        else
+        {
+            // if(Time.time - timeStampWhenEnemiesDiedOrSpawned < crossFadeDelay)
+            // {
+            //     return;
+            // }
+            if(lowPassFlag)
+            {
+                snapshotCalmLowPass.TransitionTo(lowPassTransitionDurationToCalm);
+                
+                InGameConsole.LogFancy("Transitioning to calm low pass music...");
+                InGameConsole.LogFancy(snapshotCalmLowPass.name);
+                
+                lowPassFlag = false;
+                
+            }
+        }
+    }
+    
     void Update()
     {
         // DebugInput();
-        if(Inputs.GetKeyDown(KeyCode.M))
-        {
-            SwitchMusicVolume();
-            // source.mute = !source.mute;
-        }
+        // if(Inputs.GetKeyDown(KeyCode.M))
+        // {
+        //     SwitchMusicVolume();
+        //     // source.mute = !source.mute;
+        // }
         
         float dt = UberManager.DeltaTime();
         
-        music_src.GetSpectrumData(samples, 0, FFTWindow.Blackman);
+        //musicMixer.GetS
+        main_MusicSrc.GetSpectrumData(samples, 0, FFTWindow.Blackman);
         
-        if(edit_audio_mat)
+        // if(edit_audio_mat)
+        // {
+        //     EditAudioMaterials(dt);
+        // }
+        
+        switch(mode)
         {
-            EditAudioMaterials(dt);
+            case(MusicMode.Static):
+            {
+                break;
+            }
+            case(MusicMode.Dynamic_1):
+            {
+                // CrossFadeDynamicMusic(dt);
+                break;
+            }
+            case(MusicMode.LowPass):
+            {
+                CrossFadeLowPassMusic();
+                break;
+            }
+            case(MusicMode.TwoTracks):
+            {
+                break;                
+            }
         }
         
         GetVolumeBands();
         CalculateFreqBands();
         CalculateSmoothFreqBands(dt);
         
-        PitchInterpolation();
+        PitchInterpolation(dt);
     }
     
-    public AudioMixerSnapshot snapshot_normal;
-    public AudioMixerSnapshot snapshot_muted;
+    public AudioMixerSnapshot snapshotCalmNoFilter;
+    public AudioMixerSnapshot snapshotCalmLowPass;
+    public AudioMixerSnapshot snapshotBattle;
+    
+    public AudioMixerSnapshot snapshotTwoTracksCalm;
+    public AudioMixerSnapshot snapshotTwoTracksBattle;
     
     void SwitchMusicVolume()
     {
-        if(isMuted)
-        {
-            snapshot_normal.TransitionTo(0.5f);
-        }
-        else
-        {
-            snapshot_muted.TransitionTo(0.5f);
-        }
+        
+        
+        // if(isMuted)
+        // {
+        //     snapshot_normal.TransitionTo(0.5f);
+        // }
+        // else
+        // {
+        //     snapshot_muted.TransitionTo(0.5f);
+        // }
         
         
         isMuted = !isMuted;
@@ -632,23 +807,26 @@ public class AudioManager : MonoBehaviour
         // }
     }
     
-    void SetMusicVolume(float vol)
+    void SetMusicVolume(float vol_db)
     {
-        music_src.volume = vol;
+        musicMasterMixer.audioMixer.SetFloat("MusicVolume", vol_db);
+        //calm_MusicSrc.volume = vol;
     }
     
-    // void OnGUI()
-    // {
-    //     GUIStyle style = new GUIStyle(GUI.skin.label);
-    //     style.alignment = TextAnchor.MiddleCenter;
-    //     float rectWidth = 600;
-    //     string text0 = string.Format("Current pitch: {0}; target: {1}; interp speed: {2}; acceleration: {3}", currentMasterPitch.ToString("f"), targetMasterPitch.ToString("f"), pitchInterpStartSpeed.ToString("f"), pitchInterpAcceleration.ToString("f"));
-    //     GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 52*1f, rectWidth, 50), text0, style);
-    //     string text = string.Format("<color=yellow>Normal target pitch: {0}; Normal start speed: {1}; Normal acceleration: {2}</color>", normal_targetPitch.ToString("f"), normal_interpSpeed .ToString("f"), normal_interpAcceleration.ToString("f"));
-    //     GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 52*2f, rectWidth, 50), text, style);
-    //     string text2 = string.Format("<color=red>Dead target pitch: {0}; Dead start speed: {1}; Dead acceleration: {2} </color>", dead_targetPitch.ToString("f"), dead_interpSpeed .ToString("f"), dead_interpAcceleration.ToString("f"));
-    //     GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 52*1.5f, rectWidth, 50), text2, style);
-    // }
+    void OnGUI()
+    {
+        GUIStyle style = new GUIStyle(GUI.skin.label);
+        style.alignment = TextAnchor.MiddleCenter;
+        style.fontSize = 25;
+        float rectWidth = 600;
+     //   string text0 = string.Format("Current pitch: {0}; target: {1}; interp speed: {2}; acceleration: {3}", currentMasterPitch.ToString("f"), targetMasterPitch.ToString("f"), pitchInterpStartSpeed.ToString("f"), pitchInterpAcceleration.ToString("f"));
+        
+    //     GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 52*1f, rectWidth, 50), calm_MusicSrc.volume.ToString("f"), style);
+    //    // string text = string.Format("<color=yellow>Normal target pitch: {0}; Normal start speed: {1}; Normal acceleration: {2}</color>", normal_targetPitch.ToString("f"), normal_interpSpeed .ToString("f"), normal_interpAcceleration.ToString("f"));
+    //     GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 52*2f, rectWidth, 50), battle_MusicSrc.volume.ToString("f"), style);
+      //  string text2 = string.Format("<color=red>Dead target pitch: {0}; Dead start speed: {1}; Dead acceleration: {2} </color>", dead_targetPitch.ToString("f"), dead_interpSpeed .ToString("f"), dead_interpAcceleration.ToString("f"));
+      //  GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 52*1.5f, rectWidth, 50), text2, style);
+    }
     
     public void SetMusic(string name)
     {
@@ -657,65 +835,95 @@ public class AudioManager : MonoBehaviour
     
     public static void SetMusicHaze()
     {
-        AudioManager inst = Singleton();
-        inst.music_src.clip = inst.haze;
-        inst.music_src.pitch = 1.0f;
-        inst.music_src.volume = LOUD;
-        inst.music_src.loop = true;
+        // AudioManager inst = Singleton();
+        // inst.calm_MusicSrc.clip = inst.haze;
+        // inst.calm_MusicSrc.pitch = 1.0f;
+        // inst.calm_MusicSrc.volume = LOUD;
+        // inst.calm_MusicSrc.loop = true;
         
-        inst.music_src.Play();
+        // inst.calm_MusicSrc.Play();
     }
     
-    public static void SetMusicDaycore()
+    public static AudioSource GetMainMusicSrc()
+    {
+        return Singleton().main_MusicSrc;
+    }
+    
+    
+    public static AudioSource GetBattleMusicSrc()
+    {
+        return Singleton().battle_MusicSrc;
+    }
+    
+    public static void StopMusic()
     {
         AudioManager inst = Singleton();
-        inst.music_src.clip = inst.daycore;
-        inst.music_src.pitch = 1.0f;
-        inst.music_src.volume = LOUD;
-        inst.music_src.loop = true;
         
-        inst.music_src.Play();
+        inst.main_MusicSrc.Stop();
+        inst.battle_MusicSrc.Stop();
     }
+    
+    public static void SetMusicClouds()
+    {
+        SetMusicMode(MusicMode.Static);
+        
+        AudioManager inst = Singleton();
+         
+        inst.main_MusicSrc.Stop();
+        inst.main_MusicSrc.clip = inst.clouds_main;
+        inst.main_MusicSrc.Play();
+        
+        
+        //inst.calm_MusicSrc.Play();
+        
+        inst.battle_MusicSrc.Stop();
+        inst.battle_MusicSrc.loop = true;
+        
+        //inst.battle_MusicSrc.Play();
+    }
+    
+    public static void SetMusicPrologue()
+    {
+        //SetDynamicMusicModeOn();
+        SetMusicMode(MusicMode.LowPass);
+        AudioManager inst = Singleton();
+        
+        inst.main_MusicSrc.Stop();
+        inst.main_MusicSrc.clip = inst.prologue_music;
+        inst.main_MusicSrc.Play();
+        
+        
+        inst.battle_MusicSrc.clip = inst.prologue_music;
+        inst.battle_MusicSrc.Play();
+    }
+    
+    
     
     public static void SetMusicMainMenu()
     {
-        //Debug.Log("<color=yellow>SetMusicMainMenu()</color>");
+        InGameConsole.LogFancy("<color=yellow>SetMusicMainMenu()</color>");
+        InGameConsole.LogFancy("<color=yellow>SetMusicMainMenu()</color>");
+        InGameConsole.LogFancy("<color=yellow>SetMusicMainMenu()</color>");
+        InGameConsole.LogFancy("<color=yellow>SetMusicMainMenu()</color>");
+        InGameConsole.LogFancy("<color=yellow>SetMusicMainMenu()</color>");
         
+        SetMusicMode(MusicMode.Static);
         AudioManager inst = Singleton();
-        inst.music_src.clip = inst.children_of_the_omnissiah;
-        inst.music_src.pitch = 1.0f;
         
-        inst.music_src.volume = LOUD;
-        inst.music_src.loop = true;
+        inst.main_MusicSrc.Stop();
+        inst.main_MusicSrc.clip = inst.mainMenu_theme;
+        inst.main_MusicSrc.Play();
         
-        inst.music_src.Play();
-    }
-    
-    public static void SetMusicOmnissiah()
-    {
-        AudioManager inst = Singleton();
-        inst.music_src.clip = inst.daycore;
-        inst.music_src.pitch = 1.0f;
-        
-        inst.music_src.volume = LOUD;
-        inst.music_src.loop = true;
-        
-        inst.music_src.Play();
+        inst.battle_MusicSrc.Stop();
     }
     
     void Start()
     {
         currentMasterPitch = GetMasterPitch();
         
-        music_src.clip = mainMenu_theme;
-        
-        music_src.loop = true;
-        music_src.Stop();
-        
-        music_src.Play();
-        
         isMuted = false;
-        SwitchMusicVolume();
+        SetMusicMainMenu();
+        //SwitchMusicVolume();
         
         //music_src.mute = true;
         

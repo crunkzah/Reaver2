@@ -21,6 +21,15 @@ public enum GateDetectionMode : int
     New
 }
 
+public enum MusicOnOpen : int
+{
+    None,
+    StopMusic, 
+    Clouds,
+    Prologue,
+    Prologue_Drop
+}
+
 public class GatesController : MonoBehaviour, INetworkObject
 {
     public GateDetectionMode detectionMode = GateDetectionMode.Old;
@@ -227,7 +236,7 @@ public class GatesController : MonoBehaviour, INetworkObject
         net_comp = GetComponent<NetworkObject>();
         
         thisTransform = transform;
-        thisWorldPosition = transform.position;
+        thisWorldPosition = transform.position + transform.up * 3;
         if(detectionMode == GateDetectionMode.New)
             detectionPosGlobal = detectionTransform.position;
     }
@@ -292,6 +301,9 @@ public class GatesController : MonoBehaviour, INetworkObject
         occlusion_portal.open = false;
     }
     
+    
+    bool hasEverBeenOpened = false;
+    
     void Update()
     {
         if(state != GateState.Locked && state != GateState.Orange)
@@ -300,7 +312,7 @@ public class GatesController : MonoBehaviour, INetworkObject
             {
                 if(state == GateState.Closed)
                 {
-                    
+                
                     //Open:
                     // targetPosLeftLocal = openPosLeftLocal;
                     // targetPosRightLocal = openPosRightLocal;
@@ -370,6 +382,12 @@ public class GatesController : MonoBehaviour, INetworkObject
     
     void Open()
     {
+        if(!hasEverBeenOpened)
+        {
+            CallMusic();
+            hasEverBeenOpened = true;
+        }
+        
         state = GateState.Open;
         
         targetPosLeftLocal = openPosLeftLocal;
@@ -390,10 +408,10 @@ public class GatesController : MonoBehaviour, INetworkObject
         LightPooled light = g.GetComponent<LightPooled>();
         //Color color = Random.ColorHSV();
         Color color = new Color(0f, 1f, 0, 1);
-        float decay_speed = 6 / 0.5f * 4;
         pos.y += 1F;
         float radius = 9;
-        light.DoLight(pos, color, 1f, 5, radius, decay_speed);
+        float decay_speed = radius / 0.5f;
+        light.DoLight(pos, color, 2f, 5, radius, decay_speed);
     }
     
     void Close()
@@ -408,6 +426,45 @@ public class GatesController : MonoBehaviour, INetworkObject
         //audioSource.pitch = 0.5f;
         //audioSource.PlayOneShot(closedClip);
     }
+    
+    
+    public MusicOnOpen music_on_open;
+    
+    
+    void CallMusic()
+    {
+        switch(music_on_open)
+        {
+            case(MusicOnOpen.None):
+            {
+                
+                break;
+            }
+            case(MusicOnOpen.StopMusic):
+            {
+                AudioManager.StopMusic();
+                break;
+            }
+            case(MusicOnOpen.Clouds):
+            {
+                AudioManager.SetMusicClouds();
+                break;
+            }
+            case(MusicOnOpen.Prologue):
+            {
+                AudioManager.SetMusicPrologue();
+                break;
+            }
+            case(MusicOnOpen.Prologue_Drop):
+            {
+                AudioManager.SetMusicPrologue();
+                AudioManager.GetMainMusicSrc().time     = 1.57f;
+                AudioManager.GetBattleMusicSrc().time   = 1.57f;
+                break;
+            }
+        }
+    }
+    
     
     
 #if UNITY_EDITOR

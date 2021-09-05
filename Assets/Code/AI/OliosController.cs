@@ -13,7 +13,7 @@ public enum OliosState : byte
     Dead,
 }
 
-public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject
+public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, IKillableThing
 {
     public OliosState state;
     
@@ -192,28 +192,40 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject
                 
                 break;
             }
-            case(NetworkCommand.DieWithForce):
+            case(NetworkCommand.TakeDamageExplosive):
             {
+                int incomingDamage = (int)args[0];
                 
-                // Vector3 force = (Vector3)args[0];
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.5f, 0), small_healing_times);
                 
-                // byte limb_id = 0;
-                // if(args.Length > 1)
-                // {
-                //     limb_id = (byte)args[1];
-                // }
-                
-                
-                Die();
+                TakeDamageExplosive(incomingDamage);
                 
                 break;
             }
-            case(NetworkCommand.TakeDamage):
+            case(NetworkCommand.TakeDamageLimbNoForce):
             {
                 int incomingDamage = (int)args[0];
-                TakeDamage(incomingDamage);
                 
-                //Die(Vector3.zero);
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.5f, 0), small_healing_times);
+                
+                byte limb_id = (byte)args[1];
+                TakeDamage(incomingDamage, limb_id);
+                //TakeDamageForce(incomingDamage, force, limb_id);
+                
+                break;
+            }
+            case(NetworkCommand.TakeDamageLimbWithForce):
+            {
+                int incomingDamage = (int)args[0];
+                
+                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.5f, 0), small_healing_times);
+                
+                Vector3 force = (Vector3)args[1];
+                byte limb_id = (byte)args[2];
+                TakeDamageForce(incomingDamage, force, limb_id);
                 
                 break;
             }
@@ -257,9 +269,41 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject
         }
     }
     
+    public Transform head;
+    
+    public Vector3 GetHitSpot()
+    {
+        return head.position;
+    }
+    
+    public NetworkObject GetNetComp()
+    {
+        return net_comp;
+    }
+    
+    public byte GetHitSpotLimbId()
+    {
+        return 7;
+    }
+    
+    public bool CanBeBounceHit()
+    {
+        if(state != OliosState.Dead)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+    
+    public GameObject standingCol;
+    
     void Start()
     {
         DisableSkeleton();
+        
+        NPCManager.RegisterKillable(this);
+        
         currentFlyDestination = parentTransform.localPosition;
         HitPoints = MaxHealth;
     }
@@ -825,7 +869,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject
                 {
                     death_ps.Play(true);
                 }
-                
+                Destroy(standingCol);
                 Destroy(parentTransform.gameObject, 4);
                 break;                
             }
@@ -838,6 +882,134 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject
         
     }
     
+    void TakeDamage(int dmg, byte limb_id)
+    {
+        //InGameConsole.LogOrange("TakeDamage()");
+        HitPoints -= dmg;
+         
+        if(HitPoints <= 0)
+        {
+            Die(Vector3.zero, limb_id);
+            HitPoints = 0;
+        }
+    }
+    
+    void TakeDamageForce(int dmg, Vector3 force, byte limb_id)
+    {
+        //InGameConsole.LogOrange("TakeDamageForce()");
+        HitPoints -= dmg;
+         
+        if(HitPoints <= 0)
+        {
+            Die(force, limb_id);
+            HitPoints = 0;
+        }
+    }
+    
+    void TakeDamageExplosive(int dmg)
+    {
+        //InGameConsole.LogOrange("TakeDamageExplosive()");
+        HitPoints -= dmg;
+        if(HitPoints <= 0)
+        {
+            DieFromExplosion();
+            HitPoints = 0;
+        }
+    }
+    
+    void DieFromExplosion()
+    {
+        if(state == OliosState.Dead)
+        {
+            return;
+        }
+        
+        if(spawnedObjectComp)
+            spawnedObjectComp.OnObjectDied();
+        
+        SetState(OliosState.Dead);
+        
+        
+        anim.Play("Base.Die", 0, 0);
+        InGameConsole.LogFancy("Olios Die()");
+        
+        sun_symbol.transform.SetParent(null);
+        sun_symbol.GetComponent<Rigidbody>().isKinematic = false;
+        sun_symbol.GetComponent<Rigidbody>().AddForce(Random.onUnitSphere * 6, ForceMode.Impulse);
+        sun_symbol.GetComponent<MeshCollider>().enabled = true;
+        Destroy(sun_symbol, 4.5F);
+        
+        
+        Invoke("D", 1.2f);
+        Invoke("D", 1.6f);
+        Invoke("D", 2.2f);
+        Invoke("D", 2.5f);
+        Invoke("D", 2.7f);
+        Invoke("D", 3.1f);
+        Invoke("D", 3.3f);
+        Invoke("D", 3.4f);
+        Invoke("D", 3.5f);
+        Invoke("D", 3.6f);
+        
+        
+        //anim.enabled = false;
+        col.enabled = false;
+        NetworkObjectsManager.UnregisterNetObject(net_comp);
+        
+        AudioManager.Play3D(SoundType.death_impact_gib_distorted, parentTransform.localPosition);
+        HitPoints = 0;
+        
+        StartCoroutine(DieShaking());
+       
+        DropHealthCrystals();
+    }
+    
+    void Die(Vector3 force, byte limb_to_destroy)
+    {
+        if(state == OliosState.Dead)
+        {
+            return;
+        }
+        
+        if(spawnedObjectComp)
+            spawnedObjectComp.OnObjectDied();
+        
+        SetState(OliosState.Dead);
+        
+        
+        anim.Play("Base.Die", 0, 0);
+        InGameConsole.LogFancy("Olios Die()");
+        
+        sun_symbol.transform.SetParent(null);
+        sun_symbol.GetComponent<Rigidbody>().isKinematic = false;
+        sun_symbol.GetComponent<Rigidbody>().AddForce(Random.onUnitSphere * 6, ForceMode.Impulse);
+        sun_symbol.GetComponent<MeshCollider>().enabled = true;
+        Destroy(sun_symbol, 4.5F);
+        
+        
+        Invoke("D", 1.2f);
+        Invoke("D", 1.6f);
+        Invoke("D", 2.2f);
+        Invoke("D", 2.5f);
+        Invoke("D", 2.7f);
+        Invoke("D", 3.1f);
+        Invoke("D", 3.3f);
+        Invoke("D", 3.4f);
+        Invoke("D", 3.5f);
+        Invoke("D", 3.6f);
+        
+        
+        //anim.enabled = false;
+        col.enabled = false;
+        NetworkObjectsManager.UnregisterNetObject(net_comp);
+        
+        AudioManager.Play3D(SoundType.death_impact_gib_distorted, parentTransform.localPosition);
+        HitPoints = 0;
+        
+        StartCoroutine(DieShaking());
+       
+        DropHealthCrystals();
+    }
     
     public void Die()
     {

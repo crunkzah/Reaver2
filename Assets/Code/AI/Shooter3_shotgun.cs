@@ -301,16 +301,6 @@ public class Shooter3_shotgun : MonoBehaviour, INetworkObject, IDamagableLocal, 
                 
                 break;
             }
-            case(NetworkCommand.DieWithForce):
-            {
-                // UnlockSendingCommands();
-                
-                Vector3 force = (Vector3)args[0];
-                
-                Die(force);
-                
-                break;
-            }
             case(NetworkCommand.SetState):
             {
                 UnlockSendingCommands();
@@ -339,7 +329,7 @@ public class Shooter3_shotgun : MonoBehaviour, INetworkObject, IDamagableLocal, 
                 
                 break;
             }
-            case(NetworkCommand.TakeDamage):
+            case(NetworkCommand.TakeDamageLimbWithForce):
             {
                 int incomingDamage = (int)args[0];
              
@@ -917,7 +907,6 @@ public class Shooter3_shotgun : MonoBehaviour, INetworkObject, IDamagableLocal, 
                         LockSendingCommands();
                         if(Math.SqrMagnitude(airborneVelocity) > 36 * 36)
                         {
-                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.DieWithForce, hit.normal * 10);
                         }
                         else
                         {
@@ -949,7 +938,6 @@ public class Shooter3_shotgun : MonoBehaviour, INetworkObject, IDamagableLocal, 
                         if(canSendCommands)
                         {
                              LockSendingCommands();
-                             NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.DieWithForce, hit.normal * 10);
                         }
                     }
                 }

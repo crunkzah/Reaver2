@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -9,7 +9,11 @@ using ExitGames.Client.Photon;
 
 public enum GlobalCommand : byte
 {
-    Explode_QTS
+    Explode_QTS,
+    SetDifficulty,
+    SetInfernoCircle,
+    BounceHit_RevolverBlue,
+    AddEnemiesAlive
 }
 
 [System.Serializable]
@@ -84,27 +88,55 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
     void OnDisable()
     {
         PhotonNetwork.RemoveCallbackTarget(this);
-    }
+    }   
     
-    
-   public void OnEvent(EventData photonEvent)
+    public void OnEvent(EventData photonEvent)
     {
-        //InGameConsole.LogFancy(string.Format("OnEvent() {0}", photonEvent.Code));
-        
         byte eventCode = photonEvent.Code;
         
-        if (eventCode == EventCodes.GiveItem)
+        switch(eventCode)
         {
-            object[] data = (object[])photonEvent.CustomData;
-            // for(int i = 0; i < data.Length; i++)
-            // {
-            //     InGameConsole.LogFancy("Data: <color=yellow>" + data[i].ToString() + "</color>");
-            // }
+            case(EventCodes.GiveItem):
+            {
+                object[] data = (object[])photonEvent.CustomData;
 
-            GunType gunToGive = (GunType)data[0];
-            PlayerInventory.Singleton().GiveWeaponLocally(gunToGive);
+                GunType gunToGive = (GunType)data[0];   
+                PlayerInventory.Singleton().GiveWeaponLocally(gunToGive);
+                
+                break;
+            }
+            case(EventCodes.Command_Unreliable):
+            {
+                object[] data = (object[])photonEvent.CustomData; //networkId, Command, args...
+
+                int _net_id = (int)data[0];
+                NetworkCommand _command = (NetworkCommand)data[1];
+                if(data.Length == 2)
+                {
+                    CallFuncRPC(_net_id, _command);
+                }
+                else
+                {
+                    switch(_command)
+                    {
+                        case(NetworkCommand.Move):
+                        {
+                            Vector3 movePos = (Vector3)data[2];
+                            
+                            CallFuncRPC(_net_id, _command, movePos);
+                            
+                            break;
+                        }
+                        default:
+                        {
+                            break;
+                        }
+                    }
+                }
+                
+                break;
+            }
         }
-        
     }
     
 
@@ -778,16 +810,68 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
         }
     }
     
+    public static void CallNetworkFunctionUnreliable(int networkId, NetworkCommand command, params object[] values)
+    {
+        if(networkId != -1)
+        {
+            if(PhotonNetwork.IsMasterClient)
+            {
+                switch(command)
+                {
+                    case(NetworkCommand.Move):
+                    {
+                        object[] content = new object[] { (int)networkId, (byte)command, (Vector3)values[0] }; // Array contains the target position and the IDs of the selected units
+                        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All }; // You would have to set the Receivers to All in order to receive this event on the local client as well
+                        PhotonNetwork.RaiseEvent(EventCodes.Command_Unreliable, content, raiseEventOptions, SendOptions.SendUnreliable);
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                }
+                //Singleton().photonView.RPC("CallFuncRPC", RpcTarget.AllViaServer, networkId, command, values);
+            }
+        }
+        else
+        {
+            Debug.LogError("Trying to call network function unreliably on entity with -1 netId !");
+        }
+    }
+    
+    [PunRPC]
+    void CallFuncRPCUnreliable(int networkId, NetworkCommand command, params object[] values)
+    {
+        if(Singleton().runtimePool.ContainsKey(networkId))
+        {
+            NetworkObject netObj = Singleton().runtimePool[networkId];
+
+            INetworkObject inetworkObject = netObj.GetComponent<INetworkObject>();
+            inetworkObject.ReceiveCommand(command, values);
+            
+            if(!commands_to_exclude_from_log.Contains(command))
+            {
+                string netId_and_obj_name = string.Format("<color=#03e3fc>{0} ({1}) </color>", networkId.ToString(), netObj.gameObject.name);
+                InGameConsole.Log(string.Format("<color=orange><b>{0}</b></color> was called on <b>{1}</b>", command.ToString(), netId_and_obj_name));
+            }
+        }
+        else
+        {
+            //InGameConsole.LogWarning("runtimePool doesn't contain " + networkId + " key; Command: " + command);
+        }
+    }
+    
     [Header("NPC Originals:")]
     public GameObject Sinclaire_npc;
     public GameObject Padla_npc;
     public GameObject Stepa_npc;
-    public GameObject SniperGirl_npc;
-    public GameObject CatLady_npc;
+    //public GameObject SniperGirl_npc;
+   // public GameObject CatLady_npc;
     public GameObject Olios_npc;
     public GameObject PadlaLong_npc;
     public GameObject Scourge_npc;
     public GameObject ScourgeCool_npc;
+    public GameObject SinclaireCool_npc;
     
     
     public void SpawnNPC2(byte _npc, Vector3 pos, Vector3 forward, int playerId = -1)
@@ -852,12 +936,12 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
             }
             case(NPCType.SniperGirl):
             {
-                npc_original = SniperGirl_npc;
+                //npc_original = SniperGirl_npc;
                 break;
             }
             case(NPCType.CatLady):
             {
-                npc_original = CatLady_npc;
+                //npc_original = CatLady_npc;
                 break;
             }
             case(NPCType.Olios):
@@ -883,6 +967,12 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
                 spawn_soundType = SoundType.spawn_npc_2_sound;
                 break;
             }
+            case(NPCType.SinclaireCool):
+            {
+                npc_original = SinclaireCool_npc;
+                spawn_soundType = SoundType.None;
+                break;
+            }
             default:
             {
                 break;
@@ -899,10 +989,13 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
         
         NetworkObject net_comp = spawned_npc.GetComponentInChildren<NetworkObject>();
         
-        ParticlesManager.PlayPooled(ParticleType.npc_spawned_1_ps, pos, forward);
         LightOnSpawn(pos);
         float spawn_pitch = Random.Range(0.9f, 1.05f);
-        AudioManager.Play3D(spawn_soundType, pos, spawn_pitch, 1f);
+        if(spawn_soundType != SoundType.None)
+        {
+            ParticlesManager.PlayPooled(ParticleType.npc_spawned_1_ps, pos, forward);
+            AudioManager.Play3D(spawn_soundType, pos, spawn_pitch, 1f);
+        }
         
         if(net_comp)
         {
@@ -958,12 +1051,12 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
             }
             case(NPCType.SniperGirl):
             {
-                npc_original = SniperGirl_npc;
+                //npc_original = SniperGirl_npc;
                 break;
             }
             case(NPCType.CatLady):
             {
-                npc_original = CatLady_npc;
+                //npc_original = CatLady_npc;
                 break;
             }
             case(NPCType.Olios):
@@ -985,6 +1078,11 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
             case(NPCType.ScourgeCool):
             {
                 npc_original = ScourgeCool_npc;
+                break;
+            }
+            case(NPCType.SinclaireCool):
+            {
+                npc_original = SinclaireCool_npc;
                 break;
             }
             default:
@@ -1032,8 +1130,13 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
         commands_to_exclude_from_log.Add(NetworkCommand.Shoot);
         commands_to_exclude_from_log.Add(NetworkCommand.Attack);
         commands_to_exclude_from_log.Add(NetworkCommand.Flee);
-        commands_to_exclude_from_log.Add(NetworkCommand.TakeDamage);
-        commands_to_exclude_from_log.Add(NetworkCommand.SetTarget);
+        commands_to_exclude_from_log.Add(NetworkCommand.TakeDamageLimbWithForce);
+        //commands_to_exclude_from_log.Add(NetworkCommand.SetTarget);
+        //commands_to_exclude_from_log.Add(NetworkCommand.DieWithForce);
+        
+        //commands_to_exclude_from_log.Add(NetworkCommand.SetState);
+        commands_to_exclude_from_log.Add(NetworkCommand.LaunchAirborne);
+        commands_to_exclude_from_log.Add(NetworkCommand.LaunchAirborneUp);
     }
 
     [PunRPC]
@@ -1060,7 +1163,7 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
     
     public static void CallGlobalCommand(GlobalCommand command, RpcTarget rpcTarget, params object[] args)
     {
-        PhotonMessageInfo info;
+        //PhotonMessageInfo info;
         
         byte command_byte = (byte)command;
         Singleton().photonView.RPC(nameof(GC_RPC), rpcTarget, command_byte, args);
@@ -1083,6 +1186,46 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
                 
                 obj.GetComponent<Kaboom1>().ExplodeDamageHostile(transform.localPosition, explosionRadius, explosionForce, explosionDamage, isMine, false, 0);
                 
+                break;
+            }
+            case(GlobalCommand.SetDifficulty):
+            {
+                int _difficulty = (int)args[0];
+                UberManager.Singleton().difficulty = _difficulty;
+                
+                break;
+            }
+            case(GlobalCommand.SetInfernoCircle):
+            {
+                int _infernoCircle = (int)args[0];
+                UberManager.Singleton().infernoCircle = _infernoCircle;
+                break;
+            }
+            case(GlobalCommand.BounceHit_RevolverBlue):
+            {
+                Vector3 startPos    = (Vector3)args[0];
+                Vector3 endPos      = (Vector3)args[1];
+                
+                
+                // if(Physics.Raycast(ray, out hit, revolverShotMaxDistance, bulletMask))
+                // {
+                //     lineEnd = hit.point;
+                //     OnHitScanBounce(hit.point, hitScanDirection, hit.normal, revolverDmg * 2, hit.collider, null, 2.5f, 2, 1650);
+                // }
+                // else
+                // {
+                //     OnHitScan(shotPos + hitScanDirection * revolverShotMaxDistance, hitScanDirection, -hitScanDirection, revolverDmg, null);
+                // }
+                //GameObject bulletFX = ObjectPool.s().Get(ObjectPoolKey.RevolverBullet);
+                GameObject bulletFX = ObjectPool.s().Get(ObjectPoolKey.RevolverBullet);
+                bulletFX.GetComponent<BulletControllerHurtless>().Launch2(startPos, endPos);
+                
+                break;
+            }
+            case(GlobalCommand.AddEnemiesAlive):
+            {
+                int enemiesToAdd = (int)args[0];
+                AudioManager.AddEnemiesAlive(enemiesToAdd);
                 break;
             }
             default:
