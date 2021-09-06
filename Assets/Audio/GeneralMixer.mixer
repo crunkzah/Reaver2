@@ -36,7 +36,7 @@ AudioMixerController:
     - 1e1c94946d4180648b8794c099f48aef
     name: View
   m_CurrentViewIndex: 0
-  m_TargetSnapshot: {fileID: 24500006}
+  m_TargetSnapshot: {fileID: 245215873996834576}
 --- !u!243 &24300002
 AudioMixerGroupController:
   m_ObjectHideFlags: 0
@@ -131,7 +131,7 @@ AudioMixerSnapshotController:
     c1dab23fe278e7041b01c8504672ef6c: 390
     701a334fb90cf8e46998519c3362ad04: 31.9
     f625a15f9634cda4e80fadaf8bc4fe21: 0.149
-    68c61c7fda14e2e448bf643dd4a9e58e: -10
+    68c61c7fda14e2e448bf643dd4a9e58e: -50.2
     d7325cef97e9fe1488eaa3cce8018cce: 4000
   m_TransitionOverrides: {}
 --- !u!243 &243047579101133020
@@ -393,7 +393,7 @@ AudioMixerSnapshotController:
     c1dab23fe278e7041b01c8504672ef6c: 390
     701a334fb90cf8e46998519c3362ad04: 31.9
     f625a15f9634cda4e80fadaf8bc4fe21: 0.149
-    68c61c7fda14e2e448bf643dd4a9e58e: -10
+    68c61c7fda14e2e448bf643dd4a9e58e: -50
     d7325cef97e9fe1488eaa3cce8018cce: 4000
   m_TransitionOverrides: {}
 --- !u!245 &245414330409843268
@@ -456,7 +456,7 @@ AudioMixerSnapshotController:
     c1dab23fe278e7041b01c8504672ef6c: 390
     701a334fb90cf8e46998519c3362ad04: 31.9
     f625a15f9634cda4e80fadaf8bc4fe21: 0.149
-    68c61c7fda14e2e448bf643dd4a9e58e: -10
+    68c61c7fda14e2e448bf643dd4a9e58e: -50
     d7325cef97e9fe1488eaa3cce8018cce: 4000
   m_TransitionOverrides: {}
 --- !u!245 &245732086290904122
@@ -519,7 +519,7 @@ AudioMixerSnapshotController:
     c1dab23fe278e7041b01c8504672ef6c: 390
     701a334fb90cf8e46998519c3362ad04: 31.9
     f625a15f9634cda4e80fadaf8bc4fe21: 0.149
-    68c61c7fda14e2e448bf643dd4a9e58e: -10
+    68c61c7fda14e2e448bf643dd4a9e58e: -50
     d7325cef97e9fe1488eaa3cce8018cce: 4000
   m_TransitionOverrides: {}
 --- !u!245 &245998228439395754
@@ -582,6 +582,6 @@ AudioMixerSnapshotController:
     c1dab23fe278e7041b01c8504672ef6c: 390
     701a334fb90cf8e46998519c3362ad04: 31.9
     f625a15f9634cda4e80fadaf8bc4fe21: 0.149
-    68c61c7fda14e2e448bf643dd4a9e58e: -10
+    68c61c7fda14e2e448bf643dd4a9e58e: -50
     d7325cef97e9fe1488eaa3cce8018cce: 4000
   m_TransitionOverrides: {}

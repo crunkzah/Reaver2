@@ -187,9 +187,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
             return;
         }
         
+        if(HitPoints < GetCurrentMaxHealthPenalty())
+            OnHealed();
+            
         HitPoints += _hp;
-        
-        OnHealed();
         
         if(HitPoints > MaxHealth)
         {
@@ -353,10 +354,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
                 InGameConsole.Log(string.Format("<color=yellow>Snapping foreign player!</color>"));
                 thisTransform.position = syncEndPosition;
             }
-            else
-            {
-                thisTransform.position = Vector3.MoveTowards(thisTransform.position, syncEndPosition, fpsSyncMagnitudeXZ * UberManager.DeltaTime());
-            }
+            // else
+            // {
+            //     thisTransform.position = Vector3.MoveTowards(thisTransform.position, syncEndPosition, fpsSyncMagnitudeXZ * UberManager.DeltaTime());
+            // }
             
             thisTransform.forward =  Vector3.Slerp(syncStartDirection, syncEndDirection, t);
 
@@ -2153,7 +2154,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
         //InGameConsole.LogOrange("Time since last damage taken " + (Time.time - TimeWhenTookDamage).ToString("f"));
         TimeWhenTookDamage = Time.time;
-        dmg = 0;
+        //dmg = 0;
         HitPoints -= dmg;
         MaxHealth -= dmg / 5;
         if(MaxHealth <= 1)

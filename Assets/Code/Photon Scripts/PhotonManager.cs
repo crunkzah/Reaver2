@@ -507,7 +507,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
     
     public Photon.Realtime.ClientState networkClientState;
     
-    static bool usingSavePoints = false;
+    static bool usingSavePoints = true;
     
     void OnLoadedOnSavePoint()
     {
