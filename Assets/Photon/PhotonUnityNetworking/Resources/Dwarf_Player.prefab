@@ -559,7 +559,7 @@ MonoBehaviour:
   MaxHP_mult: 1
   HitPoints: 0
   Stamina: 0
-  hpPercentageRemotePlayer: 1
+  hpPercentage: 1
   hurtLocalClip: {fileID: 8300000, guid: 10f4bf71eaff3d84eb346ad351043443, type: 3}
   launchClip: {fileID: 8300000, guid: c7ab22651f174f74d9231be18119f9d7, type: 3}
   jumpLocalClip: {fileID: 8300000, guid: 8bcabea979b1bef4ca0f98c77140f275, type: 3}

@@ -5,6 +5,8 @@ public class HideRenderer : MonoBehaviour
     static bool invisible = true;
     void OnEnable()
     {
-        GetComponent<Renderer>().enabled = !invisible;
+        Renderer rend = GetComponent<Renderer>();
+        if(rend)
+            GetComponent<Renderer>().enabled = !invisible;
     }
 }

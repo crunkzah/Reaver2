@@ -726,11 +726,11 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     {
         if(remoteAgent)
         {
-            // NavMeshHit navMeshHit;
-            // if(NavMesh.SamplePosition(destPos, out navMeshHit, 0.33f, NavMesh.AllAreas))
-            // {
-                remoteAgent.SetDestination(destPos);
-            // }
+            NavMeshHit navMeshHit;
+            if(NavMesh.SamplePosition(destPos, out navMeshHit, 0.125f, NavMesh.AllAreas))
+            {
+                 remoteAgent.SetDestination(destPos);
+            }
         }
     }
     

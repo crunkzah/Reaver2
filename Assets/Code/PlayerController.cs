@@ -803,11 +803,15 @@ public class PlayerController : MonoBehaviour, IPunObservable
     public float rttInSeconds;
     
     [PunRPC]
-    void ReceiveRTT(int _rtt, float _hpPercentage)
+    void ReceiveRTT(int _rtt, float _hpPercentage, PhotonMessageInfo info)
     {
+        InGameConsole.LogFancy("ReceiveRTT(), Sender: <color=green>" + info.Sender.NickName + "</color>");
+        
         rtt = _rtt;
         rttInSeconds = (float)rtt * 0.001F;
-        hpPercentageRemotePlayer = _hpPercentage;
+        hpPercentage = _hpPercentage;
+        //PhotonView x = PhotonNetwork.GetPhotonView(123);
+        
     }
     
     
@@ -1844,7 +1848,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
             // else
             // {
             int ping = PhotonNetwork.NetworkingClient.LoadBalancingPeer.RoundTripTime;
-            float hpPercentage = (float)(HitPoints) / (float)GetCurrentMaxHealth();
+            float hpPercentage = (float)(HitPoints) / (float)(MaxHealth);
+            InGameConsole.LogFancy(string.Format("ViewID <color={1}>{0}</color> hpPercentage is: {2}", pv.ViewID, (pv.IsMine ? "green" : "#eb9534"), hpPercentage.ToString()));
             pv.RPC(nameof(ReceiveRTT), RpcTarget.All, ping, hpPercentage);
             // }
             rttSendTimer = 0;
@@ -2074,13 +2079,12 @@ public class PlayerController : MonoBehaviour, IPunObservable
     public float Stamina;
     const float staminaRegenDelay = 0.6f;
     
-    public float hpPercentageRemotePlayer = 1;
+    public float hpPercentage = 1;
     
     public float GetHitpointsPercentageRemote()
     {
-        return hpPercentageRemotePlayer;
+        return hpPercentage;
     }
-    
     
     float timeSinceHurt = 4f;
     const float timeForHurtMaterial = 0.225f;
@@ -2099,9 +2103,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         if(pv.IsMine)
         {
-            
             tryingToSlam = false;
-            
             fpsVelocity += boostVel;
         }
     }
@@ -2314,8 +2316,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
             NPCManager.Singleton().aiTargets.Remove(this.transform);
         }
         
-        
-        UberManager.Singleton().RemovePlayerFromList(this.gameObject);
+        if(UberManager.Singleton())
+        {
+            if((UberManager.Singleton().players != null) && (UberManager.Singleton().players_controller != null))
+                UberManager.Singleton().RemovePlayerFromList(this.gameObject);
+        }
         
         if(pv.IsMine == false)
         {

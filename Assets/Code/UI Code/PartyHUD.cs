@@ -87,7 +87,7 @@ public class PartyHUD : MonoBehaviour
                     party.Add(new PartyMember(pcs[i].pv.Owner.NickName, pcs[i]));
                     InGameConsole.LogFancy("_SetPlayersInScene() NickName of player is " + pcs[i].pv.Owner.NickName);
                     party_huds[j].tmp_nick.SetText(pcs[i].pv.Owner.NickName);
-                    party_huds[j].tmp_nick.SetText(pcs[i].rtt.ToString());
+                    party_huds[j].tmp_ping.SetText(pcs[i].rtt.ToString());
                     party_huds[j].holder.SetActive(true);
                     j++;
                 }

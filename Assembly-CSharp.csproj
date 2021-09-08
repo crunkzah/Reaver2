@@ -241,6 +241,7 @@
      <Compile Include="Assets\Code\MathHelper.cs" />
      <Compile Include="Assets\Code\MeleeSwingController.cs" />
      <Compile Include="Assets\Code\MessagePanel.cs" />
+     <Compile Include="Assets\Code\MessageTrigger.cs" />
      <Compile Include="Assets\Code\Mia.cs" />
      <Compile Include="Assets\Code\Monologue.cs" />
      <Compile Include="Assets\Code\MovingNPC.cs" />
@@ -330,6 +331,7 @@
      <Compile Include="Assets\Code\UI Code\LoadingScreen.cs" />
      <Compile Include="Assets\Code\UI Code\LobbyLevelsPanel.cs" />
      <Compile Include="Assets\Code\UI Code\MainMenuManager.cs" />
+     <Compile Include="Assets\Code\UI Code\NicknameInputField.cs" />
      <Compile Include="Assets\Code\UI Code\NonMasterLabel.cs" />
      <Compile Include="Assets\Code\UI Code\PartyHUD.cs" />
      <Compile Include="Assets\Code\UI Code\PlayerListPanel.cs" />

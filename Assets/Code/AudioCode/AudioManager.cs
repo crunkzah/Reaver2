@@ -918,6 +918,10 @@ public class AudioManager : MonoBehaviour
         inst.battle_MusicSrc.Stop();
     }
     
+    public const float defaultMV = 0.75f;
+    public const float defaultEV = 0.9f;
+    
+    
     void Start()
     {
         currentMasterPitch = GetMasterPitch();
@@ -925,13 +929,13 @@ public class AudioManager : MonoBehaviour
         isMuted = false;
         SetMusicMainMenu();
         
-        float savedMusicVolume = PlayerPrefs.GetFloat("MV", 0.75f);
+        float savedMusicVolume = PlayerPrefs.GetFloat("MV", defaultMV);
         InGameConsole.LogFancy("savedMusicVolume " + savedMusicVolume.ToString("f"));
         float savedMusicVolumeDB = Mathf.Log10(savedMusicVolume) * 20;
         musicMasterMixer.audioMixer.SetFloat("MV", savedMusicVolumeDB);
         
         
-        float savedEffectsVolume = PlayerPrefs.GetFloat("EV", 0.9f);
+        float savedEffectsVolume = PlayerPrefs.GetFloat("EV", defaultEV);
         InGameConsole.LogFancy("savedEffectsVolume " + savedEffectsVolume.ToString("f"));
         float savedEffectsVolumeDB = Mathf.Log10(savedEffectsVolume) * 20;
         effectsMixer.audioMixer.SetFloat("EV", savedEffectsVolumeDB);

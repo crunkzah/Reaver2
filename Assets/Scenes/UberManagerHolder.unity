@@ -2584,7 +2584,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 300}
-  m_SizeDelta: {x: -1500, y: 70}
+  m_SizeDelta: {x: -1300, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &769500601
 MonoBehaviour:
@@ -2613,7 +2613,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.0754717, g: 0.0754717, b: 0.0754717, a: 0.7254902}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.4627451}
   m_RaycastTarget: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -5121,7 +5121,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 927892818, guid: 360d99948eaee6a46ae4f5778a7441b3, type: 3}
       propertyPath: m_Color.a
-      value: 1
+      value: 0.92941177
       objectReference: {fileID: 0}
     - target: {fileID: 1335053089, guid: 360d99948eaee6a46ae4f5778a7441b3, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -5317,7 +5317,7 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 1754301869, guid: 360d99948eaee6a46ae4f5778a7441b3, type: 3}
       propertyPath: m_Color.a
-      value: 1
+      value: 0.92941177
       objectReference: {fileID: 0}
     - target: {fileID: 1915478196, guid: 360d99948eaee6a46ae4f5778a7441b3, type: 3}
       propertyPath: m_fontColor.g
@@ -6271,10 +6271,10 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_text: 'Press <size=125%><color=#42cbf5> ''E'' </size></color> to talk '
+  m_text: Amir <3 Marat Amir <3 Marat Amir <3 Marat Amir <3 Marat Amir <3 Marat
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 970f3a47e1e643b4fa3f26aa5e33e0ec, type: 2}
-  m_sharedMaterial: {fileID: 21308928931905024, guid: 970f3a47e1e643b4fa3f26aa5e33e0ec,
+  m_fontAsset: {fileID: 11400000, guid: 5cf192ad263266943b31bfe04157c76e, type: 2}
+  m_sharedMaterial: {fileID: 21308928931905024, guid: 5cf192ad263266943b31bfe04157c76e,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -6300,12 +6300,12 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 40
+  m_fontSize: 36
   m_fontSizeBase: 40
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 36
   m_fontStyle: 1
   m_textAlignment: 514
   m_characterSpacing: 0
@@ -6341,12 +6341,12 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 1615511915}
-    characterCount: 20
+    characterCount: 69
     spriteCount: 0
-    spaceCount: 6
-    wordCount: 4
+    spaceCount: 14
+    wordCount: 15
     linkCount: 0
-    lineCount: 1
+    lineCount: 2
     pageCount: 1
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0

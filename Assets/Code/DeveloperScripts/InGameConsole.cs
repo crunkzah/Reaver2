@@ -142,7 +142,7 @@ public class InGameConsole : MonoBehaviour
         
         // if(!cmd_input_field.isFocused && Input.GetKeyDown(KeyCode.C))
         
-        if(Input.GetKeyDown(KeyCode.C))
+        if(Input.GetKeyDown(KeyCode.Tilde))
         {
             console_panel.gameObject.SetActive(!console_panel.gameObject.activeSelf);
             // Use this to take screenshots without player gui:

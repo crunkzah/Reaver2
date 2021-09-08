@@ -819,12 +819,14 @@ public class UberManager : MonoBehaviour
         //         }
         //     }
         // }
-        if(Input.GetKeyDown(KeyCode.K))
+#if UNITY_EDITOR
+        if(Input.GetKeyDown(KeyCode.F8))
         {
             ScreenCapture.CaptureScreenshot(string.Format("C:/Users/Marat/Desktop/SCREENSHOTS/Screenshot_{0}.png", screenshots), 2);
             ++screenshots;
             InGameConsole.Log("<color=blue>ScreenCaptured</color>");
         }
+#endif
     }
     
     

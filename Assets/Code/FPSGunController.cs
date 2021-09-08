@@ -472,7 +472,7 @@ public class FPSGunController : MonoBehaviour
                     
                 byte fpsCommand = (byte)FPS_Func.Shoot_AR_Ghost;
                 FPSCommand(fpsCommand, AR_Ray.origin, AR_Ray.direction);    
-                pv.RPC("FPSCommand", RpcTarget.Others, AR_Ray.origin, AR_Ray.direction);
+                pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand, AR_Ray.origin, AR_Ray.direction);
                                     
                     
                 //ShootARGhost(AR_Ray.origin, AR_Ray.direction);
@@ -3644,8 +3644,8 @@ public class FPSGunController : MonoBehaviour
                 mp5_alt_bulletShells_ps.Emit(1);
             }
         }
-        
-        mp5_alt_ps.Play();
+        if(mp5_alt_ps)        
+            mp5_alt_ps.Play();
         
         RaycastHit hit;
         Ray ray = new Ray(shotPos, hitScanDirection);
