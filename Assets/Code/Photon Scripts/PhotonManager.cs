@@ -48,8 +48,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
     void Awake()
     {
         PhotonNetwork.UseRpcMonoBehaviourCache = true;
-        PhotonNetwork.SerializationRate = 20;
-        PhotonNetwork.SendRate = 20;
+        PhotonNetwork.SendRate = 24;
+        PhotonNetwork.SerializationRate = 24;
         
         //TODO : Maybe sync scene maybe not - 20.08.2019
         PhotonNetwork.AutomaticallySyncScene = true;
@@ -91,7 +91,10 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         SceneManager.activeSceneChanged += OnActiveSceneChanged;
         SceneManager.sceneLoaded += OnSceneLoaded;
         
-        SetupMyNickName();
+        char c = (char)('A' + Random.Range (0,26));
+        PhotonNetwork.NickName = "Player_" + c.ToString();
+        
+        //SetupMyNickName();
     }
     
     void OnActiveSceneChanged(Scene current, Scene next)
@@ -756,13 +759,16 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
 
     void OnGUI()
     {
-        return;
-        string text = string.Format("<color=green>CanSpawnPlayer_OfflineMode:</color> <color=yellow>{0}</color>", canSpawnPlayer_offlineMode.ToString());
-        GUIStyle style = GUIStyle.none;
+        //return;
+        //string text = string.Format("<color=green>CanSpawnPlayer_OfflineMode:</color> <color=yellow>{0}</color>", canSpawnPlayer_offlineMode.ToString());
+        GUIStyle style = new GUIStyle(GUI.skin.label);;
         
         style.alignment = TextAnchor.MiddleCenter;
         
         float rectWidth = 350;
+        int savePointPriority = UberManager.GetSavePointPriority();
+        
+        string text = string.Format("Current savePoint: {0}", savePointPriority); 
         
         GUI.Label(new Rect((Screen.width)/2 - rectWidth/2, Screen.height - 85, rectWidth, 50), text, style);
         
@@ -837,6 +843,20 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         //Master has left!
         
         Debug.Log(string.Format("<color=yellow>OnPlayerleftRoom(): <color=green>{0}</color> has left room!</color>", otherPlayer.NickName));
+        if(PhotonNetwork.IsMasterClient)
+        {
+            ref List<PlayerController> pcs = ref UberManager.Singleton().players_controller;
+            if(pcs != null)
+            {
+                for(int i = 0; i < pcs.Count; i++)
+                {
+                    if(!pcs[i].pv.isActiveAndEnabled)
+                    {
+                        PhotonNetwork.Destroy(pcs[i].pv);
+                    }
+                }
+            }
+        }
         //Debug.Log("<color=yellow>Are we Master? </color>" + PhotonNetwork.IsMasterClient);
         // if(otherPlayer.IsMasterClient)
         // {
@@ -879,11 +899,12 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         //JoinOrCreateRoom();
     }
 
-    void SetupMyNickName()
+    public void SetupMyNickName(string nickName)
     {
         //Steam, gog, xbox stuff
-        char c = (char)('A' + Random.Range (0,26));
-        PhotonNetwork.NickName = "Crunkz_" + c;
+        //char c = (char)('A' + Random.Range (0,26));
+        //PhotonNetwork.NickName = "Crunkz_" + c;
+        PhotonNetwork.NickName = nickName;
     }
     
     public enum NetworkEvent : byte

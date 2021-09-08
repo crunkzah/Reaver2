@@ -245,6 +245,7 @@
      <Compile Include="Assets\Code\Monologue.cs" />
      <Compile Include="Assets\Code\MovingNPC.cs" />
      <Compile Include="Assets\Code\MovingPlatform.cs" />
+     <Compile Include="Assets\Code\MP5ToPickUp.cs" />
      <Compile Include="Assets\Code\NetCompLabel.cs" />
      <Compile Include="Assets\Code\NetObjectOwner.cs" />
      <Compile Include="Assets\Code\NetworkObject.cs" />
@@ -297,6 +298,7 @@
      <Compile Include="Assets\Code\ScaleAnimator.cs" />
      <Compile Include="Assets\Code\Scenario\DistanceTrigger.cs" />
      <Compile Include="Assets\Code\Scenario\DistanceTriggerNet.cs" />
+     <Compile Include="Assets\Code\Shockwave.cs" />
      <Compile Include="Assets\Code\ShootyThing1.cs" />
      <Compile Include="Assets\Code\ShotDirections.cs" />
      <Compile Include="Assets\Code\SinclaireFloating.cs" />
@@ -329,6 +331,7 @@
      <Compile Include="Assets\Code\UI Code\LobbyLevelsPanel.cs" />
      <Compile Include="Assets\Code\UI Code\MainMenuManager.cs" />
      <Compile Include="Assets\Code\UI Code\NonMasterLabel.cs" />
+     <Compile Include="Assets\Code\UI Code\PartyHUD.cs" />
      <Compile Include="Assets\Code\UI Code\PlayerListPanel.cs" />
      <Compile Include="Assets\Code\UI Code\RoomID.cs" />
      <Compile Include="Assets\Code\UI Code\ValueLabel.cs" />

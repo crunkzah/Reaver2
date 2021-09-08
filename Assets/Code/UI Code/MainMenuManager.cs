@@ -153,6 +153,11 @@ public class MainMenuManager : MonoBehaviour
         // InGameConsole.Log("<color=yellow>Credits</color> Button was pressed !");
     }
     
+    public void SetNickNameInputField(string nickName) 
+    {
+        PhotonManager.Singleton().SetupMyNickName(nickName);
+    }
+    
     public void QuitButton()
     {
         Application.Quit();

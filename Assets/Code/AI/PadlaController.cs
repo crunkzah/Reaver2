@@ -262,7 +262,10 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
                 HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
                 
                 TakeDamageExplosive(incomingDamage);
@@ -273,7 +276,10 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
                 HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
                 
                 byte limb_id = (byte)args[1];
@@ -286,11 +292,24 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
                 HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
                 
                 Vector3 force = (Vector3)args[1];
                 byte limb_id = (byte)args[2];
+                
+                int len = limbs.Length;
+                for(int i = 0; i < len; i++)
+                {
+                    if(limbs[i] && limbs[i].limb_id == limb_id)
+                    {
+                        limbs[i].ReactWithoutPos();
+                    }
+                }
+                
                 TakeDamageForce(incomingDamage, force, limb_id);
                 
                 break;
@@ -707,7 +726,11 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     {
         if(remoteAgent)
         {
-            remoteAgent.SetDestination(destPos);
+            // NavMeshHit navMeshHit;
+            // if(NavMesh.SamplePosition(destPos, out navMeshHit, 0.33f, NavMesh.AllAreas))
+            // {
+                remoteAgent.SetDestination(destPos);
+            // }
         }
     }
     
@@ -944,7 +967,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                                 
                                 NavMeshHit _navMeshHit;
                                 Vector3 samplePos = thisTransform.localPosition;
-                                if(NavMesh.SamplePosition(samplePos, out _navMeshHit, 0.66f, NavMesh.AllAreas))
+                                if(NavMesh.SamplePosition(samplePos, out _navMeshHit, 1.25f, NavMesh.AllAreas))
                                 {
                                     if(canSendCommands)
                                     {

@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     static readonly Vector3 PLAYER_GRAVITY = new Vector3(0, -13F, 0);
     
-    Transform thisTransform;
+    public Transform thisTransform;
     public SkinnedMeshRenderer player_renderer;
         
     AudioSource playerAudioSource;
@@ -89,11 +89,12 @@ public class PlayerController : MonoBehaviour, IPunObservable
     public GameObject Dash_prefab;
     public GameObject debugAvatar;
     public Animator debugAvatarAnim;
+    
+    public Material masterMaterial;
 
     void Start()
     {
         //MakePlayerLight();
-        
         
         
         if(pv.IsMine)
@@ -119,11 +120,16 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
         else
         {
+            if(pv.Owner.IsMasterClient)
+            {
+                debugAvatar.GetComponentInChildren<SkinnedMeshRenderer>().sharedMaterial = masterMaterial;
+            }
             Destroy(wind_audioSource.gameObject);
             Destroy(fpsWeaponPlaceMover);
         }
         
         UberManager.Singleton().AddPlayerToList(this.gameObject);
+        PartyHUD.RebuildPartyHUD();
         
         Revive();
     }
@@ -288,7 +294,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     Vector3 syncVelocity;
 
-    
+    float foreignCameraXAngle;
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -296,7 +302,14 @@ public class PlayerController : MonoBehaviour, IPunObservable
         {
             stream.SendNext(transform.position);
             stream.SendNext(transform.forward);
-            stream.SendNext(fpsVelocity);
+            //stream.SendNext(transform.forward.x)
+            Vector3 fpsVelToSend = fpsVelocity;
+            
+            // if(fpsVelToSend.y == MIN_GRAVITY)
+            //     fpsVelToSend.y = 0;
+                
+            stream.SendNext(fpsVelToSend);
+            stream.SendNext(fpsCameraPlace.localEulerAngles.x);
             
             
             
@@ -313,6 +326,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             syncPosition        = (Vector3)stream.ReceiveNext();
             syncEndDirection    = (Vector3)stream.ReceiveNext();
             syncVelocity        = (Vector3)stream.ReceiveNext();
+            foreignCameraXAngle = (float)stream.ReceiveNext();
 
             
             syncStartDirection  = transform.forward;
@@ -329,6 +343,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
 #endregion
 
+
+    public Transform foreignXAngleIndicator;
 
     void SyncedMovement()
     {
@@ -364,7 +380,12 @@ public class PlayerController : MonoBehaviour, IPunObservable
             // This 'velocity' is used for animation (if not controlled locally):
             //velocity = syncVelocity;
             fpsVelocity = syncVelocity;
-            debugAvatarAnim.SetFloat("MoveSpeed", fpsSyncMagnitudeXZ);
+            if(debugAvatarAnim)
+                debugAvatarAnim.SetFloat("MoveSpeed", fpsSyncMagnitudeXZ);
+            if(foreignXAngleIndicator)
+            {
+                foreignXAngleIndicator.localEulerAngles = new Vector3(foreignCameraXAngle, foreignXAngleIndicator.localRotation.y, foreignXAngleIndicator.localRotation.z);
+            }
         }
         else
         {
@@ -442,6 +463,12 @@ public class PlayerController : MonoBehaviour, IPunObservable
         if(pv.IsMine)
         {
             Transform _camTr = FollowingCamera.Singleton().transform;
+            RotationAnimator rot_anim_cam = _camTr.GetComponent<RotationAnimator>();
+            if(rot_anim_cam)
+            {
+                rot_anim_cam.enabled = false;
+                Destroy(rot_anim_cam);
+            }
             if(_camTr)
             {
                 Rigidbody _camRb = _camTr.gameObject.GetComponent<Rigidbody>();
@@ -484,7 +511,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     public Transform fpsWallJumpSensor;
     bool makeMouseSensitivityUniversal = false;
     public float fpsMouseSens = 1f;
-    const float baseMoveSpeed = 12.5F;
+    const float baseMoveSpeed = 11.5F;
     float fpsMaxMoveSpeedCurrent = 12.5f;
     
     float bunnyHopSpeedMult = bunnyHopMinMult;
@@ -493,6 +520,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     const float fpsDuckSpeed = 4.0f;
     const float fpsSlideSpeed = 17.5F;
+    
     const float fpsJumpForce = 10;
     const float fpsGravity = -9.8f * 3F;
     public float player_gravity_multiplier = 1;
@@ -526,6 +554,15 @@ public class PlayerController : MonoBehaviour, IPunObservable
         return HeadTarget.position;
     }
     
+    public Vector3 GetHeadPositionPredicted()
+    {
+        if(!HeadTarget)
+        {
+            return new Vector3(0, 0, 0);
+        }
+        return HeadTarget.position + fpsVelocity * rttInSeconds;
+    }
+    
     public float moveSpeedMultiplier = 1;
     public float moveSpeedMultiplier_RevolverUlt = 1;
     
@@ -539,10 +576,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     Vector3 normalCameraPlacePosition = new Vector3(0, 0, 0);
     Vector3 duckCameraPlacePosition = new Vector3(0, 0f, 0);//new Vector3(0, -1.626f, 0);
-    float targetFov = 110;
+    float targetFov = 103;
     float fovSpeed = 60f;
     
-    const float normalFov = 110;
+    const float normalFov = 103;
     const float duckingFov = 120;
     
     
@@ -595,49 +632,61 @@ public class PlayerController : MonoBehaviour, IPunObservable
     //public AudioSource slidingAudioClip;
     public AudioSource playerAudioSource_sliding;
     
+    
+    
+    [PunRPC]
     void OnSlideStarted()
     {
-        isSliding = true;
         slidingPs.Play();
-        
-        controller.height = slideControllerHeight;
-        controller.center = new Vector3(0, slideControllerHeight / 2f, 0);
         
         if(pv.IsMine)
         {
+            controller.height = slideControllerHeight;
+            controller.center = new Vector3(0, slideControllerHeight / 2f, 0);
+            isSliding = true;
             CameraShaker.Slide();
             fpsCameraPlace.localPosition = duckCameraPlacePosition;
             // fpsCam_camera.fieldOfView = duckingFov;
             slideVel.y = slideGravity;
             wasLaunchedToSlam = false;
+            playerAudioSource_sliding.Play();
             //Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("NPC2"), true);
+        }
+        else
+        {
+            debugAvatarAnim.SetLayerWeight(1, 1);
         }
         
         
-        playerAudioSource_sliding.Play();
     }
     
     public bool canSlide = true;
     
+    [PunRPC]
     void OnSlideEnded()
     {
-        isSliding = false;
-        float castDistance = normalControllerHeight - slideControllerHeight;
-        RaycastHit hit;
         slidingPs.Stop();
-        playerAudioSource_sliding.Stop();
         
-        if(Physics.CapsuleCast(GetTopCapsuleP(), GetBottomCapsuleP(), controller.radius, vUp, out hit,  castDistance, groundAndNPCMask))
+        if(!pv.IsMine)
         {
-            InGameConsole.LogOrange("Can't stand from sliding!");
-            Debug.Log("Collider: <color=yellow>" + hit.collider + "</color>");
+            debugAvatarAnim.SetLayerWeight(1, 0);
         }
         else
         {
-            controller.height = normalControllerHeight;
-            controller.center = new Vector3(0, normalControllerHeight/2f, 0);
-            if(pv.IsMine)
+            isSliding = false;
+            playerAudioSource_sliding.Stop();
+            float castDistance = normalControllerHeight - slideControllerHeight;
+            RaycastHit hit;
+            if(Physics.CapsuleCast(GetTopCapsuleP(), GetBottomCapsuleP(), controller.radius, vUp, out hit,  castDistance, groundAndNPCMask))
             {
+                InGameConsole.LogOrange("Can't stand from sliding!");
+                Debug.Log("Collider: <color=yellow>" + hit.collider + "</color>");
+            }
+            else
+            {
+                pv.RPC(nameof(OnSlideEnded), RpcTarget.Others);
+                controller.height = normalControllerHeight;
+                controller.center = new Vector3(0, normalControllerHeight/2f, 0);
                 slideVel.x = 0;
                 slideVel.z = 0;
                 slideVel.y = slideGravity;
@@ -645,7 +694,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
                 CameraShaker.UnSlide();
                 
                 fpsCameraPlace.localPosition = normalCameraPlacePosition;
-                //Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("NPC2"), false);
+                    //Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("NPC2"), false);
             }
         }
     }
@@ -754,10 +803,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
     public float rttInSeconds;
     
     [PunRPC]
-    void ReceiveRTT(int _rtt)
+    void ReceiveRTT(int _rtt, float _hpPercentage)
     {
         rtt = _rtt;
         rttInSeconds = (float)rtt * 0.001F;
+        hpPercentageRemotePlayer = _hpPercentage;
     }
     
     
@@ -857,7 +907,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     public ParticleSystem wind_player_ps;
     
-    
+    const float dashZeroGravityDuration = 0.15F;
+    float dashZeroGravityTimer = 0;
     
     void FPSDash(Vector3 dashDirWorldSpace)
     {
@@ -878,6 +929,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
         if(pv.IsMine)
         {
             MakeImmuneForDamageForXTime(dashDamageImmune);
+            dashZeroGravityTimer = dashZeroGravityDuration;
+            
+            
             if(dashDirWorldSpace.x == 0 && dashDirWorldSpace.z == 0)
             {
                 dashDirWorldSpace = thisTransform.forward;
@@ -915,7 +969,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
         
         FPSDashFX();
-        pv.RPC("FPSDashFX", RpcTarget.Others);
+        //pv.RPC("FPSDashFX", RpcTarget.Others);
     }
     
     public AudioClip dashAudioClip;
@@ -925,7 +979,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         damageImmuneTimer = x;
     }
     
-    [PunRPC]
+    
     void FPSDashFX()
     {
         playerAudioSource.PlayOneShot(dashAudioClip, 0.5f);
@@ -980,7 +1034,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
         p2.y += 0.1f;
         
         RaycastHit hit;
-        if(Physics.CapsuleCast(p1, p2, controller.radius * 1.25f, Vector3.down, out hit, dt * Math.Abs(slamVelocityY), npc2Mask))
+        
+        if(Physics.CapsuleCast(p1, p2, controller.radius * 1.75f, Vector3.down, out hit, dt * Math.Abs(slamVelocityY), npc2Mask))
         {
             NetworkObject npc_net_comp = hit.collider.GetComponent<NetworkObject>();
             if(npc_net_comp != null)
@@ -994,27 +1049,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
                     
                     idl.TakeDamageLocally(SlamDirectDamage, thisTransform.localPosition, Vector3.down);
                     NetworkObjectsManager.CallNetworkFunction(npc_net_comp.networkId, NetworkCommand.TakeDamageExplosive, SlamDirectDamage);                       
-                    
-                    // if(npc_hp - SlamDirectDamage <= 0)
-                    // {
-                    //     Physics.IgnoreCollision(controller, hit.collider, true);
-                    //     byte limb_to_destroy = (byte)Random.Range(1, 4);
-                    //     NetworkObjectsManager.CallNetworkFunction(npc_net_comp.networkId, NetworkCommand.TakeDamageExplosive, Vector3.down * 125);                       
-                    //     //InGameConsole.Log("<color=green>DOING SLAM DIRECT DAMAGE 1</color>");
-                    // }
-                    // else
-                    // {
-                    //     idl.TakeDamageLocally(SlamDirectDamage, thisTransform.localPosition, Vector3.down);
-                    //     NetworkObjectsManager.CallNetworkFunction(npc_net_comp.networkId, NetworkCommand.TakeDamageLimbWithForce, SlamDirectDamage);
-                        
-                    //     tryingToSlam = false;
-                        
-                        
-                    //     //PlayDirSlam();
-                        
-                    //     pv.RPC("PlayDirSlam", RpcTarget.Others);
-                    //     InGameConsole.Log("<color=yellow>DOING SLAM DIRECT DAMAGE 2</color>");
-                    // }
                 }
             }
         }
@@ -1028,7 +1062,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     float groundSlammed_timeStamp;
     float onBecomeGrounded_timeStamp;
-    const float slamBoostTimeWindow = 0.75f;
+    const float slamBoostTimeWindow = 0.4f;
     
     float GetGroundSlamDelay()
     {
@@ -1327,9 +1361,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
                             slideVel = fpsVelocity;
                         }
                         slideVel.y = 0;
+                        
                         slideVel = Math.Normalized(slideVel);
                         
                         slideVel *= fpsSlideSpeed * moveSpeedMultiplier;
+                        pv.RPC(nameof(OnSlideStarted), RpcTarget.Others);
                         OnSlideStarted();
                     }
                 }
@@ -1389,7 +1425,14 @@ public class PlayerController : MonoBehaviour, IPunObservable
             }
             
             float _fpsGravity = fpsGravity;
-            if(gunController.hook && gunController.hook.state == HookState.Hooked)
+            
+            dashZeroGravityTimer -= dt;
+            if(dashZeroGravityTimer < 0f)
+            {
+                dashZeroGravityTimer = 0f;
+            }
+            
+            if((dashZeroGravityTimer > 0) || (gunController.hook && gunController.hook.state == HookState.Hooked))
             {
                 _fpsGravity = 0;
             }
@@ -1459,7 +1502,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
                             calculatedV.y = MIN_GRAVITY;
                         }
                     }
-                    
+                    InGameConsole.LogFancy("Hitting " + capsuleCastHit.collider.gameObject.name);
                     //InGameConsole.LogFancy(string.Format("PlayerController(): hit something, <color=green>v1{0}</color>, <color=yellow>v2{1}</color>", fpsVelocity, calculatedV));
                     fpsVelocity = calculatedV;
                     //InGameConsole.LogFancy(string.Format("PlayerController(): dot: <color=green>{0}</color> magnitude<color=yellow>{1}</color>", dot, fpsVelMagnitude));
@@ -1707,6 +1750,16 @@ public class PlayerController : MonoBehaviour, IPunObservable
         return thisTransform.localPosition + new Vector3(0, controller.height/2 , 0);
     }
     
+    public Vector3 GetCenterPositionPredictedXZ()
+    {
+        if(!thisTransform)
+            return new Vector3(0, 0, 0);
+            
+        Vector3 _centerPos = thisTransform.localPosition + new Vector3(0, controller.height/2 , 0);
+        
+        return _centerPos + Math.GetXZ(fpsVelocity) * rttInSeconds * 0.5f;
+    }
+    
     
     public Vector3 GetGroundPosition()
     {
@@ -1779,20 +1832,21 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
     }
     
-    void SyncRTTWithMaster(float dt)
+    void SyncRTTAndHitPointsPercentage(float dt)
     {
         if(rttSendTimer > rttSendCD)
         {
             // InGameConsole.LogFancy("UpdateRTT");
-            if(PhotonNetwork.IsMasterClient)
-            {
-                ReceiveRTT(PhotonNetwork.NetworkingClient.LoadBalancingPeer.RoundTripTime);
-            }
-            else
-            {
-                int ping = PhotonNetwork.NetworkingClient.LoadBalancingPeer.RoundTripTime;
-                pv.RPC("ReceiveRTT", RpcTarget.MasterClient, ping);
-            }
+            // if(PhotonNetwork.IsMasterClient)
+            // {
+            //     ReceiveRTT(PhotonNetwork.NetworkingClient.LoadBalancingPeer.RoundTripTime);
+            // }
+            // else
+            // {
+            int ping = PhotonNetwork.NetworkingClient.LoadBalancingPeer.RoundTripTime;
+            float hpPercentage = (float)(HitPoints) / (float)GetCurrentMaxHealth();
+            pv.RPC(nameof(ReceiveRTT), RpcTarget.All, ping, hpPercentage);
+            // }
             rttSendTimer = 0;
         }
         else
@@ -1848,7 +1902,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     void Update()
     {
         float dt = UberManager.DeltaTime();
-        SyncRTTWithMaster(dt);
+        SyncRTTAndHitPointsPercentage(dt);
         
         
         if(pv.IsMine)
@@ -2020,6 +2074,13 @@ public class PlayerController : MonoBehaviour, IPunObservable
     public float Stamina;
     const float staminaRegenDelay = 0.6f;
     
+    public float hpPercentageRemotePlayer = 1;
+    
+    public float GetHitpointsPercentageRemote()
+    {
+        return hpPercentageRemotePlayer;
+    }
+    
     
     float timeSinceHurt = 4f;
     const float timeForHurtMaterial = 0.225f;
@@ -2116,12 +2177,14 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     float maxHealthTimer = 0;
     
+    const float MaxHealthPenaltyRecoveryTime = 5f;
+    
     void UpdateMaxHealth(float dt)
     {
         if(!isAlive)
             return;
             
-        if(Math.Abs(Time.time - TimeWhenTookDamage) > 4)
+        if(Math.Abs(Time.time - TimeWhenTookDamage) > MaxHealthPenaltyRecoveryTime)
         {
             maxHealthTimer += dt * 10;
             if(maxHealthTimer > 1)
@@ -2210,6 +2273,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         // }
        if(pv.IsMine && FollowingCamera.Singleton() && fpsCameraPlace.childCount > 0)
        {
+            
             Transform _camTr = FollowingCamera.Singleton().transform;
             _camTr.SetParent(null);
             _camTr.localPosition  = new Vector3(0, 8, 0);
@@ -2249,6 +2313,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
         {
             NPCManager.Singleton().aiTargets.Remove(this.transform);
         }
+        
+        
+        UberManager.Singleton().RemovePlayerFromList(this.gameObject);
         
         if(pv.IsMine == false)
         {
@@ -2349,6 +2416,21 @@ public class PlayerController : MonoBehaviour, IPunObservable
         gunController.DestroyFPSGuns();
     }
     
+    [PunRPC]
+    void DieRPC()
+    {
+      //  ParticlesManager.Play(ParticleType.blood_cloud1, thisTransform.localPosition + new Vector3(0, 2, 0), Vector3.forward);
+      //  ParticlesManager.Play(ParticleType.blood_cloud1, thisTransform.localPosition + new Vector3(0, 2, 0) + Vector3.right, Vector3.forward);
+      //  ParticlesManager.Play(ParticleType.blood_cloud1, thisTransform.localPosition + new Vector3(0, 2, 0) + Vector3.left, Vector3.forward);
+     //   ParticlesManager.Play(ParticleType.blood_cloud1, thisTransform.localPosition + new Vector3(0, 2, 0) + Vector3.down, Vector3.forward);
+    //    ParticlesManager.Play(ParticleType.gibs_explosion_ps, thisTransform.localPosition + new Vector3(0, 2, 0), Vector3.forward);
+        isAlive = false;
+        if(!pv.IsMine)
+        {
+            Destroy(debugAvatar);
+        }
+    }
+    
     //[PunRPC]
     void Die()
     {
@@ -2362,6 +2444,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
         if(pv.IsMine)
         {
+            pv.RPC(nameof(DieRPC), RpcTarget.Others);
             Invoke(nameof(OnDieDestroyFPSGUNS), 0.1f);
             PlayerGUI_In_Game.Singleton().ReleasePlayerGUI();
             PostProcessingController2.SetState(PostProcessingState.PlayerDead);

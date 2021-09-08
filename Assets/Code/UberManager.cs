@@ -93,6 +93,19 @@ public class UberManager : MonoBehaviour
         }
     }
     
+    public void RemovePlayerFromList(GameObject player)
+    {
+        if(players.Contains(player))
+        {
+            players.Remove(player);
+            PlayerController pc = player.GetComponent<PlayerController>();
+            if(players_controller.Contains(pc))
+            {
+                players_controller.Remove(pc);
+            }
+        }
+    }
+    
     
     
     [Header("QTS prefab:")]
@@ -127,6 +140,23 @@ public class UberManager : MonoBehaviour
     }
     
     static bool useQTS  = true;
+    
+    public void ToggleUseFogs()
+    {
+        //bool UseFogs = (PlayerPrefs.GetInt("Fogs", 1) == 1);
+        bool UseFogs = (PlayerPrefs.GetInt("Fogs", 1) == 1);
+        if(UseFogs)
+        {
+            PlayerPrefs.SetInt("Fogs", 0);
+        }
+        else
+        {
+            PlayerPrefs.SetInt("Fogs", 1);
+        }
+        
+        int currentBuildIndex = UberManager.GetCurrentLevelIndex();
+        OnFogsChanged(currentBuildIndex);
+    }
     
     public static QuickTimeSphere MakeQTS(int _caller_id, Transform _parent, Vector3 pos, QuickTimeType _type, float _radius, int _damage, float _time_to_be_alive)
     {
@@ -181,6 +211,8 @@ public class UberManager : MonoBehaviour
                 }
             }
         }
+        
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
     }
     
 
@@ -188,18 +220,114 @@ public class UberManager : MonoBehaviour
 
     void Start()
     {
-       local_settings = new LocalSettings();
+        local_settings = new LocalSettings();   
+       
+        bool hasKeyFogs = PlayerPrefs.HasKey("Fogs");
+        
+        InGameConsole.LogOrange("HasKeyFogs: " + hasKeyFogs);
+        InGameConsole.LogOrange("HasKeyFogs: " + hasKeyFogs);
+        InGameConsole.LogOrange("HasKeyFogs: " + hasKeyFogs);
+        InGameConsole.LogOrange("HasKeyFogs: " + hasKeyFogs);
+        InGameConsole.LogOrange("HasKeyFogs: " + hasKeyFogs);
+       
+        if(PlayerPrefs.GetInt("Fogs", 1) == 1)
+        {
+            InGameConsole.LogOrange("GetIntFogs(): " + PlayerPrefs.GetInt("Fogs", 1));  
+        }
+        else
+        {
+            InGameConsole.LogOrange("<color=green>GetIntFogs()</color>: " + PlayerPrefs.GetInt("Fogs", 1));     
+        }
     //    local_settings.ReadLocalSettings();
     
-       Application.targetFrameRate = 144;
+       //Application.targetFrameRate = 144;
+       Application.targetFrameRate = 300;
     }
     
-    void OnLevelChanged(Scene prev, Scene now)
+    void OnFogsChanged(int currentBuildIndex)
     {
-        InGameConsole.LogOrange(string.Format("OnLevelChanged: <color=yellow>{0}</color>-><color=blue>{1}</color>", prev.name, now.name));
-        
-        
-        timeSinceLevelLoaded = TimeSinceStart();
+        bool UseFogs = (PlayerPrefs.GetInt("Fogs", 1) == 1);
+        if(UseFogs)
+        {
+            switch(currentBuildIndex)
+            {
+                case(0):
+                {
+                    RenderSettings.fog = false;
+                    break;
+                }
+                case(1):
+                {
+                    RenderSettings.fog = false;
+                    break;
+                }
+                case(2):
+                {
+                    RenderSettings.fog = true;
+                    break;
+                }
+                case(3):
+                {
+                    RenderSettings.fog = false;
+                    break;
+                }
+                
+                case(4):
+                {
+                    RenderSettings.fog = true;
+                    break;
+                }
+                case(5):
+                {
+                    RenderSettings.fog = false;
+                    break;
+                }
+                case(6):
+                {
+                    RenderSettings.fog = false;
+                    break;
+                }
+                case(7):
+                {
+                    RenderSettings.fog = true;
+                    break;
+                }
+                case(8):
+                {
+                    RenderSettings.fog = false;
+                    break;
+                }
+                case(9):
+                {
+                    RenderSettings.fog = false;
+                    break;
+                }
+                
+                default:
+                {
+                    RenderSettings.fog = true;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            RenderSettings.fog = false;
+        }
+    }
+    
+    void OnActiveSceneChanged(Scene prev, Scene now)
+    {
+        //InGameConsole.LogOrange(string.Format("UberManager(): OnActiveSceneChanged(): <color=yellow>{0}</color>-><color=blue>{1}</color>", prev.name, now.name));
+        if(now.buildIndex < 2)
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+        DialogueManager.HideShutter();
+        OnFogsChanged(now.buildIndex);
+        PartyHUD.RebuildPartyHUD();
+        //timeSinceLevelLoaded = TimeSinceStart();
     }
     
     public static float deltaTime = 0f;
@@ -495,6 +623,8 @@ public class UberManager : MonoBehaviour
         string text = string.Format("<color=yellow>Spawn NPC: <color=green>{0}</color></color>", spawn_npcs[spawn_index]);
         rectWidth = 200;
         GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 52, rectWidth, 50), text, style);
+        //text = string.Format("UseFogs: {0}", UseFogs);
+        //GUI.Label(new Rect((Screen.width-rectWidth)/2, Screen.height - 102, rectWidth, 50), text, style);
         
     }
 
@@ -579,7 +709,7 @@ public class UberManager : MonoBehaviour
     
     public int infernoCircle;
     public int difficulty = 3; // 0, 1, 2, 3
-    public const int HEALING_DMG_THRESHOLD = 35;
+    public static int HEALING_DMG_THRESHOLD = 40;
     
     public static void ResetRestartsCount()
     {
@@ -606,6 +736,7 @@ public class UberManager : MonoBehaviour
     public static void StopInGameTimer()
     {
         GameStats.SetStats(Singleton().RestartsOnThisLevel, Singleton().InGameTimer, Singleton().difficulty);
+        //if(PhotonNetwork.)
         GameStats.Show();
         Singleton()._StopInGameTimer();
     }
@@ -632,12 +763,12 @@ public class UberManager : MonoBehaviour
         {
             case(InGameTimerState.NotCounting):
             {
-            break;
+                break;
             }
             case(InGameTimerState.Working):
             {
                 InGameTimer += dt;
-            break;
+                break;
             }
         }
     }

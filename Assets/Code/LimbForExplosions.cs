@@ -5,6 +5,7 @@ public class LimbForExplosions : MonoBehaviour
     public DamagableLimb[] limbs;
     
     static Vector3 vForward = new Vector3(0, 0, 1);
+    public bool canBeAffected = true;
     
     void Awake()
     {
@@ -13,6 +14,12 @@ public class LimbForExplosions : MonoBehaviour
     
     public void ExplodeEveryLimb()
     {
+        if(!canBeAffected)
+        {
+            return;
+        }
+        
+        
         int len = limbs.Length;
         
         for(int i = 0; i < len; i++)
@@ -25,6 +32,11 @@ public class LimbForExplosions : MonoBehaviour
     
     public void OnExplodeAffected()
     {
+        if(!canBeAffected)
+        {
+            return;
+        }
+        
         if(limbs != null)
         {
             int len = limbs.Length;

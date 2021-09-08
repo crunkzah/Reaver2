@@ -621,6 +621,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   limbs: []
+  canBeAffected: 1
 --- !u!114 &5080211031617784813
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -645,7 +646,7 @@ MonoBehaviour:
   state: 0
   velocity: {x: 0, y: 0, z: 0}
   clipStep: {fileID: 8300000, guid: 73ed0b4410af8684d848f5b90022da31, type: 3}
-  clipHurt1: {fileID: 0}
+  clipHurt1: {fileID: 8300000, guid: f3d55798e8a7a41438f7a72e1b12af32, type: 3}
   clipDeath: {fileID: 0}
   clipLaunchedAirborne: {fileID: 0}
   clipShoot: {fileID: 0}
@@ -1952,7 +1953,7 @@ AudioSource:
   Priority: 50
   DopplerLevel: 1
   MinDistance: 2
-  MaxDistance: 6
+  MaxDistance: 16
   Pan2D: 0
   rolloffMode: 2
   BypassEffects: 0

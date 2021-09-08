@@ -17,7 +17,7 @@ public class StartUpScreen : MonoBehaviour
         return Instance;
     }
     
-    float duration = 1.75f;
+    float duration = 2.5f;
     
     Image img;
 
@@ -37,7 +37,7 @@ public class StartUpScreen : MonoBehaviour
         // Color col = img.color;
         // Color col = Color.black;
         // img.color = new Color(col.r, col.g, col.b, 1f);
-        FadeIn(1f);
+        FadeIn(2f);
     }
     
     public void FadeIn(float _duration)
@@ -49,6 +49,7 @@ public class StartUpScreen : MonoBehaviour
         alpha = 1f;
         Color col = Color.black;
         img.color = new Color(col.r, col.g, col.b, 1f);
+        this.gameObject.SetActive(true);
     }
     
     // void FadeOut()

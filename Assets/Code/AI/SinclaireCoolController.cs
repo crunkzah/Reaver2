@@ -9,6 +9,8 @@ public enum SinclaireCoolState : byte
     SwordAttacking1,
     Firing1,
     SpawningCool,
+    Vanished,
+    Slamming,
     Dead
 }
 
@@ -28,12 +30,26 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
     Rigidbody[] joint_rbs;
     //CharacterJoint[] joints;
     
+    //public ParticleSystem hair;
+    
     public SinclaireCoolState state;
+    
+    public GameObject shockwave_prefab;
     
     //public TrailRendererController sword_tr_controller;
     public SinclaireSword sword;
     
     public ParticleSystem[] details_ps;
+    
+    const float vanishDuration = 3f; 
+    
+    const int shockWaveDamage = 33;
+    
+    void MakeShockWave(Vector3 pos)
+    {
+        GameObject shockwave_obj = Instantiate(shockwave_prefab, new Vector3(1000, 1000, 1000), Quaternion.identity);
+        shockwave_obj.GetComponent<Shockwave>().DoShockwave(pos, 4f, shockWaveDamage);
+    }
     
     
     void InitJoints()
@@ -70,14 +86,60 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
     DamagableLimb[] limbs;
     
     SpawnedObject spawnedObjectComp;
+    LimbForExplosions limb_for_explosions;
+    
+    public SkinnedMeshRenderer smr;
+    public MeshRenderer dagger_rend;
+    public MeshRenderer dagger_rend2;
+    
+    
+    void GoVanish()
+    {
+        dagger_rend.enabled     = false;
+        dagger_rend2.enabled    = false;
+        smr.enabled             = false; 
+        
+        sword.Appear();
+        sword.Hide();
+        
+        limb_for_explosions.canBeAffected = false;
+        int len = limbs.Length;
+        for(int i = 0; i < len; i++)
+        {
+            limbs[i].react = DamageReactType.no_react;
+        }
+        len = details_ps.Length;
+        for(int i = 0; i < len; i++)
+            details_ps[i].Stop();
+    }
+    
+    void ReturnFromVanish()
+    {
+        dagger_rend.enabled  = true;
+        dagger_rend2.enabled = true;
+        smr.enabled          = true;
+        
+        limb_for_explosions.canBeAffected = true;
+        int len = limbs.Length;
+        for(int i = 0; i < len; i++)
+        {
+            
+            limbs[i].react = DamageReactType.headShot_dmg;
+        }
+        sword.Show();
+        len = details_ps.Length;
+        for(int i = 0; i < len; i++)
+            details_ps[i].Play();
+    }
     
     void Awake()
     {
-        
         instance_id = GetInstanceID();
         spawnedObjectComp = GetComponent<SpawnedObject>();
         InitJoints();
         DisableSkeleton();
+        
+        limb_for_explosions = GetComponent<LimbForExplosions>();
         
         col = GetComponent<CapsuleCollider>();
         net_comp = GetComponent<NetworkObject>();
@@ -149,6 +211,13 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
             InitAsMaster();    
         }
         
+        HitPoints = MaxHealth;
+        if(PhotonNetwork.CurrentRoom.PlayerCount > 1)
+        {
+            HitPoints *= PhotonNetwork.CurrentRoom.PlayerCount;
+            CalculatedMaxHealth = HitPoints;
+        }
+        
         NPCManager.RegisterKillable(this);
         
         if(UberManager.GetCurrentLevelIndex() == 2 && UberManager.Singleton().infernoCircle == 0) //If we are on level_Start
@@ -174,7 +243,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
     
     public float GetBossHitPointsPercents()
     {
-        float Result = HitPoints / (MaxHealth / 100f);
+        float Result = HitPoints / (CalculatedMaxHealth * 0.01f);
         return Result;
     }
     
@@ -189,6 +258,8 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
     {
         canSendCommands = true;
     }
+    
+    public ParticleSystem slam_ps;
     
     public void ReceiveCommand(NetworkCommand command, params object[] args)
     {
@@ -209,6 +280,8 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                         SetState(SinclaireCoolState.Chasing);
                     }
                 }
+                
+                brainTimer = path_update_cd;
                 
                 break;
             }
@@ -296,7 +369,10 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                 
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
                 HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.5f, 0), small_healing_times);
                 
                 TakeDamageExplosive(incomingDamage);
@@ -311,7 +387,10 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                 }
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
                 HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.5f, 0), small_healing_times);
                 
                 byte limb_id = (byte)args[1];
@@ -328,7 +407,10 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                 }
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
                 HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.5f, 0), small_healing_times);
                 
                 Vector3 force = (Vector3)args[1];
@@ -337,11 +419,85 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                 
                 break;
             }
+            case(NetworkCommand.Ability2):
+            {
+                UnlockSendingCommands();
+                
+                GoVanish();
+                SetState(SinclaireCoolState.Vanished);
+                
+                
+                break;
+            }
+            case(NetworkCommand.Ability3):
+            {
+                UnlockSendingCommands();
+                
+                currentSlamPos = (Vector3)args[0];
+                float slamHeight = (float)args[1];
+                
+                ReturnFromVanish();                
+                thisTransform.localPosition = currentSlamPos + new Vector3(0, slamHeight, 0);
+                if(remoteAgent)
+                {
+                    remoteAgent.enabled = false;
+                }
+                anim.Play("Base.Slam", 0, 0);
+                slam_ps.Play();
+                didSlam = false;
+                
+                SetState(SinclaireCoolState.Slamming);
+                
+                
+                break;
+            }
             default:
             {
                 break;
             }
         }
+    }
+    
+    const float slamSpeed = 72;
+    Vector3 currentSlamPos;
+    bool didSlam = false;
+    
+    
+    
+    public void S()
+    {
+        if(PhotonNetwork.IsMasterClient)
+        {
+            if(remoteAgent)
+            {
+                remoteAgent.enabled = true;
+                WarpRemoteAgent(thisTransform.localPosition);
+                UpdateRemoteAgentDestination(thisTransform.localPosition);
+                
+            }
+            
+            firing_masterTimer = 0.5f;
+            slam_cooldown_timer = 0;
+            if(canSendCommands)
+            {
+                Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
+                if(potentialTarget)
+                {
+                    PlayerController pc = potentialTarget.GetComponent<PlayerController>();
+                    if(pc)
+                    {
+                        LockSendingCommands();
+                        NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
+                    }
+                }
+                else
+                {
+                    LockSendingCommands();
+                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetState, (byte)SinclaireCoolState.Idle);
+                }
+            }
+        }
+        //MakeShockWave(thisTransform.localPosition);
     }
     
     void SetTarget(PlayerController target)
@@ -360,6 +516,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
         {
             Destroy(current_qts);
         }
+        
         
         switch(_state)
         {
@@ -462,13 +619,13 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
     //const float sword_attack1_damageTimingEnd = 1.1F / 4;
     
     //const float sword_attack1_distance = 2F;
-    const float sword_attack1_radius = 1.6F;
+    const float sword_attack1_radius = 2F;
     const int sword_attack1_dmg = 30;
     
     
     const float firing_duration = 2 / 2;
     const int firing_damage_per_proj = 25;
-    const float firing_timing = 1F / 2;
+    const float firing_timing = 1F / 2.5f;
     const float firing_cooldown = 4.0F;
     const float firing_distance = 144F;
     
@@ -606,6 +763,8 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
     
     
     const float spawning_duration = 4.4f;
+    const float slam_cooldown = 6;
+    float slam_cooldown_timer;
     
     void UpdateBrain(float dt)
     {
@@ -635,12 +794,39 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                 {
                     brainTimer += dt;
                     firing_masterTimer += dt;
+                    slam_cooldown_timer += dt;
+                    
+                    
                     Vector3 targetGroundPos = target_pc.GetGroundPosition();
                     
                     UpdateRemoteAgentDestination(targetGroundPos);
                    
                     if(canSendCommands)
                     {
+                        if(slam_cooldown_timer > slam_cooldown)
+                        {
+                            LockSendingCommands();
+                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability2);
+                            break;
+                            
+                            // int playerCount = NPCManager.AITargets().Count;
+                            
+                            // int rand = Random.Range(0, playerCount);
+                            
+                            
+                            // PlayerController slam_target = NPCManager.AITargets()[rand].GetComponent<PlayerController>(); 
+                            // if(slam_target && slam_target.isAlive)
+                            // {
+                            //     LockSendingCommands();
+                            //     NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability1)
+                            //     break;                                                                
+                            // }
+                            // else
+                            // {
+                            //     slam_cooldown_timer = slam_cooldown * 0.8f;
+                            // }
+                        }
+                        
                         Vector3 sinclaireGroundPosition = thisTransform.localPosition;
                         
                         inRange1 = Math.SqrDistance(targetGroundPos, sinclaireGroundPosition) < dashDistanceCheck * dashDistanceCheck;
@@ -708,7 +894,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                             if(Math.SqrDistance(thisTransform.localPosition, movePos) > 0.175F * 0.175F)
                             {
                                 LockSendingCommands();
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Move, movePos);
+                                NetworkObjectsManager.CallNetworkFunctionUnreliable(net_comp.networkId, NetworkCommand.Move, movePos);
                             }
                         }
                     }
@@ -801,6 +987,64 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                 
                 break;
             }
+            case(SinclaireCoolState.Vanished):
+            {
+                brainTimer += dt;
+                if(brainTimer > vanishDuration)
+                {
+                    int playerCount = NPCManager.AITargets().Count;
+                    int playersAlive = 0;
+                    for(int i = 0; i < playerCount; i++)
+                    {
+                        if(NPCManager.AITargets()[i].GetComponent<PlayerController>().isAlive)
+                            playersAlive++;
+                    }
+                    
+                    float slamHeight = 18;
+                    Vector3 slamPos = thisTransform.localPosition;
+                    
+                    if(playersAlive > 0)
+                    {
+                        int rand = Random.Range(0, playersAlive);
+                        PlayerController slam_target = NPCManager.AITargets()[rand].GetComponent<PlayerController>(); 
+                        
+                        if(slam_target && slam_target.isAlive)
+                        {
+                            RaycastHit hit;
+                            
+                            Vector3 slamTargetPredictedPos = slam_target.GetCenterPositionPredictedXZ();
+                            Ray ray = new Ray(slamTargetPredictedPos, Vector3.down);
+                            
+                            if(Physics.SphereCast(ray, 1f,  out hit, 200, groundMask))
+                            {
+                                NavMeshHit navMeshHit;
+                                if(NavMesh.SamplePosition(hit.point, out navMeshHit, 1, NavMesh.AllAreas))
+                                {
+                                    //slamHeight = Mathf.Max(slam_target.GetGroundPosition().y + 3 ;
+                                    slamPos = navMeshHit.position;
+                                    InGameConsole.LogFancy("FOUND OK POS <color=yellow>" + slamPos + "</color>");
+                                }
+                                else
+                                {
+                                    InGameConsole.LogFancy("FOUND NOT POS FROM NAVMESH SAMPLE POSITION");
+                                }
+                            }
+                            else
+                            {
+                                InGameConsole.LogFancy("FOUND NOT POS FROM RAYCAST");
+                            }
+                        }
+                    }
+                        
+                    LockSendingCommands();
+                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability3, slamPos, slamHeight);
+                }
+                break;
+            }
+            case(SinclaireCoolState.Slamming):
+            {
+                break;
+            }
             case(SinclaireCoolState.Dead):
             {
                 break;
@@ -870,7 +1114,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
     }
     
     
-    public Vector3 localStrikeOffset = new Vector3(0, 3.5f, 2f);
+    Vector3 localStrikeOffset = new Vector3(0, 2f, 1f);
     
     int instance_id;
     public Transform qts_transform;
@@ -912,7 +1156,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                 
                 if(UberManager.CanMakeQTS(instance_id))
                 {
-                    current_qts = UberManager.MakeQTS(instance_id, thisTransform, qts_transform.position, QuickTimeType.Default, 0.75f, 900, 0.25f);
+                    current_qts = UberManager.MakeQTS(instance_id, thisTransform, qts_transform.position, QuickTimeType.Default, 0.75f, 900, 0.2f);
                 }   
                 
                 RotateToLookAt(currentDestination, 0.08F);
@@ -924,8 +1168,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                     float sqrDistanceToDestination = Math.SqrDistance(currentDestination, currentPos);
                     if(sword_attack_timer > sword_attack1_damageTimingStart && dV > 0 && sqrDistanceToDestination > 0f)
                     {
-                        Vector3 dmgPos = thisTransform.localPosition;
-                        dmgPos = dmgPos + thisTransform.up * localStrikeOffset.y + thisTransform.forward * localStrikeOffset.z;// + thisTransform.forward * localStrikeOffset.z;
+                        Vector3 dmgPos = thisTransform.localPosition + thisTransform.up * localStrikeOffset.y + thisTransform.forward * localStrikeOffset.z;
                         float dmgRadius = sword_attack1_radius;
                         if(TryDoMeleeDamageToLocalPlayer(dmgPos, dmgRadius))
                         {
@@ -976,6 +1219,27 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
             {
                 break;
             }
+            case(SinclaireCoolState.Vanished):
+            {
+                
+                break;
+            }
+            case(SinclaireCoolState.Slamming):
+            {
+                thisTransform.localPosition = Vector3.MoveTowards(thisTransform.localPosition, currentSlamPos, slamSpeed * dt);
+                
+                if(!didSlam)
+                {
+                    float sqrDistance = Math.SqrDistance(thisTransform.localPosition, currentSlamPos);
+                    if(sqrDistance < 0.1f * 0.1f)
+                    {
+                        didSlam = true;
+                        anim.Play("Base.OnSlammed", 0, 0);
+                        MakeShockWave(currentSlamPos + new Vector3(0, 0.2f, 0));                        
+                    }
+                }
+                break;
+            }
             default:
             {
                 break;
@@ -985,10 +1249,15 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
     
     
     const int MaxHealth = 11750;
-    int HitPoints = MaxHealth;
+    int CalculatedMaxHealth;
+    int HitPoints;
     
-     void TakeDamage(int dmg, byte limb_id)
+    void TakeDamage(int dmg, byte limb_id)
     {
+        if(state == SinclaireCoolState.SpawningCool || state == SinclaireCoolState.Vanished)
+        {
+            return;
+        }
         //InGameConsole.LogOrange("TakeDamage()");
         HitPoints -= dmg;
          
@@ -1001,6 +1270,10 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
     
     void TakeDamageForce(int dmg, Vector3 force, byte limb_id)
     {
+        if(state == SinclaireCoolState.SpawningCool || state == SinclaireCoolState.Vanished)
+        {
+            return;
+        }
         //InGameConsole.LogOrange("TakeDamageForce()");
         HitPoints -= dmg;
          
@@ -1013,6 +1286,10 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
     
     void TakeDamageExplosive(int dmg)
     {
+        if(state == SinclaireCoolState.SpawningCool || state == SinclaireCoolState.Vanished)
+        {
+            return;
+        }
         //InGameConsole.LogOrange("TakeDamageExplosive()");
         HitPoints -= dmg;
         if(HitPoints <= 0)

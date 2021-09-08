@@ -122,12 +122,23 @@ public class GameStats : MonoBehaviour
         if(isShowing)
         {
             float dt = UberManager.DeltaTime();
-            
+            time_spent_target = UberManager.Singleton().InGameTimer;
             statsPanel.anchoredPosition = Vector2.MoveTowards(statsPanel.anchoredPosition, V2_zero, speed * dt);
             if(time_spent_current != time_spent_target)
-                gameTimer_label.SetText(time_spent_current.ToString("f"));
+            {
+                string minutes = Mathf.Floor(time_spent_target / 60).ToString("00");
+                if(time_spent_target < 10)
+                {
+                    minutes = Mathf.Floor(time_spent_target / 60).ToString("0");
+                }
+                string seconds = (time_spent_target % 60).ToString("00");
+                
+                string s = string.Format("{0}:{1}", minutes, seconds);
+                
+                gameTimer_label.SetText(s);
+            }
             
-            float v = time_spent_target / 4f;
+            float v = time_spent_target / 3f;
             time_spent_current = Mathf.MoveTowards(time_spent_current, time_spent_target, dt * v);
             
             if(Input.GetKeyDown(KeyCode.Escape))

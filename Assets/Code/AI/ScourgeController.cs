@@ -267,7 +267,10 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
                 HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
                 
                 TakeDamageExplosive(incomingDamage);
@@ -278,7 +281,10 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
                 HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
                 
                 byte limb_id = (byte)args[1];
@@ -291,11 +297,22 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
                 HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
                 
                 Vector3 force = (Vector3)args[1];
                 byte limb_id = (byte)args[2];
+                int len = limbs.Length;
+                for(int i = 0; i < len; i++)
+                {
+                    if(limbs[i] && limbs[i].limb_id == limb_id)
+                    {
+                        limbs[i].ReactWithoutPos();
+                    }
+                }
                 TakeDamageForce(incomingDamage, force, limb_id);
                 
                 break;
@@ -372,7 +389,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
     }
     
     const float projectileSpeed = 45F;
-    const float projectileRadius = 0.25F;
+    const float projectileRadius = 0.33F;
     const int projectileDamage = 12;
     const int shotsPerRound = 3;
     int shotsPerformed = 0; 
@@ -1179,7 +1196,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                                 velocity.x = velocity.y = velocity.z = 0;
                                 NavMeshHit _navMeshHit;
                                 Vector3 samplePos = thisTransform.localPosition;
-                                if(NavMesh.SamplePosition(samplePos, out _navMeshHit, 0.66f, NavMesh.AllAreas))
+                                if(NavMesh.SamplePosition(samplePos, out _navMeshHit, 1f, NavMesh.AllAreas))
                                 {
                                     if(canSendCommands)
                                     {

@@ -136,7 +136,7 @@ public class PlayerInventory : MonoBehaviour
             }
             case(GunType.RocketLauncher):
             {
-                playerGunSlots[2][0] = gunToGive;
+                playerGunSlots[3][0] = gunToGive;
                 
                 if(localPlayer)
                 {
@@ -148,7 +148,7 @@ public class PlayerInventory : MonoBehaviour
             }
             case(GunType.AR):
             {
-                playerGunSlots[3][0] = gunToGive;
+                playerGunSlots[2][0] = gunToGive;
                 if(localPlayer)
                 {
                     FPSGunController localFPSGunController = localPlayer.GetComponent<FPSGunController>();
@@ -160,7 +160,7 @@ public class PlayerInventory : MonoBehaviour
             }
             case(GunType.MP5_alt):
             {
-                playerGunSlots[3][1] = gunToGive;
+                playerGunSlots[2][1] = gunToGive;
                 if(localPlayer)
                 {
                     FPSGunController localFPSGunController = localPlayer.GetComponent<FPSGunController>();

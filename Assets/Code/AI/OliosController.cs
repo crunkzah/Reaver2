@@ -196,8 +196,11 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
-                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.5f, 0), small_healing_times);
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
                 
                 TakeDamageExplosive(incomingDamage);
                 
@@ -207,8 +210,11 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
-                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.5f, 0), small_healing_times);
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
                 
                 byte limb_id = (byte)args[1];
                 TakeDamage(incomingDamage, limb_id);
@@ -220,11 +226,22 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
-                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.5f, 0), small_healing_times);
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
                 
                 Vector3 force = (Vector3)args[1];
                 byte limb_id = (byte)args[2];
+                int len = limbs.Length;
+                for(int i = 0; i < len; i++)
+                {
+                    if(limbs[i] && limbs[i].limb_id == limb_id)
+                    {
+                        limbs[i].ReactWithoutPos();
+                    }
+                }
                 TakeDamageForce(incomingDamage, force, limb_id);
                 
                 break;
@@ -306,6 +323,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
         
         currentFlyDestination = parentTransform.localPosition;
         HitPoints = MaxHealth;
+        standingCol.gameObject.SetActive(true);
     }
     
     const int MaxHealth = 2500;

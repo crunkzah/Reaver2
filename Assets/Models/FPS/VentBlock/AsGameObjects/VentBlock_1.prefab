@@ -16,6 +16,10 @@ MonoBehaviour:
   localDirection: 1
   rotationSpeed: 90
   objectToRotate: {fileID: 0}
+  randomizeRotation: 0
+  randomizeRotationStep: 45
+  randomizePositionOnAxis: 0
+  randomizePositionStep: 0.075
   space: 1
 --- !u!1 &5063238992350239755
 GameObject:
@@ -170,7 +174,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &24454383244766011
 Transform:
   m_ObjectHideFlags: 0

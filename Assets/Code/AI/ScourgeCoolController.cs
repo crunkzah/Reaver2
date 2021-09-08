@@ -265,7 +265,10 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
                 HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
                 
                 TakeDamageExplosive(incomingDamage);
@@ -276,7 +279,10 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
                 HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
                 
                 byte limb_id = (byte)args[1];
@@ -289,7 +295,10 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
                 HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
                 
                 Vector3 force = (Vector3)args[1];
@@ -306,7 +315,7 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
     }
     
     const float projectileSpeed = 55F;
-    const float projectileRadius = 0.25F;
+    const float projectileRadius = 0.33F;
     const int projectileDamage = 12;
     //const int shotsPerRound = 3;
     int shotsPerformed = 0; 

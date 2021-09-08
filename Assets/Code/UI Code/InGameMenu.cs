@@ -23,6 +23,14 @@ public class InGameMenu : MonoBehaviour
         
         return _instance;
     }
+    
+    
+    public Toggle fogs_toggle;
+    public Toggle coats_toggle;
+    public Toggle gore_toggle;
+    
+    
+  
 
     public InGameMenuState state;
     
@@ -30,6 +38,25 @@ public class InGameMenu : MonoBehaviour
     bool wasCursorVisibleBeforeMenu = true;
     
     public GameObject canvas;
+    public GameObject main;
+    public GameObject settings;
+    
+    public void InGameMenuBackButton()
+    {
+        Hide();
+    }
+    
+    public void InGameMenuSettingsBackButton()
+    {
+        settings.SetActive(false);
+        main.SetActive(true);
+    }
+    
+    public void InGameMenuSettingsButton()
+    {
+        settings.SetActive(true);
+        main.SetActive(false);
+    }
     
     
     public static bool IsVisible()
@@ -51,8 +78,6 @@ public class InGameMenu : MonoBehaviour
     
     public static void Show()
     {
-        
-        
         Singleton()._ShowInGameMenu();
     }
     
@@ -60,7 +85,23 @@ public class InGameMenu : MonoBehaviour
     {
         InGameConsole.LogFancy("ShowInGameMenu");
         UberManager.PauseGame();
+        if(PlayerPrefs.GetInt("Fogs", 1) == 1)
+            fogs_toggle.isOn = true;
+        else
+            fogs_toggle.isOn = false;
+            
+        //fogs_toggle.isOn = (PlayerPrefs.GetInt("Fogs", 1) > 0);
+        //InGameConsole.LogFancy("GetInt fogs " + (PlayerPrefs.GetInt("Fogs", 1) > 0));
+        //currentMusicVolumeOnSlider = 
+        //curentMusicVolumeOnSlider = Mathf.Log10()
         
+        currentMusicVolumeOnSlider = PlayerPrefs.GetFloat("MV", 0.75f);
+        musicScrollbar.value = currentMusicVolumeOnSlider;
+        
+        
+        
+        currentEffectsVolumeOnSlider = PlayerPrefs.GetFloat("EV", 0.9f);
+        effectsScrollbar.value = currentEffectsVolumeOnSlider;
         
         if(!canBeShown)
         {
@@ -106,6 +147,27 @@ public class InGameMenu : MonoBehaviour
         {
             LockCursor();
         }
+        
+        bool UseFogs = (PlayerPrefs.GetInt("Fogs", 1) == 1);
+        
+        if(UseFogs)
+        {
+            PlayerPrefs.SetInt("Fogs", 1);
+        }
+        else
+        {
+            PlayerPrefs.SetInt("Fogs", 0);
+        }
+        //PlayerPrefs.SetInt("Fogs", (UberManager.UseFogs ? 1 : 0));
+        //InGameConsole.LogFancy("SetInt fogs " + (UberManager.UseFogs ? 1 : 0));
+        
+        currentMusicVolumeOnSlider = musicScrollbar.value;
+        currentMusicVolumeOnSlider = Mathf.Clamp(currentMusicVolumeOnSlider, 0.0001f, 1f);
+        PlayerPrefs.SetFloat("MV", currentMusicVolumeOnSlider);
+        
+        currentEffectsVolumeOnSlider = effectsScrollbar.value;
+        currentEffectsVolumeOnSlider = Mathf.Clamp(currentEffectsVolumeOnSlider, 0.0001f, 1f);
+        PlayerPrefs.SetFloat("EV", currentEffectsVolumeOnSlider);
         
         Singleton().canvas.SetActive(false);
     }
@@ -160,6 +222,52 @@ public class InGameMenu : MonoBehaviour
         }
     }
     
+    public void FogsToggle()
+    {
+        UberManager.Singleton().ToggleUseFogs();
+    }
+    
+    public void OnMouseSensChanged()
+    {
+        
+    }
+    
+    public void OnFovChanged()
+    {
+        
+    }
+    
+    public void OnMasterVolumeChanged()
+    {
+        
+    }
+    
+    public Scrollbar musicScrollbar;
+    public Scrollbar effectsScrollbar;
+    
+    float currentEffectsVolumeOnSlider;
+    float currentMusicVolumeOnSlider;
+    
+    public void OnMusicVolumeChanged()
+    {
+        musicScrollbar.value = Mathf.Clamp(musicScrollbar.value, 0.0001f, 1f);
+        currentMusicVolumeOnSlider = musicScrollbar.value;
+        float db = Mathf.Log10(currentMusicVolumeOnSlider) * 20f;
+        AudioManager.Singleton().musicMasterMixer.audioMixer.SetFloat("MV", db);
+        
+//        InGameConsole.LogFancy("OnMusicVolumeChanged db: " + db.ToString("f"));
+    }
+    
+    public void OnEffectsVolumeChanged()
+    {
+        effectsScrollbar.value = Mathf.Clamp(effectsScrollbar.value, 0.0001f, 1f);
+        currentEffectsVolumeOnSlider = effectsScrollbar.value;
+        float db = Mathf.Log10(currentEffectsVolumeOnSlider) * 20f;
+        AudioManager.Singleton().effectsMixer.audioMixer.SetFloat("EV", db);
+        
+        //InGameConsole.LogFancy("OnEffectsVolumeChanged " + effectsScrollbar.value.ToString("f"));
+    }
+    
     void Update()
     {
         if(GetEscapeKeyDown() && !GameStats.IsShowing())
@@ -169,6 +277,8 @@ public class InGameMenu : MonoBehaviour
             {
                 return;
             }
+            
+            
             // switch(state)
             // {
             //     case(InGameMenuState.Hidden):
@@ -186,7 +296,14 @@ public class InGameMenu : MonoBehaviour
             // }
             if(Singleton().canvas.activeSelf)
             {
-                Hide();
+                if(settings.activeSelf)
+                {
+                    InGameMenuSettingsBackButton();
+                }
+                else
+                {
+                    Hide();
+                }
             }
             else
             {

@@ -16,7 +16,7 @@ public class HealthCrystal : MonoBehaviour, IPooledObject
     
     
     const float maxSpeed = 720000f;
-    const float acceleration = 20f;
+    const float acceleration = 21f;
     
     float currentSpeed = 0;
     
@@ -54,7 +54,7 @@ public class HealthCrystal : MonoBehaviour, IPooledObject
         
         ps.Clear();
         ps.Play();
-        hp = _hp;
+        hp = _hp / 2;
         
         lifeTimer = Random.Range(LifeTime - 0.2f, LifeTime + 0.2f);
         

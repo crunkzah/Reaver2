@@ -1,6 +1,7 @@
 using UnityEngine;
 using Photon.Pun;
 using TMPro;
+using System.Collections.Generic;
 
 public enum CheckpointState : byte
 {
@@ -209,6 +210,7 @@ public class Checkpoint : MonoBehaviour, INetworkObject
         audio_src = GetComponent<AudioSource>();
         playersMask = LayerMask.GetMask("Player");
         thisTransform = transform;
+        thisPosition = thisTransform.position;
         
         if(DEBUG_disable_checkpoints)
         {
@@ -224,11 +226,15 @@ public class Checkpoint : MonoBehaviour, INetworkObject
         checkPoint_light = GetComponentInChildren<Light>();
     }
     
+    Vector3 thisPosition;
+    
     bool CheckIfPlayersInArea()
     {
         bool Result = true;
         
-        int playersCount = NPCManager.AITargets().Count;
+        ref List<PlayerController> pcs = ref UberManager.Singleton().players_controller;
+        int playersCount = pcs.Count;
+        //int playersCount = NPCManager.AITargets().Count;
         
         if(playersCount == 0)
         {
@@ -241,17 +247,21 @@ public class Checkpoint : MonoBehaviour, INetworkObject
                 {
                     for(int i = 0; i < playersCount; i++)
                     {
-                        float sqrDistanceToPlayer = Math.SqrDistance(NPCManager.AITargets()[i].localPosition, thisTransform.position);
-                        if(sqrDistanceToPlayer < radius * radius)
+                        //float sqrDistanceToPlayer = Math.SqrDistance(AITargets()[i].localPosition, thisTransform.position);
+                        if(pcs[i] && pcs[i].isAlive)
                         {
-                            if(trigger_on_one_player)
+                            float sqrDistanceToPlayer = Math.SqrDistance(pcs[i].thisTransform.localPosition, thisPosition);
+                            if(sqrDistanceToPlayer < radius * radius)
                             {
-                                return true;
+                                if(trigger_on_one_player)
+                                {
+                                    return true;
+                                }
+                                Result = true;
                             }
-                            Result = true;
+                            else
+                                return false;
                         }
-                        else
-                             return false;
                     }
                     break;
                 }
@@ -259,16 +269,20 @@ public class Checkpoint : MonoBehaviour, INetworkObject
                 {
                     for(int i = 0; i < playersCount; i++)
                     {
-                        if(bounds.Contains(NPCManager.AITargets()[i].localPosition))
+                    //   if(bounds.Contains(NPCManager.AITargets()[i].localPosition))
+                        if(pcs[i] && pcs[i].isAlive)
                         {
-                            if(trigger_on_one_player)
+                            if(bounds.Contains(pcs[i].thisTransform.localPosition))
                             {
-                                return true;
+                                if(trigger_on_one_player)
+                                {
+                                    return true;
+                                }
+                                Result = true;
                             }
-                            Result = true;
+                            else
+                                return false;
                         }
-                        else
-                            return false;
                     }
                     break;
                 }

@@ -27,6 +27,11 @@ public class SinclaireSword : MonoBehaviour
     
     public ParticleSystem onAppearSword;
     
+    public void Show()
+    {
+        rend.enabled = true;
+    }
+    
     public void Appear()
     {
         rend.enabled = true;

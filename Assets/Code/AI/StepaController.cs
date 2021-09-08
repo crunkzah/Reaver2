@@ -268,8 +268,11 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
-                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.0f, 0), small_healing_times);
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2f, 0), small_healing_times);
                 
                 TakeDamageExplosive(incomingDamage);
                 
@@ -279,8 +282,11 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
-                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.0f, 0), small_healing_times);
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2f, 0), small_healing_times);
                 
                 
                 
@@ -294,11 +300,22 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
-                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2.0f, 0), small_healing_times);
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2f, 0), small_healing_times);
                 
                 Vector3 force = (Vector3)args[1];
                 byte limb_id = (byte)args[2];
+                int len = limbs.Length;
+                for(int i = 0; i < len; i++)
+                {
+                    if(limbs[i] && limbs[i].limb_id == limb_id)
+                    {
+                        limbs[i].ReactWithoutPos();
+                    }
+                }
                 TakeDamageForce(incomingDamage, force, limb_id);
                 
                 break;
@@ -374,15 +391,15 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
         }
     }
     
-    const float projectileSpeed = 38F;
+    const float projectileSpeed = 42F;
     const float projectileRadius = 0.4F;
-    const int projectileDamage = 25;
+    const int projectileDamage = 30;
     
     const float shootMaxDistance = 55;
     const float shootingChasingCooldown = 2.15F;
     float shootingChasingTimer = 0;
     
-    const float shootingDuration = 0.7F;//0.5F;
+    const float shootingDuration = 0.6F;//0.5F;
     
     
     void DoLight(Vector3 pos)
@@ -465,10 +482,18 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     
     float damage_taken_timeStamp;
     
+    float damage_taken_timeStamp2;
+    
     void TakeDamage(int dmg, byte limb_id)
     {
+        if(Time.time - damage_taken_timeStamp > 0.2f)
+        {
+            damage_taken_timeStamp = Time.time;
+            audio_src.PlayOneShot(clipHurt1, 1f);
+        }
         //InGameConsole.LogOrange("TakeDamage()");
         HitPoints -= dmg;
+        //audio_src.clip clipHurt1
          
         if(HitPoints <= 0)
         {
@@ -479,6 +504,11 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     
     void TakeDamageForce(int dmg, Vector3 force, byte limb_id)
     {
+        if(Time.time - damage_taken_timeStamp > 0.2f)
+        {
+            damage_taken_timeStamp = Time.time;
+            audio_src.PlayOneShot(clipHurt1, 0.8f);
+        }
         //InGameConsole.LogOrange("TakeDamageForce()");
         HitPoints -= dmg;
          
@@ -491,6 +521,11 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     
     void TakeDamageExplosive(int dmg)
     {
+        if(Time.time - damage_taken_timeStamp > 0.2f)
+        {
+            damage_taken_timeStamp = Time.time;
+            audio_src.PlayOneShot(clipHurt1, 0.8f);
+        }
         //InGameConsole.LogOrange("TakeDamageExplosive()");
         HitPoints -= dmg;
         if(HitPoints <= 0)
@@ -875,6 +910,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                     Vector3 offsettedTargetHeadPos = target_pc.GetHeadPosition();
                     offsettedTargetHeadPos.y -= 0.25F;
                     
+                    
                     bool canShootFromDestination = CanShootAtPos(shootingCheckPosOffsetted, offsettedTargetHeadPos, shootMaxDistance);
                     
                     if(!canShootFromDestination)
@@ -1161,7 +1197,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                                 velocity.x = velocity.y = velocity.z = 0;
                                 NavMeshHit _navMeshHit;
                                 Vector3 samplePos = thisTransform.localPosition;
-                                if(NavMesh.SamplePosition(samplePos, out _navMeshHit, 0.66f, NavMesh.AllAreas))
+                                if(NavMesh.SamplePosition(samplePos, out _navMeshHit, 1f, NavMesh.AllAreas))
                                 {
                                     if(canSendCommands)
                                     {

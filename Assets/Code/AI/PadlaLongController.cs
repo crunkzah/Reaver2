@@ -91,6 +91,11 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
     
     public bool CanBeBounceHit()
     {
+        if(head == null)
+        {
+            return false;
+        }
+        
         if(state != PadlaLongState.Dead)
         {
             return true;
@@ -237,8 +242,11 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
-                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2f, 0), small_healing_times);
                 
                 TakeDamageExplosive(incomingDamage);
                 
@@ -248,8 +256,11 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
-                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2f, 0), small_healing_times);
                 
                 byte limb_id = (byte)args[1];
                 TakeDamage(incomingDamage, limb_id);
@@ -261,8 +272,11 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
             {
                 int incomingDamage = (int)args[0];
                 
-                int small_healing_times = incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
-                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 1.5f, 0), small_healing_times);
+                int _incomingDamage = incomingDamage;
+                if(_incomingDamage > HitPoints)
+                    _incomingDamage = HitPoints;
+                int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                HealthCrystalSmall.MakeSmallHealing(thisTransform.localPosition + new Vector3(0, 2f, 0), small_healing_times);
                 
                 Vector3 force = (Vector3)args[1];
                 byte limb_id = (byte)args[2];

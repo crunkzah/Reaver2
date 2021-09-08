@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Photon.Pun;
 
 public enum GateState : int
 {
@@ -27,7 +28,9 @@ public enum MusicOnOpen : int
     StopMusic, 
     Clouds,
     Prologue,
-    Prologue_Drop
+    City_1,
+    City_2,
+    Machinery
 }
 
 public class GatesController : MonoBehaviour, INetworkObject
@@ -304,6 +307,21 @@ public class GatesController : MonoBehaviour, INetworkObject
     
     bool hasEverBeenOpened = false;
     
+    void StopInGameTimer()
+    {
+        UberManager.StopInGameTimer();
+        //float timer = UberManager.Singleton().InGameTimer;
+        if(PhotonNetwork.IsMasterClient)
+        {
+            int restarts = UberManager.Singleton().RestartsOnThisLevel;
+            float time = UberManager.Singleton().InGameTimer;
+            int diff = UberManager.Singleton().difficulty;
+                
+            
+            NetworkObjectsManager.CallGlobalCommand(GlobalCommand.ShowRunStats, RpcTarget.Others,  restarts, time, diff);
+        }
+    }
+    
     void Update()
     {
         if(state != GateState.Locked && state != GateState.Orange)
@@ -331,7 +349,7 @@ public class GatesController : MonoBehaviour, INetworkObject
                         }
                         case(StopWatchBehaviour.Finish):
                         {
-                            UberManager.StopInGameTimer();
+                            Invoke(nameof(StopInGameTimer), 0.15f);//UberManager.StopInGameTimer();
                             stopWatch = StopWatchBehaviour.None;
                             break;
                         }
@@ -455,11 +473,20 @@ public class GatesController : MonoBehaviour, INetworkObject
                 AudioManager.SetMusicPrologue();
                 break;
             }
-            case(MusicOnOpen.Prologue_Drop):
+            case(MusicOnOpen.City_1):
             {
-                AudioManager.SetMusicPrologue();
-                AudioManager.GetMainMusicSrc().time     = 1.57f;
-                AudioManager.GetBattleMusicSrc().time   = 1.57f;
+                AudioManager.SetMusicCity1();
+                break;
+            }
+            case(MusicOnOpen.City_2):
+            {
+                AudioManager.SetMusicCity2();
+                break;
+            }
+            case(MusicOnOpen.Machinery):
+            {
+                InGameConsole.LogFancy("GatesController() SetMusicMachinery");
+                AudioManager.SetMusicMachinery();
                 break;
             }
         }

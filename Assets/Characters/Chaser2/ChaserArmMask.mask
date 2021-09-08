@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ChaserArmMask
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: Chaser2
+    m_Weight: 0
+  - m_Path: Chaser2_armature
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root/Leg1.l
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root/Leg1.l/Leg2.l
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root/Leg1.l/Leg2.l/Leg3.l
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root/Leg1.l/Leg2.l/Leg3.l/Foot1.l
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root/Leg1.r
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root/Leg1.r/Leg2.r
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root/Leg1.r/Leg2.r/Leg3.r
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root/Leg1.r/Leg2.r/Leg3.r/Foot1.r
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root/Torso
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root/Torso/Arm1.l
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root/Torso/Arm1.l/Arm2.l
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root/Torso/Arm1.l/Arm2.l/Arm3.l
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root/Torso/Arm1.r
+    m_Weight: 1
+  - m_Path: Chaser2_armature/Root/Torso/Arm1.r/Arm2.r
+    m_Weight: 1
+  - m_Path: Chaser2_armature/Root/Torso/Arm1.r/Arm2.r/Arm3.r
+    m_Weight: 1
+  - m_Path: Chaser2_armature/Root/Torso/Neck
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root/Torso/Shoulder1.l
+    m_Weight: 0
+  - m_Path: Chaser2_armature/Root/Torso/Shoulder1.r
+    m_Weight: 0

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Text;
 
 public class MessagePanel : MonoBehaviour
 {
@@ -26,11 +27,19 @@ public class MessagePanel : MonoBehaviour
     public Image panel_img;
 
     float timer = 0;
+    
+    int currentCharIndex;
+    string msg_target = string.Empty;
+    
 
     public void ShowMessage(string msg, float time)
     {
         timer = time;
         tmp.SetText(msg);
+        //charTimer = 0;
+        //tmp.SetText(string.Empty);
+        //msg_target = msg;
+        currentCharIndex = 0;
         
         OnShow();        
         Invoke(nameof(Flicker), 0.15F);
@@ -63,12 +72,17 @@ public class MessagePanel : MonoBehaviour
         tmp.enabled = false;
     }
     
+    const float charTypeTime = 0.1f;
+    float charTimer;
+    
+ 
+    
     void Update()
     {
+        float dt = UberManager.DeltaTime();
+      
         if(timer > 0)
         {
-            float dt = UberManager.DeltaTime();
-            
             timer -= dt;
             if(timer <= 0f)
             {

@@ -13,7 +13,8 @@ public enum GlobalCommand : byte
     SetDifficulty,
     SetInfernoCircle,
     BounceHit_RevolverBlue,
-    AddEnemiesAlive
+    AddEnemiesAlive,
+    ShowRunStats
 }
 
 [System.Serializable]
@@ -1131,12 +1132,20 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
         commands_to_exclude_from_log.Add(NetworkCommand.Attack);
         commands_to_exclude_from_log.Add(NetworkCommand.Flee);
         commands_to_exclude_from_log.Add(NetworkCommand.TakeDamageLimbWithForce);
-        //commands_to_exclude_from_log.Add(NetworkCommand.SetTarget);
-        //commands_to_exclude_from_log.Add(NetworkCommand.DieWithForce);
+        commands_to_exclude_from_log.Add(NetworkCommand.TakeDamageLimbNoForce);
+        commands_to_exclude_from_log.Add(NetworkCommand.TakeDamageExplosive);
+        commands_to_exclude_from_log.Add(NetworkCommand.SetTarget);
         
-        //commands_to_exclude_from_log.Add(NetworkCommand.SetState);
+        commands_to_exclude_from_log.Add(NetworkCommand.SetState);
         commands_to_exclude_from_log.Add(NetworkCommand.LaunchAirborne);
         commands_to_exclude_from_log.Add(NetworkCommand.LaunchAirborneUp);
+        
+        commands_to_exclude_from_log.Add(NetworkCommand.Ability1);
+        commands_to_exclude_from_log.Add(NetworkCommand.Ability2);
+        commands_to_exclude_from_log.Add(NetworkCommand.Ability3);
+        
+        commands_to_exclude_from_log.Add(NetworkCommand.OpenGates);
+        commands_to_exclude_from_log.Add(NetworkCommand.LockGates);
     }
 
     [PunRPC]
@@ -1188,6 +1197,23 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
                 
                 break;
             }
+            case(GlobalCommand.ShowRunStats):
+            {
+                int restarts = (int)args[0];
+                float time = (float)args[1];
+                int diff = (int)args[2];
+                
+                UberManager.Singleton().InGameTimer = time;
+                UberManager.Singleton().RestartsOnThisLevel = restarts;
+                UberManager.Singleton().difficulty = diff;
+                
+                GameStats.SetStats(restarts, time, diff);
+                GameStats.Show();
+                
+                
+                
+                break;
+            }
             case(GlobalCommand.SetDifficulty):
             {
                 int _difficulty = (int)args[0];
@@ -1217,7 +1243,7 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
                 //     OnHitScan(shotPos + hitScanDirection * revolverShotMaxDistance, hitScanDirection, -hitScanDirection, revolverDmg, null);
                 // }
                 //GameObject bulletFX = ObjectPool.s().Get(ObjectPoolKey.RevolverBullet);
-                GameObject bulletFX = ObjectPool.s().Get(ObjectPoolKey.RevolverBullet);
+                GameObject bulletFX = ObjectPool.s().Get(ObjectPoolKey.Revolver_bullet_ult);
                 bulletFX.GetComponent<BulletControllerHurtless>().Launch2(startPos, endPos);
                 
                 break;

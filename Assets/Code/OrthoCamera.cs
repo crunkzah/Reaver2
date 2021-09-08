@@ -28,10 +28,13 @@ public class OrthoCamera : MonoBehaviour
     {
         cam = GetComponent<Camera>();
         HideDeathScreen();
+        
         //HideBossHPBarFancyThings();
         //Hide();
         //Disable
     }
+    
+    
     
     // bool isDeathScreenOn = false;
     // bool isBossHPBarFancyThingsOn = false;
@@ -139,6 +142,26 @@ public class OrthoCamera : MonoBehaviour
         }
     }
     
+    void Update()
+    {
+        if(show3DGUI)
+        {
+            PlayerController local_pc = PhotonManager.GetLocalPlayer();
+            if(local_pc)    
+            {
+                HOLDER_DYNAMIC_3DGUI.gameObject.SetActive(true);
+            }
+            else
+            {
+                HOLDER_DYNAMIC_3DGUI.gameObject.SetActive(false);    
+            }
+        }
+        else
+        {
+            HOLDER_DYNAMIC_3DGUI.gameObject.SetActive(false);
+        }
+    }
+    
     int playerHitPointsOld = 50;
     float playerStaminaOld = 50;
     
@@ -151,6 +174,7 @@ public class OrthoCamera : MonoBehaviour
     public static void Hide3DGUI()
     {
         show3DGUI = false;
+        
     }
     
     public static void Update3DGUI(float dt, int currentHP, float maxHPPenalty, int maxHP, float stamina)
@@ -180,9 +204,17 @@ public class OrthoCamera : MonoBehaviour
             playerHitPointsOld = currentHP;
             hitpoints_label.SetText(currentHP.ToString());
             float hpPercentage = (float)currentHP / (float)maxHP;
+            
+            float oldRadius = currentHitPoints_ps_shape.radius;
             float _radius = Mathf.Lerp(0, hitPointsFullRadius, hpPercentage);
             
-            currentHitPoints_ps_shape.radius = Mathf.MoveTowards(currentHitPoints_ps_shape.radius, _radius, dt * lerpSpeed);
+            if(!Mathf.Approximately(oldRadius, _radius))
+            {
+                currentHitPoints_ps_shape.radius = Mathf.MoveTowards(currentHitPoints_ps_shape.radius, _radius, dt * lerpSpeed);
+                currentHitPoints_ps.Stop();
+                currentHitPoints_ps.Play();
+            }
+            
             
             float _X = Mathf.Lerp(0,  hitPoints_full_pos.x, hpPercentage);
             float X = currentHitPoints_ps.transform.localPosition.x;
@@ -202,7 +234,15 @@ public class OrthoCamera : MonoBehaviour
             
             //hitpoints_label.SetText(currentHP.ToString());
             float staminaPercentage = (float)stamina / 100f;
+            oldRadius = stamina_ps_shape.radius;
             _radius = Mathf.Lerp(0, staminaFullRadius, staminaPercentage);
+            
+            if(!Mathf.Approximately(oldRadius, _radius))
+            {
+                stamina_ps_shape.radius = Mathf.MoveTowards(stamina_ps_shape.radius, _radius, dt * lerpSpeed);
+                stamina_ps.Stop();
+                stamina_ps.Play();
+            }
             
             //stamina_ps_shape.radius = radius;
             stamina_ps_shape.radius = Mathf.MoveTowards(stamina_ps_shape.radius, _radius, dt * lerpSpeed);;

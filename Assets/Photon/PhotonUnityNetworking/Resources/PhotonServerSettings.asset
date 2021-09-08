@@ -18,7 +18,7 @@ MonoBehaviour:
     AppIdVoice: 
     AppVersion: 1.0
     UseNameServer: 1
-    FixedRegion: 
+    FixedRegion: ru
     Server: 
     Port: 0
     Protocol: 0
@@ -70,4 +70,7 @@ MonoBehaviour:
   - GC_RPC
   - GS
   - CallFuncRPCUnreliable
+  - OnSlideEnded
+  - OnSlideStarted
+  - DieRPC
   DisableAutoOpenWizard: 1

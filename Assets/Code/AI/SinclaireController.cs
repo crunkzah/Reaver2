@@ -289,6 +289,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                 
                 break;
             }
+            
             default:
             {
                 break;
@@ -422,7 +423,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     //const float sword_attack1_damageTimingEnd = 1.1F / 4;
     
     //const float sword_attack1_distance = 2F;
-    const float sword_attack1_radius = 1.25F;
+    const float sword_attack1_radius = 1.55F;
     const int sword_attack1_dmg = 25;
     
     
@@ -704,7 +705,8 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                             if(Math.SqrDistance(thisTransform.localPosition, movePos) > 0.175F * 0.175F)
                             {
                                 LockSendingCommands();
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Move, movePos);
+                                // NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Move, movePos);
+                                NetworkObjectsManager.CallNetworkFunctionUnreliable(net_comp.networkId, NetworkCommand.Move, movePos);
                             }
                         }
                     }
@@ -855,7 +857,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     }
     
     
-    public Vector3 localStrikeOffset = new Vector3(0, 1.25f, 0.25f);
+    Vector3 localStrikeOffset = new Vector3(0, 1.25f, 1.0f);
     
     int instance_id;
     public Transform qts_transform;

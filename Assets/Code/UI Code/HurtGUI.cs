@@ -7,7 +7,7 @@ public class HurtGUI : MonoBehaviour
     
     [Header("Hurt:")]
     public Image hurt_img;
-    const float hurtAlphaStart = 1.8f;
+    const float hurtAlphaStart = 1.3f;
     public float hurtAlphaAcceleration = 8f;
     float hurtAlphaCurrentSpeed;
     [Header("HealP:")]

@@ -146,9 +146,7 @@ public class AudioManager : MonoBehaviour
             Singleton().targetMasterPitch = targetPitch;
             Singleton().pitchInterpStartSpeed = startSpeed;
             Singleton().pitchInterpAcceleration = acceleration;
-            // InGameConsole.LogFancy("Master pitch: " + currentPitch);
         }
-//        Singleton().masterMixer.audioMixer.SetFloat(masterPitchParam, targetPitch);
     }
     
     public static void SetMasterPitch(float pitch)
@@ -157,6 +155,9 @@ public class AudioManager : MonoBehaviour
     }
     
     const float LOUD = 1;
+    
+    public AudioMixer generalMixer;
+    
     
     public AudioMixerGroup masterMixer;
     
@@ -179,6 +180,8 @@ public class AudioManager : MonoBehaviour
     
     void InitExplosionsPool()
     {
+        
+        
         explosionsPooled = new AudioSource[pooled_explosions_num];
         
         for(int i = 0; i < pooled_explosions_num; i++)
@@ -233,10 +236,20 @@ public class AudioManager : MonoBehaviour
     public AudioClip clouds_main;
     [Header("Prologue:")]
     public AudioClip prologue_music;
+    [Header("City:")]
+    public AudioClip city1_music;
+    public AudioClip city2_music;
+    [Header("Machinery:")]
+    public AudioClip machinery_music;
     
     
+    
+    [Header("AUDIO SOURCES:")]
     public AudioSource main_MusicSrc;
     public AudioSource battle_MusicSrc;
+    
+    public AudioSource mics_AudioSrc;
+    
     public AudioSource source2;
     [Header("Globals clips:")]
     public AudioClip[] globalClips;
@@ -249,10 +262,6 @@ public class AudioManager : MonoBehaviour
         }
         else
         {
-            _EmissionShaderID = Shader.PropertyToID("_Emission");
-            
-            //  
-            
             InitAudioLib();
             InitAudioPool();
             InitExplosionsPool();
@@ -554,34 +563,15 @@ public class AudioManager : MonoBehaviour
     public float emissionSmoothRate = 3f;
     
     
-    int _EmissionShaderID;
-    
-    void EditAudioMaterials(float dt)
-    {
-        float t = Mathf.InverseLerp(0, audio_emission_MaxVolume, currentVolume_music);
-        float lerped_audio_emission = Mathf.Lerp(audio_emission_min, audio_emission_max, t);
-        
-        if(lerped_audio_emission > audio_emission)
-        {
-            audio_emission = Mathf.MoveTowards(audio_emission, lerped_audio_emission, 6 * emissionSmoothRate * dt);
-        }
-        else
-        {
-            audio_emission = Mathf.MoveTowards(audio_emission, lerped_audio_emission, emissionSmoothRate * dt);
-        }
-        
-        audio_mat.SetFloat(_EmissionShaderID, audio_emission);
-    }
-    
     //static bool dynamicMusicMode = false;
     public MusicMode mode;
     
-    public static void SetMusicMode(MusicMode _mode)
+    public static void SetMusicMode(MusicMode _mode, float transitionTime = 0.01f)
     {
-        Singleton()._SetMusicMode(_mode);
+        Singleton()._SetMusicMode(_mode, transitionTime);
     }
     
-    public void _SetMusicMode(MusicMode _mode)
+    public void _SetMusicMode(MusicMode _mode, float transitionTime)
     {
         mode = _mode;
         
@@ -590,13 +580,14 @@ public class AudioManager : MonoBehaviour
             case(MusicMode.Static):
             {
                 main_MusicSrc.outputAudioMixerGroup = musicCalmNoFilterMixer;
-                snapshotCalmNoFilter.TransitionTo(0.1f);
+                
+                snapshotCalmNoFilter.TransitionTo(transitionTime);
                 
                 break;
             }
             case(MusicMode.Dynamic_1):
             {
-                snapshotCalmNoFilter.TransitionTo(0.1f);
+                snapshotCalmNoFilter.TransitionTo(transitionTime);
                 
                 break;
             }
@@ -605,7 +596,7 @@ public class AudioManager : MonoBehaviour
                 lowPassFlag = false;
                 main_MusicSrc.outputAudioMixerGroup = musicCalmLowPassMixer;
                 battle_MusicSrc.outputAudioMixerGroup = musicBattleMixer;
-                snapshotCalmLowPass.TransitionTo(0.1f);
+                snapshotCalmLowPass.TransitionTo(transitionTime);
                 
                 break;
             }
@@ -613,7 +604,7 @@ public class AudioManager : MonoBehaviour
             {
                 main_MusicSrc.outputAudioMixerGroup = musicCalmNoFilterMixer;
                 battle_MusicSrc.outputAudioMixerGroup = musicBattleMixer;
-                snapshotTwoTracksCalm.TransitionTo(0.1f);
+                snapshotTwoTracksCalm.TransitionTo(transitionTime);
                 
                 break;
             }
@@ -723,21 +714,9 @@ public class AudioManager : MonoBehaviour
     void Update()
     {
         // DebugInput();
-        // if(Inputs.GetKeyDown(KeyCode.M))
-        // {
-        //     SwitchMusicVolume();
-        //     // source.mute = !source.mute;
-        // }
-        
         float dt = UberManager.DeltaTime();
         
-        //musicMixer.GetS
         main_MusicSrc.GetSpectrumData(samples, 0, FFTWindow.Blackman);
-        
-        // if(edit_audio_mat)
-        // {
-        //     EditAudioMaterials(dt);
-        // }
         
         switch(mode)
         {
@@ -774,44 +753,6 @@ public class AudioManager : MonoBehaviour
     
     public AudioMixerSnapshot snapshotTwoTracksCalm;
     public AudioMixerSnapshot snapshotTwoTracksBattle;
-    
-    void SwitchMusicVolume()
-    {
-        
-        
-        // if(isMuted)
-        // {
-        //     snapshot_normal.TransitionTo(0.5f);
-        // }
-        // else
-        // {
-        //     snapshot_muted.TransitionTo(0.5f);
-        // }
-        
-        
-        isMuted = !isMuted;
-        
-        
-        // if(music_src.volume == LOUD)
-        // {
-        //     music_src.volume = 0;
-        //     SetMusicVolume(0);
-        // }
-        // else
-        // {
-        //     if(music_src.volume == 0f)
-        //     {
-        //         music_src.volume = LOUD;
-        //         SetMusicVolume(LOUD);
-        //     }
-        // }
-    }
-    
-    void SetMusicVolume(float vol_db)
-    {
-        musicMasterMixer.audioMixer.SetFloat("MusicVolume", vol_db);
-        //calm_MusicSrc.volume = vol;
-    }
     
     void OnGUI()
     {
@@ -897,15 +838,75 @@ public class AudioManager : MonoBehaviour
         inst.battle_MusicSrc.Play();
     }
     
+    public static void SetMusicCity1()
+    {
+        //SetDynamicMusicModeOn();
+        SetMusicMode(MusicMode.Static, 0);
+        AudioManager inst = Singleton();
+        
+        inst.main_MusicSrc.Stop();
+        inst.main_MusicSrc.clip = inst.city1_music;
+        inst.main_MusicSrc.Play();
+        
+        
+        inst.battle_MusicSrc.clip = inst.city1_music;
+        inst.battle_MusicSrc.Play();
+    }
+    
+    public static void SetMusicCity2()
+    {
+        //SetDynamicMusicModeOn();
+        SetMusicMode(MusicMode.LowPass, 1);
+        AudioManager inst = Singleton();
+        
+        inst.main_MusicSrc.Stop();
+        inst.main_MusicSrc.clip = inst.city2_music;
+        inst.main_MusicSrc.Play();
+        
+        inst.battle_MusicSrc.Stop();
+        inst.battle_MusicSrc.clip = inst.city2_music;
+        inst.battle_MusicSrc.Play();
+    }
+    
+    public static void SetMusicMachinery()
+    {
+        //SetDynamicMusicModeOn();
+        SetMusicMode(MusicMode.LowPass, 1);
+        AudioManager inst = Singleton();
+        
+        inst.main_MusicSrc.Stop();
+        inst.main_MusicSrc.clip = inst.machinery_music;
+        inst.main_MusicSrc.Play();
+        
+        inst.battle_MusicSrc.Stop();
+        inst.battle_MusicSrc.clip = inst.machinery_music;
+        inst.battle_MusicSrc.Play();
+    }
+    
+    // public static void SetMusicPrologue()
+    // {
+    //     //SetDynamicMusicModeOn();
+    //     SetMusicMode(MusicMode.LowPass);
+    //     AudioManager inst = Singleton();
+        
+    //     inst.main_MusicSrc.Stop();
+    //     inst.main_MusicSrc.clip = inst.prologue_music;
+    //     inst.main_MusicSrc.Play();
+        
+        
+    //     inst.battle_MusicSrc.clip = inst.prologue_music;
+    //     inst.battle_MusicSrc.Play();
+    // }
+    
     
     
     public static void SetMusicMainMenu()
     {
-        InGameConsole.LogFancy("<color=yellow>SetMusicMainMenu()</color>");
-        InGameConsole.LogFancy("<color=yellow>SetMusicMainMenu()</color>");
-        InGameConsole.LogFancy("<color=yellow>SetMusicMainMenu()</color>");
-        InGameConsole.LogFancy("<color=yellow>SetMusicMainMenu()</color>");
-        InGameConsole.LogFancy("<color=yellow>SetMusicMainMenu()</color>");
+        //InGameConsole.LogFancy("<color=yellow>SetMusicMainMenu()</color>");
+        //InGameConsole.LogFancy("<color=yellow>SetMusicMainMenu()</color>");
+       // InGameConsole.LogFancy("<color=yellow>SetMusicMainMenu()</color>");
+        //InGameConsole.LogFancy("<color=yellow>SetMusicMainMenu()</color>");
+        //InGameConsole.LogFancy("<color=yellow>SetMusicMainMenu()</color>");
         
         SetMusicMode(MusicMode.Static);
         AudioManager inst = Singleton();
@@ -923,9 +924,17 @@ public class AudioManager : MonoBehaviour
         
         isMuted = false;
         SetMusicMainMenu();
-        //SwitchMusicVolume();
         
-        //music_src.mute = true;
+        float savedMusicVolume = PlayerPrefs.GetFloat("MV", 0.75f);
+        InGameConsole.LogFancy("savedMusicVolume " + savedMusicVolume.ToString("f"));
+        float savedMusicVolumeDB = Mathf.Log10(savedMusicVolume) * 20;
+        musicMasterMixer.audioMixer.SetFloat("MV", savedMusicVolumeDB);
+        
+        
+        float savedEffectsVolume = PlayerPrefs.GetFloat("EV", 0.9f);
+        InGameConsole.LogFancy("savedEffectsVolume " + savedEffectsVolume.ToString("f"));
+        float savedEffectsVolumeDB = Mathf.Log10(savedEffectsVolume) * 20;
+        effectsMixer.audioMixer.SetFloat("EV", savedEffectsVolumeDB);
         
         SetTargetMasterPitch(normal_targetPitch, normal_interpSpeed, normal_interpAcceleration);
     }

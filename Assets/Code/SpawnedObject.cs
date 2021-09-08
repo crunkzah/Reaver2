@@ -7,7 +7,8 @@ public class SpawnedObject : MonoBehaviour
     
     public void SetEnemySpawnerID(int spawnerID)
     {
-        parent_enemySpawner = EnemySpawner.all_spawners[spawnerID];
+        if(PhotonNetwork.IsMasterClient)
+            parent_enemySpawner = EnemySpawner.all_spawners[spawnerID];
     }
     
     public void OnObjectDied()

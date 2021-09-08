@@ -5,7 +5,8 @@ using System.Collections.Generic;
 public enum DamageReactType
 {
     small_dmg,
-    headShot_dmg
+    headShot_dmg,
+    no_react
 }
 
 public class DamagableLimb : MonoBehaviour
@@ -126,6 +127,10 @@ public class DamagableLimb : MonoBehaviour
     {
         switch(react)    
         {
+            case(DamageReactType.no_react):
+            {
+                break;
+            }
             case(DamageReactType.small_dmg):
             {
                 ParticlesManager.PlayPooled(ParticleType.hurt1_ps, thisTransform.position, vForward);
@@ -252,6 +257,10 @@ public class DamagableLimb : MonoBehaviour
     {
         switch(react)    
         {
+            case(DamageReactType.no_react):
+            {
+                break;
+            }
             case(DamageReactType.small_dmg):
             {
                 ParticlesManager.PlayPooled(ParticleType.hurt1_ps, pos, -damage_dir);

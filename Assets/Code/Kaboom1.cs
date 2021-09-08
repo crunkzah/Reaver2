@@ -69,7 +69,7 @@ public class Kaboom1 : MonoBehaviour
         
         if(isMine)
         {
-            InGameConsole.LogFancy("ExplodeDamageHostile is <color=green>Mine</color>");
+            //InGameConsole.LogFancy("ExplodeDamageHostile is <color=green>Mine</color>");
             targetsHit = Physics.OverlapSphereNonAlloc(pos, radius, hits, enemyExplosionMask);
             targetsHit = Mathf.Min(targetsHit, hits.Length);
             
@@ -80,7 +80,7 @@ public class Kaboom1 : MonoBehaviour
                 if(limb && limb.CanBeStompedOn())
                 {
                     limb.TakeDamageLimb(3500);
-                    InGameConsole.LogFancy("ExplodingLimb");
+              //      InGameConsole.LogFancy("ExplodingLimb");
                 }
             }
             
@@ -101,7 +101,7 @@ public class Kaboom1 : MonoBehaviour
             
             if(targetsHit > 0)
             {
-                InGameConsole.LogFancy(string.Format("targets hit number {0}", targetsHit));
+                //InGameConsole.LogFancy(string.Format("targets hit number {0}", targetsHit));
                 
                 for(int i = 0; i < targetsHit; i++)
                 {
@@ -142,7 +142,7 @@ public class Kaboom1 : MonoBehaviour
         }
         else
         {
-            InGameConsole.LogFancy("ExplodeDamageHostile is <color=red>not Mine</color>");
+            //InGameConsole.LogFancy("ExplodeDamageHostile is <color=red>not Mine</color>");
         }
         
         PlayerController local_pc = PhotonManager.GetLocalPlayer();

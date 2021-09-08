@@ -643,6 +643,11 @@ public class FPSGunController : MonoBehaviour
                         damageDirection.Normalize();
                     }
                     
+                    if(pv.IsMine)
+                    {
+                        //int small_healing_times = _incomingDamage / UberManager.HEALING_DMG_THRESHOLD;
+                        HealthCrystalSmall.MakeSmallHealing(point, 15);
+                    }
                     
                     Vector3 launchPos = targetNetworkObject.transform.localPosition;
                     NetworkObjectsManager.CallNetworkFunction(targetNetworkObject.networkId, NetworkCommand.LaunchAirborne, launchPos, damageDirection * 14);
@@ -764,10 +769,13 @@ public class FPSGunController : MonoBehaviour
                         
                         if(Physics.Raycast(punchQtsRay, out qts_hit, punchDistance, QTSLayer))
                         {
-                            InGameConsole.LogFancy("Calling QTS from PUNCH");
+                        //    InGameConsole.LogFancy("Calling QTS from PUNCH");
                             QuickTimeSphere qts = qts_hit.collider.GetComponent<QuickTimeSphere>();
-                            qts.OnHit();
-                            pController.MakeImmuneForDamageForXTime(0.150F);
+                            if(qts)
+                            {
+                                qts.OnHit();
+                                pController.MakeImmuneForDamageForXTime(0.150F);
+                            }
                         }
                         
                         // if(arm1_overcharged)
@@ -2728,6 +2736,7 @@ public class FPSGunController : MonoBehaviour
             revolverFX_stronger_ps.Play();
             
             pController.BoostVelocity(-ray.direction * 24.0F);
+            revolverFX_ps.Play();
             
             if(Math.Abs(pController.velocity.y) > 2f)
             {
@@ -2737,7 +2746,6 @@ public class FPSGunController : MonoBehaviour
         RaycastHit hit;
         
         float revolverShotMaxDistance = 200F;
-        revolverFX_ps.Play();
         
         Vector3 lineStart = pv.IsMine ? gunPoint_revolver_fps.position : gunPoint_revolver_tps.position;
         Vector3 lineEnd = lineStart + ray.direction * revolverShotMaxDistance;
@@ -2802,13 +2810,13 @@ public class FPSGunController : MonoBehaviour
             revolverFX_stronger_ps.Play();
             if(arm_right_animator)
                 arm_right_animator.Play("Base.Fire1", 0, 0);
+            revolverFX_ps.Play();
         }
                 
         //RaycastHit hit;
         Ray ray = new Ray(shotPos, hitScanDirection);
         
         //float revolverShotMaxDistance = 200f;
-        revolverFX_ps.Play();
         
         //Vector3 lineStart = pv.IsMine ? gunPoint_revolver_fps.position : gunPoint_revolver_tps.position;
         //Vector3 lineEnd = lineStart + ray.direction * revolverShotMaxDistance;
@@ -2840,13 +2848,13 @@ public class FPSGunController : MonoBehaviour
             CameraShaker.MakeTrauma(0.15f);
             revolver_fps.anim.Play("Base.Fire1", 0, 0);
             arm_right_animator.Play("Base.Fire1", 0, 0);
+            revolverFX_ps.Play();
         }
                 
         RaycastHit hit;
         Ray ray = new Ray(shotPos, hitScanDirection);
         
         float revolverShotMaxDistance = 200f;
-        revolverFX_ps.Play();
         
         Vector3 lineStart = pv.IsMine ? gunPoint_revolver_fps.position : gunPoint_revolver_tps.position;
         Vector3 lineEnd = lineStart + ray.direction * revolverShotMaxDistance;
@@ -2882,13 +2890,13 @@ public class FPSGunController : MonoBehaviour
             CameraShaker.MakeTrauma(0.15f);
             revolver_blue_fps.anim.Play("Base.Fire1", 0, 0);
             arm_right_animator.Play("Base.Fire1", 0, 0);
+            revolverFX_blue_ps.Play();
         }
                 
         RaycastHit hit;
         Ray ray = new Ray(shotPos, hitScanDirection);
         
         float revolverShotMaxDistance = 200f;
-        revolverFX_blue_ps.Play();
         
         Vector3 lineStart = pv.IsMine ? gunPoint_revolver_blue_fps.position : gunPoint_revolver_tps.position;
         Vector3 lineEnd = lineStart + ray.direction * revolverShotMaxDistance;
@@ -2924,13 +2932,13 @@ public class FPSGunController : MonoBehaviour
             CameraShaker.MakeTrauma(0.15f);
             revolver_blue_fps.anim.Play("Base.Fire2", 0, 0);
             arm_right_animator.Play("Base.Fire2", 0, 0);
+            revolverFX_blue_ps.Play();
         }
                 
         RaycastHit hit;
         Ray ray = new Ray(shotPos, hitScanDirection);
         
         float revolverShotMaxDistance = 200f;
-        revolverFX_blue_ps.Play();
         
         Vector3 lineStart = pv.IsMine ? gunPoint_revolver_blue_fps.position : gunPoint_revolver_tps.position;
         Vector3 lineEnd = lineStart + ray.direction * revolverShotMaxDistance;
@@ -3844,7 +3852,8 @@ public class FPSGunController : MonoBehaviour
                                 killables_cache.Clear();
                                 int len = NPCManager.killablesMaxNum;
                                 const float maxDistanceSqr = 16 * 16;
-                                int maxBounces = 3;
+                                // const float maxDistanceSqr = 32 * 32;
+                                int maxBounces = 4;
                                 // if(maxBounces > NPCManager.killables.Count)
                                 // {
                                 //     maxBounces = NPCManager.killables.Count;
@@ -3882,10 +3891,10 @@ public class FPSGunController : MonoBehaviour
                                         float d = Math.Magnitude(hitSpot - startPoint);
                                         killables_cache.Add(killable_target);
                                         
-                                        float bounceDelay = 0.08f;
+                                        float bounceDelay = 0.1f;
                                         if(!PhotonNetwork.OfflineMode)
                                         {
-                                            bounceDelay = 0.033f;
+                                            bounceDelay = bounceDelay / 2;
                                         }
                                         
                                         if(Physics.Raycast(bounceRay, out bounceHit, d, groundCeilingMask))

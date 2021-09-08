@@ -2,7 +2,7 @@
 
 public class HealthCrystalSmall : MonoBehaviour
 {
-    const float small_healing_radius = 2.85f;
+    const float small_healing_radius = 2.95f;
     const float small_healing_radiusSquared = small_healing_radius * small_healing_radius;
     const int small_healing_amount = 1;
     

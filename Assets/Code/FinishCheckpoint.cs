@@ -13,9 +13,11 @@ public class FinishCheckpoint : MonoBehaviour
         worldPos = transform.position;
     }
     
+    bool isWorking = true;
+    
     void Update()
     {
-        if(PhotonNetwork.IsMasterClient)
+        if(PhotonNetwork.IsMasterClient && isWorking)
         {
             PlayerController local_player = PhotonManager.GetLocalPlayer();
             
@@ -26,7 +28,9 @@ public class FinishCheckpoint : MonoBehaviour
                 {
                     if(Inputs.GetInteractKeyDown())
                     {
-                        ProceedToNextLevel();
+                        isWorking = false;
+                        ///StartUpScreen.Singleton().FadeIn(2);
+                        Invoke(nameof(ProceedToNextLevel), 1);
                     }
                 }
             }

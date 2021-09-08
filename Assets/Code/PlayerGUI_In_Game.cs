@@ -66,6 +66,21 @@ public class PlayerGUI_In_Game : MonoBehaviour
     
     void Update()
     {
+        if(localPlayer)
+        {
+            if(!crosshair.activeSelf)
+            {
+                crosshair.SetActive(true);
+            }
+        }
+        else
+        {
+            if(crosshair.activeSelf)
+            {
+                crosshair.SetActive(false);
+            }
+        }
+        
         if(GUI3D)
         {
             if(localPlayer)
@@ -79,9 +94,11 @@ public class PlayerGUI_In_Game : MonoBehaviour
                 OrthoCamera.Hide3DGUI();
             }
             HidePlayerGUI();
+            
         }
         else
         {
+            OrthoCamera.Hide3DGUI();
             if(localPlayer)
             {
                 if(!hpBar.gameObject.activeSelf)
@@ -94,11 +111,6 @@ public class PlayerGUI_In_Game : MonoBehaviour
                     staminaBar.gameObject.SetActive(true);
                     staminaText.gameObject.SetActive(true);
                 }
-                if(!crosshair.activeSelf)
-                {
-                    crosshair.SetActive(true);
-                }
-                
                 if(playerHp != localPlayer.HitPoints)
                 {
                     ProcessHealth();

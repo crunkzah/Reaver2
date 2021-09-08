@@ -21,13 +21,14 @@ public class AudioReact : MonoBehaviour
     }
     
     ParticleSystem.MainModule main_module;
+    public float minSimulationSpeed = 0.2f;
     
     public float vol;
     
     void Update()
     {
         vol = AudioManager.GetCurrentVolume() * mult;
-        main_module.simulationSpeed = vol;
+        main_module.simulationSpeed = minSimulationSpeed + mult * vol;
         
         //ps.emission.rateOverTime = vol * mult;
         
