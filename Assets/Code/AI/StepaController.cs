@@ -486,11 +486,8 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     
     void TakeDamage(int dmg, byte limb_id)
     {
-        if(Time.time - damage_taken_timeStamp > 0.2f)
-        {
-            damage_taken_timeStamp = Time.time;
-            audio_src.PlayOneShot(clipHurt1, 1f);
-        }
+        OnTakeDamageSFX();
+
         //InGameConsole.LogOrange("TakeDamage()");
         HitPoints -= dmg;
         //audio_src.clip clipHurt1
@@ -504,11 +501,11 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     
     void TakeDamageForce(int dmg, Vector3 force, byte limb_id)
     {
-        if(Time.time - damage_taken_timeStamp > 0.2f)
-        {
-            damage_taken_timeStamp = Time.time;
-            audio_src.PlayOneShot(clipHurt1, 0.8f);
-        }
+        //if(Time.time - damage_taken_timeStamp > 0.2f)
+        //{
+            OnTakeDamageSFX();
+
+        //}
         //InGameConsole.LogOrange("TakeDamageForce()");
         HitPoints -= dmg;
          
@@ -521,17 +518,25 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     
     void TakeDamageExplosive(int dmg)
     {
-        if(Time.time - damage_taken_timeStamp > 0.2f)
-        {
-            damage_taken_timeStamp = Time.time;
-            audio_src.PlayOneShot(clipHurt1, 0.8f);
-        }
+        OnTakeDamageSFX();
+        //if(Time.time - damage_taken_timeStamp > 0.2f)
+        //{
+        //}
         //InGameConsole.LogOrange("TakeDamageExplosive()");
         HitPoints -= dmg;
         if(HitPoints <= 0)
         {
             DieFromExplosion();
             HitPoints = 0;
+        }
+    }
+    void OnTakeDamageSFX()
+    {
+        if(Time.time - damage_taken_timeStamp2 > 0.2f)
+        {
+            audio_src.pitch = Random.Range(0.92f, 1f);
+            audio_src.PlayOneShot(clipHurt1, 1);
+            damage_taken_timeStamp2 = Time.time;
         }
     }
     
@@ -559,7 +564,8 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
         NetworkObjectsManager.UnregisterNetObject(net_comp);
         if(remoteAgent)
             Destroy(remoteAgent.gameObject, 0.1f);
-            
+        audio_src.pitch = Random.Range(0.6f, 0.8f);
+        audio_src.PlayOneShot(clipDeath);
         
         
         audio_src.PlayOneShot(clipDeath, 0.5f);
@@ -620,8 +626,9 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
         }
         
         AudioManager.RemoveEnemiesAlive();
-        
         SetState(StepaState.Dead);
+        audio_src.pitch = Random.Range(0.7f, 0.9f);
+        audio_src.PlayOneShot(clipDeath);
         
         if(spawnedObjectComp)
             spawnedObjectComp.OnObjectDied();
@@ -872,6 +879,9 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     const float fleeingComfortDistance = 12F;
     const float fleeingRange = 6F;
     
+    float changeTargetTimer;
+    const float changeTargetCooldown = 6;
+    
     void UpdateBrain(float dt)
     {
         switch(state)
@@ -901,6 +911,37 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 
                 if(target_pc)
                 {
+                    changeTargetTimer += dt;
+                    if(changeTargetTimer > changeTargetCooldown)
+                    {
+                        changeTargetTimer = 0;
+                        if(canSendCommands)
+                        {
+                            Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
+                            Vector3 _shootingCheckPosOffsetted = currentDestination;
+                            _shootingCheckPosOffsetted.y += offsetShootingY;
+                            
+                            Vector3 _offsettedTargetHeadPos = target_pc.GetHeadPosition();
+                            _offsettedTargetHeadPos.y -= 0.25F;
+                            
+                            
+                            bool _canShootFromDestination = CanShootAtPos(_shootingCheckPosOffsetted, _offsettedTargetHeadPos, shootMaxDistance);
+                            if(_canShootFromDestination)
+                            {
+                                if(potentialTarget && (potentialTarget.GetInstanceID() != target_pc.thisTransform.GetInstanceID()))
+                                {
+                                    PlayerController pc = potentialTarget.GetComponent<PlayerController>();
+                                    if(pc)
+                                    {
+                                        LockSendingCommands();
+                                        NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
                     Vector3 targetGroundPos = target_pc.GetGroundPosition();
                     //UpdateRemoteAgentDestination(targetGroundPos);
                     

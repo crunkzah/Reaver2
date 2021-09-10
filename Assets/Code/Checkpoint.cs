@@ -191,12 +191,17 @@ public class Checkpoint : MonoBehaviour, INetworkObject
             }
         }
     }
-    
+
+#if UNITY_EDITOR    
     void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, radius);
+        if(detectionMode == CheckpointDetectionMode.Sphere)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(transform.position, radius);
+        }
     }
+#endif
     
     static bool DEBUG_disable_checkpoints = false;
     

@@ -412,13 +412,13 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             }
             case(PadlaState.Idle):
             {
-                brainTimer = path_update_cd;
+                brainTimer = path_update_cd / 2;
                 break;
             }
             case(PadlaState.Chasing):
             {
                 distanceTravelledRunningSqr = 0;
-                brainTimer = path_update_cd;
+                brainTimer = path_update_cd / 2;
                 break;
             }
             default:
@@ -495,7 +495,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             
         
         
-        audio_src.PlayOneShot(clipDeath, 0.5f);
+        audio_src.PlayOneShot(clipDeath, 0.75f);
         HitPoints = 0;
         
         EnableSkeleton();  
@@ -569,7 +569,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
         if(remoteAgent)
             Destroy(remoteAgent.gameObject, 0.1f);
             
-        audio_src.PlayOneShot(clipDeath, 0.5f);
+        audio_src.PlayOneShot(clipDeath, 0.75f);
         HitPoints = 0;
         
         EnableSkeleton();  
@@ -727,9 +727,13 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
         if(remoteAgent)
         {
             NavMeshHit navMeshHit;
-            if(NavMesh.SamplePosition(destPos, out navMeshHit, 0.125f, NavMesh.AllAreas))
+            if(NavMesh.SamplePosition(destPos, out navMeshHit, 9f, NavMesh.AllAreas))
             {
                  remoteAgent.SetDestination(destPos);
+            }
+            else
+            {
+                remoteAgent.SetDestination(destPos);
             }
         }
     }
@@ -784,7 +788,8 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     const float punch1_dashDistance = 4f;
     
     int numberOfPunchesPerformed = 0;
-    
+    float changeTargetTimer;
+    const float changeTargetCooldown = 4;
     
     void UpdateBrain(float dt)
     {
@@ -815,6 +820,28 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 if(target_pc)
                 {
                     Vector3 targetGroundPos = target_pc.GetGroundPosition();
+                    
+                    changeTargetTimer += dt;
+                    if(changeTargetTimer > changeTargetCooldown)
+                    {
+                        changeTargetTimer = 0;
+                        if(canSendCommands)
+                        {
+                            Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
+                            if(potentialTarget && (potentialTarget.GetInstanceID() != target_pc.thisTransform.GetInstanceID()))
+                            {
+                                PlayerController pc = potentialTarget.GetComponent<PlayerController>();
+                                if(pc)
+                                {
+                                    LockSendingCommands();
+                                    InGameConsole.LogFancy("Padla is choosing another target!");
+                                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
                     
                     UpdateRemoteAgentDestination(targetGroundPos);
                     
@@ -1159,7 +1186,9 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                     distanceTravelledRunningSqr -= footStepDistanceSqr;
                     if(distanceTravelledRunningSqr  > footStepDistanceSqr)
                         distanceTravelledRunningSqr = 0;
-                    
+                        
+                        
+                    audio_src.pitch = Random.Range(0.95f, 1.05f);
                     audio_src.PlayOneShot(clipStep, 0.33F);
                 }
                 

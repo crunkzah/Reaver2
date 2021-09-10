@@ -29,6 +29,11 @@ public class Inputs : MonoBehaviour
         m_EventSystem = FindObjectOfType<EventSystem>();
     }
     
+    public static bool GetInteractKey()
+    {
+        return Input.GetKey(KeyCode.E);
+    }
+    
     public static bool GetInteractKeyDown()
     {
         return Input.GetKeyDown(KeyCode.E);

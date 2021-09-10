@@ -563,7 +563,7 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
         hc.Launch(this.transform.localPosition + new Vector3(0, 1.25f, 0), 10);
     }
     
-    const int MaxHealth = 2500;
+    const int MaxHealth = 2900;
     public int HitPoints = MaxHealth;
     
     public int GetCurrentHP()
@@ -726,7 +726,10 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
     float fleeingTimer;
     const float fleeingTimeout = 3F;
     const float fleeingComfortDistance = 12F;
-    const float fleeingRange = 9F;
+    const float fleeingRange = 16F;
+    
+    float changeTargetTimer;
+    const float changeTargetCooldown = 4;
     
     void UpdateBrain(float dt)
     {
@@ -757,6 +760,37 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
                 
                 if(target_pc)
                 {
+                    changeTargetTimer += dt;
+                    if(changeTargetTimer > changeTargetCooldown)
+                    {
+                        changeTargetTimer = 0;
+                        if(canSendCommands)
+                        {
+                            Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
+                            Vector3 _shootingCheckPosOffsetted = currentDestination;
+                            _shootingCheckPosOffsetted.y += offsetShootingY;
+                            
+                            Vector3 _offsettedTargetHeadPos = target_pc.GetHeadPosition();
+                            _offsettedTargetHeadPos.y -= 0.25F;
+                            
+                            bool _canShootFromDestination = CanShootAtPos(_shootingCheckPosOffsetted, _offsettedTargetHeadPos, shootMaxDistance);
+                            if(_canShootFromDestination)
+                            {
+                                if(potentialTarget && (potentialTarget.GetInstanceID() != target_pc.thisTransform.GetInstanceID()))
+                                {
+                                    PlayerController pc = potentialTarget.GetComponent<PlayerController>();
+                                    if(pc)
+                                    {
+                                        LockSendingCommands();
+                                        NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
+                                        changeTargetTimer = -2f;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
                     Vector3 targetGroundPos = target_pc.GetGroundPosition();
                     //UpdateRemoteAgentDestination(targetGroundPos);
                     

@@ -32,7 +32,7 @@ public class MessagePanel : MonoBehaviour
     string msg_target = string.Empty;
     
 
-    public void ShowMessage(string msg, float time)
+    public void ShowMessage(string msg, float time, bool playSound = true)
     {
         timer = time;
         tmp.SetText(msg);
@@ -41,7 +41,7 @@ public class MessagePanel : MonoBehaviour
         //msg_target = msg;
         currentCharIndex = 0;
         
-        OnShow();        
+        OnShow(playSound);        
         Invoke(nameof(Flicker), 0.15F);
         Invoke(nameof(Flicker), 0.3F);
         Invoke(nameof(Flicker), 0.45F);
@@ -59,11 +59,12 @@ public class MessagePanel : MonoBehaviour
         tmp.enabled = !tmp.enabled;
     }
     
-    void OnShow()
+    void OnShow(bool playSound = true)
     {
         panel_img.enabled = true;
         tmp.enabled = true;
-        AudioManager.PlayClip(SoundType.ui_blip1, 1, 1.4f);
+        if(playSound)
+            AudioManager.PlayClip(SoundType.ui_blip1, 1, 1.4f);
     }
     
     void OnHide()

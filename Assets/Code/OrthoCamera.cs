@@ -46,8 +46,9 @@ public class OrthoCamera : MonoBehaviour
     public Transform Heart;
     Material heart_mat;
     static Color heart_start_color     = new Color(1f, 0, 3f/255f);
+    //static Color heart_start_color_dark     = new Color(0.8f, 0, 0f);
     static Color heart_healed_color    = new Color(3f/255f, 1, 0);
-    static Color heart_hurt_color      = new Color(0.1f, 0, 3f/255f);
+    static Color heart_hurt_color      = new Color(0.25f, 0, 3f/255f);
     Color heartColor;
     int colorID;
     
@@ -290,6 +291,10 @@ public class OrthoCamera : MonoBehaviour
             {
                 currentHitPoints_ps_main.startColor = heartColor;
                 heartColor = Vector4.MoveTowards(heartColor, heart_start_color, heartColorSpeed * dt);
+                // float blackness = Random.Range(0.95f, 1f);
+                // heartColor.r *= blackness;
+                // heartColor.g *= blackness;
+                // heartColor.b *= blackness;
                 
                 //InGameConsole.LogFancy("SetColor() " + heartColor);
                 heart_mat.SetColor(colorID, heartColor);

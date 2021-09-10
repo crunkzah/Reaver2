@@ -536,7 +536,8 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
             
         
         
-        audio_src.PlayOneShot(clipDeath, 0.5f);
+        audio_src.pitch = Random.Range(0.9f, 1.1f);
+        audio_src.PlayOneShot(clipDeath, 1);
         HitPoints = 0;
         
         EnableSkeleton();  
@@ -600,6 +601,9 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
         if(spawnedObjectComp)
             spawnedObjectComp.OnObjectDied();
         
+        audio_src.pitch = Random.Range(0.9f, 1.1f);
+        audio_src.PlayOneShot(clipDeath, 1);
+        
         HitPoints = -1;
         
         anim.enabled = false;
@@ -609,7 +613,6 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
         if(remoteAgent)
             Destroy(remoteAgent.gameObject, 0.1f);
             
-        audio_src.PlayOneShot(clipDeath, 0.5f);
         HitPoints = 0;
         
         EnableSkeleton();  
@@ -842,6 +845,9 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
     const float fleeingComfortDistance = 12F;
     const float fleeingRange = 9F;
     
+    float changeTargetTimer;
+    const float changeTargetCooldown = 6;
+    
     public GameObject coat;
     
     void UpdateBrain(float dt)
@@ -873,7 +879,39 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                 
                 if(target_pc)
                 {
+                    changeTargetTimer += dt;
+                    if(changeTargetTimer > changeTargetCooldown)
+                    {
+                        changeTargetTimer = 0;
+                        if(canSendCommands)
+                        {
+                            Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
+                            Vector3 _shootingCheckPosOffsetted = currentDestination;
+                            _shootingCheckPosOffsetted.y += offsetShootingY;
+                            
+                            Vector3 _offsettedTargetHeadPos = target_pc.GetHeadPosition();
+                            _offsettedTargetHeadPos.y -= 0.25F;
+                            
+                            bool _canShootFromDestination = CanShootAtPos(_shootingCheckPosOffsetted, _offsettedTargetHeadPos, shootMaxDistance);
+                            if(_canShootFromDestination)
+                            {
+                                if(potentialTarget && (potentialTarget.GetInstanceID() != target_pc.thisTransform.GetInstanceID()))
+                                {
+                                    PlayerController pc = potentialTarget.GetComponent<PlayerController>();
+                                    if(pc)
+                                    {
+                                        LockSendingCommands();
+                                        NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
                     Vector3 targetGroundPos = target_pc.GetGroundPosition();
+                    
+                    
                     //UpdateRemoteAgentDestination(targetGroundPos);
                     
                     Vector3 shootingCheckPosOffsetted = currentDestination;

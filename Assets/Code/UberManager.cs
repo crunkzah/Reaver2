@@ -246,7 +246,11 @@ public class UberManager : MonoBehaviour
     
     void OnFogsChanged(int currentBuildIndex)
     {
-        bool UseFogs = (PlayerPrefs.GetInt("Fogs", 1) == 1);
+        bool UseFogs = false;//(PlayerPrefs.GetInt("Fogs", 1) == 1);
+        if((PlayerPrefs.GetInt("Fogs", 1) == 1))
+        {
+            UseFogs = true;
+        }
         if(UseFogs)
         {
             switch(currentBuildIndex)
@@ -263,7 +267,7 @@ public class UberManager : MonoBehaviour
                 }
                 case(2):
                 {
-                    RenderSettings.fog = true;
+                    RenderSettings.fog = false;
                     break;
                 }
                 case(3):
@@ -523,7 +527,7 @@ public class UberManager : MonoBehaviour
             readyToSwitchLevel = false;
             
             LoadingScreen.SetOn(level_index);
-            System.GC.Collect();
+            //System.GC.Collect();
             
             if(SceneManager.GetActiveScene().buildIndex == level_index)
             {

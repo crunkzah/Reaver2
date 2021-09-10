@@ -174,14 +174,12 @@ public class AudioManager : MonoBehaviour
     
     [Header("Explosions:")]
     public GameObject explosion_pooled_prefab;
-    int pooled_explosions_num = 2;
+    int pooled_explosions_num = 8;
     int current_pooled_explosion = 0;
     public AudioSource[] explosionsPooled;
     
     void InitExplosionsPool()
     {
-        
-        
         explosionsPooled = new AudioSource[pooled_explosions_num];
         
         for(int i = 0; i < pooled_explosions_num; i++)
@@ -918,8 +916,8 @@ public class AudioManager : MonoBehaviour
         inst.battle_MusicSrc.Stop();
     }
     
-    public const float defaultMV = 0.75f;
-    public const float defaultEV = 0.9f;
+    public const float defaultMV = 0.1f;
+    public const float defaultEV = 0.15f;
     
     
     void Start()

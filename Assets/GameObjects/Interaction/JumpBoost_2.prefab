@@ -229,7 +229,8 @@ AudioSource:
   m_GameObject: {fileID: 4219788296332181693}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 90796b012c318744db1bee2b209366c9,
+    type: 2}
   m_audioClip: {fileID: 8300000, guid: bd4bb512d5f3c4447ba30822e0b5aede, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
@@ -10037,6 +10038,14 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 0061b7c86bdf5cb4388048a37697bace, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 138a13a16b6849d439ca6cae47dff1e8, type: 2}
+    - target: {fileID: 2300000, guid: 0061b7c86bdf5cb4388048a37697bace, type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 0061b7c86bdf5cb4388048a37697bace, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -10079,14 +10088,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 0061b7c86bdf5cb4388048a37697bace, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2300000, guid: 0061b7c86bdf5cb4388048a37697bace, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 138a13a16b6849d439ca6cae47dff1e8, type: 2}
-    - target: {fileID: 2300000, guid: 0061b7c86bdf5cb4388048a37697bace, type: 3}
-      propertyPath: m_ScaleInLightmap
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

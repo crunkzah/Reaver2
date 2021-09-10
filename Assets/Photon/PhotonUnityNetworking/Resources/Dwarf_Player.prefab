@@ -457,13 +457,13 @@ CharacterController:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Height: 2.4
+  m_Height: 2
   m_Radius: 0.45
   m_SlopeLimit: 50
   m_StepOffset: 0.5
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1.2, z: 0}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &709
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -523,7 +523,6 @@ MonoBehaviour:
   playerAudioSource_sliding: {fileID: 1068610734324334833}
   canSlide: 1
   tiltingTargetAngle: 0
-  tiltAngle: 1.5
   weaponSwingingAnimator: {fileID: 1897910890154104094}
   tiltTime: 0.1
   swingingDampTime: 0
@@ -828,7 +827,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 709}
   viewIdField: 0
-  InstantiationId: 1
+  InstantiationId: 3
   isRuntimeInstantiated: 0
 --- !u!114 &8788468314865930829
 MonoBehaviour:
@@ -83400,7 +83399,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9142349130932824877}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.35, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7092791173402009808}
@@ -84192,15 +84191,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a354df679f838b748a366876fbad6914, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.01
+      value: 0.008
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a354df679f838b748a366876fbad6914, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.01
+      value: 0.008
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: a354df679f838b748a366876fbad6914, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.01
+      value: 0.008
       objectReference: {fileID: 0}
     - target: {fileID: 9500000, guid: a354df679f838b748a366876fbad6914, type: 3}
       propertyPath: m_Enabled

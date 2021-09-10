@@ -67,6 +67,7 @@ ModelImporter:
     7400014: RobotArm_armature|Hook1_impact
     7400016: RobotArm_armature|Punch2_impact
     7400018: RobotArm_armature|Punch2
+    7400020: RobotArm_armature|Pet
     9500000: //RootNode
     13700000: RobotArm
     2186277476908879412: ImportLogs
@@ -289,7 +290,14 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events: []
+      events:
+      - time: 0.38539043
+        functionName: OnInject
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}
@@ -353,6 +361,34 @@ ModelImporter:
     - serializedVersion: 16
       name: RobotArm_armature|Punch2
       takeName: RobotArm_armature|Punch2
+      firstFrame: 0
+      lastFrame: 59
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: RobotArm_armature|Pet
+      takeName: RobotArm_armature|Pet
       firstFrame: 0
       lastFrame: 59
       wrapMode: 0

@@ -4648,7 +4648,7 @@ ParticleSystem:
 --- !u!199 &550453201031196812
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -9355,7 +9355,7 @@ ParticleSystem:
 --- !u!199 &4615673389935049803
 ParticleSystemRenderer:
   serializedVersion: 6
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -9427,6 +9427,7 @@ GameObject:
   - component: {fileID: 7723501633518086627}
   - component: {fileID: 700913614015793723}
   - component: {fileID: 7220782391740347113}
+  - component: {fileID: 3148502257954003727}
   m_Layer: 10
   m_Name: Mia_statue_stand1
   m_TagString: Untagged
@@ -9522,3 +9523,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95de5baa0c1772148948604cecd7afd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ps: {fileID: 0}
+--- !u!114 &3148502257954003727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7723501633515829027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 465008d2efe9915408c4fc0ce32044f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  has_msg: 1
+  eng_msg: These games are getting better than realistic...
+  rus_msg: These games are getting better than realistic...

@@ -647,7 +647,7 @@ MonoBehaviour:
   velocity: {x: 0, y: 0, z: 0}
   clipStep: {fileID: 8300000, guid: 73ed0b4410af8684d848f5b90022da31, type: 3}
   clipHurt1: {fileID: 8300000, guid: f3d55798e8a7a41438f7a72e1b12af32, type: 3}
-  clipDeath: {fileID: 0}
+  clipDeath: {fileID: 8300000, guid: 99ab928719d5d6f4e9a9fca69ce7dec1, type: 3}
   clipLaunchedAirborne: {fileID: 0}
   clipShoot: {fileID: 0}
 --- !u!1 &2036743217302176042
@@ -1941,9 +1941,10 @@ AudioSource:
   m_GameObject: {fileID: 2140672439993972342}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 243086065624918228, guid: 90796b012c318744db1bee2b209366c9,
+    type: 2}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -1951,9 +1952,9 @@ AudioSource:
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 50
-  DopplerLevel: 1
+  DopplerLevel: 2
   MinDistance: 2
-  MaxDistance: 16
+  MaxDistance: 24
   Pan2D: 0
   rolloffMode: 2
   BypassEffects: 0

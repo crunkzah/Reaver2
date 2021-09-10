@@ -10329,7 +10329,7 @@ MonoBehaviour:
   velocity: {x: 0, y: 0, z: 0}
   clipStep: {fileID: 8300000, guid: 73ed0b4410af8684d848f5b90022da31, type: 3}
   clipHurt1: {fileID: 0}
-  clipDeath: {fileID: 0}
+  clipDeath: {fileID: 8300000, guid: ba0eefc7ea756e444be661161aad060d, type: 3}
   clipLaunchedAirborne: {fileID: 0}
   clipShoot: {fileID: 0}
 --- !u!114 &6369200147387901361
@@ -10372,6 +10372,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   limbs: []
+  canBeAffected: 1
 --- !u!1 &3794194158871260521
 GameObject:
   m_ObjectHideFlags: 0
@@ -11612,7 +11613,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 243086065624918228, guid: 90796b012c318744db1bee2b209366c9,
     type: 2}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -11620,8 +11621,8 @@ AudioSource:
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
+  DopplerLevel: 1.5
+  MinDistance: 2
   MaxDistance: 24
   Pan2D: 0
   rolloffMode: 0
@@ -11784,15 +11785,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 8f567d5ecc623db4a8166831ecd1ef1b, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.01
+      value: 0.010941
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 8f567d5ecc623db4a8166831ecd1ef1b, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.01
+      value: 0.010941
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 8f567d5ecc623db4a8166831ecd1ef1b, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.01
+      value: 0.010941
       objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: 8f567d5ecc623db4a8166831ecd1ef1b, type: 3}
       propertyPath: m_Materials.Array.size
@@ -11871,15 +11872,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 8f567d5ecc623db4a8166831ecd1ef1b, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.01
+      value: 0.010941
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 8f567d5ecc623db4a8166831ecd1ef1b, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.01
+      value: 0.010941
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 8f567d5ecc623db4a8166831ecd1ef1b, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.01
+      value: 0.010941
       objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: 8f567d5ecc623db4a8166831ecd1ef1b, type: 3}
       propertyPath: m_Materials.Array.size

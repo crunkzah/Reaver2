@@ -522,7 +522,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
         {
             case(SinclaireCoolState.Chasing):
             {
-                brainTimer = path_update_cd;
+                brainTimer = path_update_cd / 2;
                 break;
             }
             case(SinclaireCoolState.Idle):
@@ -766,6 +766,9 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
     const float slam_cooldown = 6;
     float slam_cooldown_timer;
     
+    float changeTargetTimer;
+    const float changeTargetCooldown = 6.0f;
+    
     void UpdateBrain(float dt)
     {
         switch(state)
@@ -792,6 +795,26 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
             {
                 if(target_pc)
                 {
+                    changeTargetTimer += dt;
+                    if(changeTargetTimer > changeTargetCooldown)
+                    {
+                        changeTargetTimer = 0;
+                        if(canSendCommands)
+                        {
+                            Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
+                            if(potentialTarget.GetInstanceID() != target_pc.thisTransform.GetInstanceID())
+                            {
+                                PlayerController pc = potentialTarget.GetComponent<PlayerController>();
+                                if(pc)
+                                {
+                                    LockSendingCommands();
+                                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
                     brainTimer += dt;
                     firing_masterTimer += dt;
                     slam_cooldown_timer += dt;
@@ -1166,7 +1189,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                 {
                     //if(sword_attack_timer > sword_attack1_damageTimingStart && sword_attack_timer < sword_attack1_damageTimingEnd)
                     float sqrDistanceToDestination = Math.SqrDistance(currentDestination, currentPos);
-                    if(sword_attack_timer > sword_attack1_damageTimingStart && dV > 0 && sqrDistanceToDestination > 0f)
+                    if(sword_attack_timer > sword_attack1_damageTimingStart)
                     {
                         Vector3 dmgPos = thisTransform.localPosition + thisTransform.up * localStrikeOffset.y + thisTransform.forward * localStrikeOffset.z;
                         float dmgRadius = sword_attack1_radius;
@@ -1235,7 +1258,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                     {
                         didSlam = true;
                         anim.Play("Base.OnSlammed", 0, 0);
-                        MakeShockWave(currentSlamPos + new Vector3(0, 0.2f, 0));                        
+                        MakeShockWave(currentSlamPos + new Vector3(0, 0.33f, 0));                        
                     }
                 }
                 break;

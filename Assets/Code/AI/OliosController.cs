@@ -339,6 +339,9 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
     const float strikeCooldown_minor = 1.7F;
     const float strikeCooldown_major = 2.5F;
     
+    float changeTargetTimer;
+    const float changeTargetCooldown = 7f;
+    
     void UpdateBrain(float dt)
     {
         switch(state)
@@ -367,6 +370,26 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
                 
                 if(target_pc)
                 {
+                    changeTargetTimer += dt;
+                    if(changeTargetTimer > changeTargetCooldown)
+                    {
+                        changeTargetTimer = 0;
+                        if(canSendCommands)
+                        {
+                            Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
+                            if(potentialTarget.GetInstanceID() != target_pc.thisTransform.GetInstanceID())
+                            {
+                                PlayerController pc = potentialTarget.GetComponent<PlayerController>();
+                                if(pc)
+                                {
+                                    LockSendingCommands();
+                                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
                     if(moveTimer > moveCooldown)
                     {
                         if(canSendCommands)
@@ -717,8 +740,8 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
         bullet.explosionPlayerDamage = 25;
         bullet.explosionDamage = 400;
         bullet.explosionCanDamageNPCs = false;
-        bullet.explosionForce = 24;
-        bullet.explosionRadius = 6;
+        bullet.explosionForce = 32;
+        bullet.explosionRadius = 7;
     }
     
     void Strike_Hor(Vector3 pos, Vector3 dir, Vector3 upDir)
@@ -739,7 +762,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
             
             GameObject projectile = ObjectPool.s().Get(ObjectPoolKey.Bullet_npc2);
             BulletController bullet = projectile.GetComponent<BulletController>();
-            bullet.LaunchAsSphere(pos, rotated_dir, 0.3F, normalBulletsMask, projectile_normal_speed, 20, isMine);
+            bullet.LaunchAsSphere(pos, rotated_dir, 0.3F, normalBulletsMask, projectile_normal_speed, 25, isMine);
             
             angle += angleStep;
         }
@@ -763,7 +786,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
             
             GameObject projectile = ObjectPool.s().Get(ObjectPoolKey.Bullet_npc2);
             BulletController bullet = projectile.GetComponent<BulletController>();
-            bullet.LaunchAsSphere(pos, rotated_dir, 0.3F, normalBulletsMask, projectile_normal_speed, 20, isMine);
+            bullet.LaunchAsSphere(pos, rotated_dir, 0.3F, normalBulletsMask, projectile_normal_speed, 25, isMine);
             
             angle += angleStep;
         }

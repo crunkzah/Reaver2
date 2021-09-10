@@ -103,6 +103,8 @@ public class JumpBooster : MonoBehaviour, IActivatable, INetworkObject
     public bool inLocalSpace = false;
     
     static readonly Vector3 vUp = new Vector3(0, 1, 0);
+    public bool ForceVelocityBoost = false;
+    public float time_to_be_forced = 1.25f;
     
     void AnimatedTransform()
     {
@@ -142,6 +144,7 @@ public class JumpBooster : MonoBehaviour, IActivatable, INetworkObject
                         {
                             Vector3 vel_in_localSpace = transform.TransformVector(boostVelocity);
                             player_on_booster.BoostVelocity(vel_in_localSpace);
+                            
                         }
                         else
                         {

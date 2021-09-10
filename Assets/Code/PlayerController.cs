@@ -135,9 +135,14 @@ public class PlayerController : MonoBehaviour, IPunObservable
     }
     
     float bunnyHopDecreaseRate = 0.045F;
-    float bunnyHopIncreasePerJump = 0.135F;
+    float bunnyHopIncreasePerJump = 0.175F;
     
+    float uncontrollableTimer = 0;
     
+    public void MakeImmovableForXTime(float time_to_be_uncontrollable)
+    {
+        uncontrollableTimer = time_to_be_uncontrollable;
+    }
     
     void ProcessMaxSpeed(float dt)
     {
@@ -304,18 +309,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
             stream.SendNext(transform.forward);
             //stream.SendNext(transform.forward.x)
             Vector3 fpsVelToSend = fpsVelocity;
-            
-            // if(fpsVelToSend.y == MIN_GRAVITY)
-            //     fpsVelToSend.y = 0;
                 
             stream.SendNext(fpsVelToSend);
             stream.SendNext(fpsCameraPlace.localEulerAngles.x);
-            
-            
-            
-            // stream.SendNext(velocity);
-            //stream.SendNext(finalVelocity);
-          //  stream.SendNext((int)aliveState);
         }
         else
         {
@@ -332,12 +328,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
             syncStartDirection  = transform.forward;
             syncStartPosition   = transform.position;
             syncEndPosition     = syncPosition;
-            
-            //This is used for animation only:
-            
-            
-         //   aliveState = (PlayerAliveState)stream.ReceiveNext();
-            
         }
     }
 
@@ -350,50 +340,41 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         // TODO: Handle the case when packet arrives very late (say 350ms). - 13.01.2020
         
-        if(aliveState == PlayerAliveState.Normal)
-        {
-            syncTime += UberManager.DeltaTime();
-            float t = syncTime / syncDelay;
-            float dt = UberManager.DeltaTime();
-            
+        syncTime += UberManager.DeltaTime();
+        float t = syncTime / syncDelay;
+        float dt = UberManager.DeltaTime();
+        
 
-            Vector3 oldPosition = thisTransform.position;
-            
-            
-            
-            thisTransform.localPosition = Vector3.MoveTowards(thisTransform.localPosition, syncEndPosition, dt * Math.Magnitude(syncVelocity));
-            
-            float fpsSyncMagnitudeXZ = Math.Magnitude(Math.GetXZ(syncVelocity));
-            
-            if(Math.SqrDistance(thisTransform.position, syncEndPosition) > 8f * 8f)
-            {
-                InGameConsole.Log(string.Format("<color=yellow>Snapping foreign player!</color>"));
-                thisTransform.position = syncEndPosition;
-            }
-            // else
-            // {
-            //     thisTransform.position = Vector3.MoveTowards(thisTransform.position, syncEndPosition, fpsSyncMagnitudeXZ * UberManager.DeltaTime());
-            // }
-            
-            thisTransform.forward =  Vector3.Slerp(syncStartDirection, syncEndDirection, t);
-
-            // This 'velocity' is used for animation (if not controlled locally):
-            //velocity = syncVelocity;
-            fpsVelocity = syncVelocity;
-            if(debugAvatarAnim)
-                debugAvatarAnim.SetFloat("MoveSpeed", fpsSyncMagnitudeXZ);
-            if(foreignXAngleIndicator)
-            {
-                foreignXAngleIndicator.localEulerAngles = new Vector3(foreignCameraXAngle, foreignXAngleIndicator.localRotation.y, foreignXAngleIndicator.localRotation.z);
-            }
-        }
-        else
+        Vector3 oldPosition = thisTransform.position;
+        
+        
+        
+        thisTransform.localPosition = Vector3.MoveTowards(thisTransform.localPosition, syncEndPosition, dt * Math.Magnitude(syncVelocity));
+        
+        float fpsSyncMagnitudeXZ = Math.Magnitude(Math.GetXZ(syncVelocity));
+        
+        if(Math.SqrDistance(thisTransform.position, syncEndPosition) > 8f * 8f)
         {
-            if(aliveState == PlayerAliveState.Dashing)
-            {
-                thisTransform.position = Vector3.MoveTowards(thisTransform.position, syncEndPosition, dash_speed * UberManager.DeltaTime());
-            }
+            InGameConsole.Log(string.Format("<color=yellow>Snapping foreign player!</color>"));
+            thisTransform.position = syncEndPosition;
         }
+        // else
+        // {
+        //     thisTransform.position = Vector3.MoveTowards(thisTransform.position, syncEndPosition, fpsSyncMagnitudeXZ * UberManager.DeltaTime());
+        // }
+        
+        thisTransform.forward =  Vector3.Slerp(syncStartDirection, syncEndDirection, t);
+
+        // This 'velocity' is used for animation (if not controlled locally):
+        //velocity = syncVelocity;
+        fpsVelocity = syncVelocity;
+        if(debugAvatarAnim)
+            debugAvatarAnim.SetFloat("MoveSpeed", fpsSyncMagnitudeXZ);
+        if(foreignXAngleIndicator)
+        {
+            foreignXAngleIndicator.localEulerAngles = new Vector3(foreignCameraXAngle, foreignXAngleIndicator.localRotation.y, foreignXAngleIndicator.localRotation.z);
+        }
+        
     }
     
     public bool isMovementControllable = true;
@@ -511,7 +492,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     public Transform fpsWallJumpSensor;
     bool makeMouseSensitivityUniversal = false;
     public float fpsMouseSens = 1f;
-    const float baseMoveSpeed = 11.5F;
+    const float baseMoveSpeed = 9.5F;
     float fpsMaxMoveSpeedCurrent = 12.5f;
     
     float bunnyHopSpeedMult = bunnyHopMinMult;
@@ -626,8 +607,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
     }
     
-    float slideControllerHeight = 0.9f;//1f;
-    float normalControllerHeight = 2.4f;
+    float slideControllerHeight = 0.5f;//1f;
+    float normalControllerHeight = 2.0f;
     
     //public AudioSource slidingAudioClip;
     public AudioSource playerAudioSource_sliding;
@@ -786,7 +767,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     public float tiltingTargetAngle = 0;
     //public float tiltingSpeed = 30f;
-    public float tiltAngle = 1.5f;
+    float tiltAngle = 2.0f;
     
     public Animator weaponSwingingAnimator;
     
@@ -797,15 +778,16 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     
     
-    float rttSendCD = 1f;
+    float rttSendCD = 0.25f;
     float rttSendTimer = 0f;
     public int rtt = 0;
     public float rttInSeconds;
     
+    //void ReceiveRTT(int _rtt, float _hpPercentage, PhotonMessageInfo info)
     [PunRPC]
-    void ReceiveRTT(int _rtt, float _hpPercentage, PhotonMessageInfo info)
+    void ReceiveRTT(int _rtt, float _hpPercentage)
     {
-        InGameConsole.LogFancy("ReceiveRTT(), Sender: <color=green>" + info.Sender.NickName + "</color>");
+        //InGameConsole.LogFancy("ReceiveRTT(), Sender: <color=green>" + info.Sender.NickName + "</color>");
         
         rtt = _rtt;
         rttInSeconds = (float)rtt * 0.001F;
@@ -880,7 +862,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         if(pv.IsMine)
         {
             //InGameConsole.LogOrange("GS() GS() GS()");
-            if(!tryingToSlam)
+            if(!tryingToSlam || fpsVelocity.y > slamVelocityY)
             {
                 groundSlamStartPos = _pos; 
                 
@@ -934,7 +916,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
         {
             MakeImmuneForDamageForXTime(dashDamageImmune);
             dashZeroGravityTimer = dashZeroGravityDuration;
-            
+            if(gunController.hook.state == HookState.Hooked)
+            {
+                gunController.hook.state = HookState.PullingBack;
+            }
             
             if(dashDirWorldSpace.x == 0 && dashDirWorldSpace.z == 0)
             {
@@ -1292,9 +1277,14 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
         Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
         
-        if(!CanControlPlayer())
+        if(!CanControlPlayer() || uncontrollableTimer > 0)
         {
             input *= 0;
+        }
+        uncontrollableTimer -= dt;
+        if(uncontrollableTimer < 0)
+        {
+            uncontrollableTimer = 0;
         }
         tiltingTargetAngle = input.x == 0 ? 0 : Mathf.Sign(input.x) * -tiltAngle;
         tiltingTargetAngle *= 1 - Math.Abs(fpsCameraPlace.forward.y);
@@ -1438,6 +1428,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             
             if((dashZeroGravityTimer > 0) || (gunController.hook && gunController.hook.state == HookState.Hooked))
             {
+                
                 _fpsGravity = 0;
             }
             
@@ -1454,25 +1445,65 @@ public class PlayerController : MonoBehaviour, IPunObservable
             
             float fpsVelMagnitude = Math.Magnitude(fpsVelocity);
             
-            if(!jumpedThisFrame)
+            if(!jumpedThisFrame && Inputs.GetJumpKeyDown())
             {
                 Ray wallJumpRay = GetFPSRay();
-                RaycastHit hit;
+                //RaycastHit hit;
                 
-                if(Physics.Raycast(wallJumpRay, out hit, 1.25f, groundMask))
+//                const float wallJumpCheckRadius     = 0.5f;
+                const float wallJumpCheckDistance   = 0.9f;
+                
+                wallJumpRay.direction = Math.GetXZ(-thisTransform.right);
+                //wallJumpRay.origin = GetFPSRay().origin - wallJumpRay.direction * 0.33f;
+                RaycastHit leftHit;
+                bool leftCheck = Physics.Raycast(wallJumpRay, out leftHit, wallJumpCheckDistance, groundMask);
+                
+                wallJumpRay.direction = Math.GetXZ(thisTransform.right);
+                //wallJumpRay.origin = GetFPSRay().origin - wallJumpRay.direction * 0.33f;
+                RaycastHit rightHit;
+                bool rightCheck = Physics.Raycast(wallJumpRay, out rightHit, wallJumpCheckDistance, groundMask);
+                
+                wallJumpRay.direction = Math.GetXZ(-thisTransform.forward);
+                //wallJumpRay.origin = GetFPSRay().origin - wallJumpRay.direction * 0.33f;
+                RaycastHit backHit;
+                bool backCheck = Physics.Raycast(wallJumpRay, out backHit, wallJumpCheckDistance * 0.9f, groundMask);
+                
+                wallJumpRay.direction = Math.GetXZ(thisTransform.forward);
+                //wallJumpRay.origin = GetFPSRay().origin - wallJumpRay.direction * 0.33f;
+                RaycastHit forwardHit;
+                bool forwardCheck = Physics.Raycast(wallJumpRay, out forwardHit, wallJumpCheckDistance * 1.1f, groundMask);
+                
+                RaycastHit wallHit = new RaycastHit();
+                if(forwardCheck)
                 {
-                    // controller.ClosestPoint(hit.point);
-                    
-                    if(Math.Abs(hit.normal.y) < 0.2)
+                    wallHit = forwardHit;
+                }
+                else if(backCheck)
+                {
+                    wallHit = backHit;
+                }
+                else if(rightCheck)
+                {
+                    wallHit = rightHit;
+                } 
+                else if(leftCheck)
+                {
+                    wallHit = leftHit;
+                }
+                bool somethingChecked = forwardCheck || backCheck || rightCheck || leftCheck;
+                
+                if(somethingChecked)
+                {
+                    if(Math.Abs(wallHit.normal.y) < 0.2)
                     {
                         if(Inputs.GetJumpKeyDown())
                         {
-                            Vector3 wallJumpBoostVel = hit.normal * fpsWallJumpForceXZ;
+                            Vector3 wallJumpBoostVel = wallHit.normal * fpsWallJumpForceXZ;
                             wallJumpBoostVel.y = fpsWallJumpForceY;
                             
                             playerAudioSource.PlayOneShot(jumpWallLocalClip, 0.8f);
                             // Debug.DrawRay(hit.point, Math.Normalized(wallJumpBoostVel) * 1f, Color.yellow, 3f);
-                            // InGameConsole.LogFancy("WallJump vel: " + wallJumpBoostVel);
+                            InGameConsole.LogFancy("WallJump vel: " + wallJumpBoostVel);
                             BoostVelocity(wallJumpBoostVel);
                         }
                     }
@@ -1506,7 +1537,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
                             calculatedV.y = MIN_GRAVITY;
                         }
                     }
-                    InGameConsole.LogFancy("Hitting " + capsuleCastHit.collider.gameObject.name);
+                    //InGameConsole.LogFancy("Hitting " + capsuleCastHit.collider.gameObject.name);
                     //InGameConsole.LogFancy(string.Format("PlayerController(): hit something, <color=green>v1{0}</color>, <color=yellow>v2{1}</color>", fpsVelocity, calculatedV));
                     fpsVelocity = calculatedV;
                     //InGameConsole.LogFancy(string.Format("PlayerController(): dot: <color=green>{0}</color> magnitude<color=yellow>{1}</color>", dot, fpsVelMagnitude));
@@ -1836,23 +1867,24 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
     }
     
+    int lastTimeRTT = 0;
+    float hpPercentageLastTime;
+    
     void SyncRTTAndHitPointsPercentage(float dt)
     {
         if(rttSendTimer > rttSendCD)
         {
-            // InGameConsole.LogFancy("UpdateRTT");
-            // if(PhotonNetwork.IsMasterClient)
-            // {
-            //     ReceiveRTT(PhotonNetwork.NetworkingClient.LoadBalancingPeer.RoundTripTime);
-            // }
-            // else
-            // {
+            float _hpPercentage = (float)(HitPoints) / (float)(GetMaxHealthNoPenalty());
             int ping = PhotonNetwork.NetworkingClient.LoadBalancingPeer.RoundTripTime;
-            float hpPercentage = (float)(HitPoints) / (float)(MaxHealth);
-            InGameConsole.LogFancy(string.Format("ViewID <color={1}>{0}</color> hpPercentage is: {2}", pv.ViewID, (pv.IsMine ? "green" : "#eb9534"), hpPercentage.ToString()));
-            pv.RPC(nameof(ReceiveRTT), RpcTarget.All, ping, hpPercentage);
-            // }
-            rttSendTimer = 0;
+            
+            if(!Mathf.Approximately(hpPercentageLastTime, _hpPercentage) || (Math.Abs(ping - lastTimeRTT) > 10))
+            {
+                hpPercentageLastTime = _hpPercentage;
+                lastTimeRTT = ping;
+                pv.RPC(nameof(ReceiveRTT), RpcTarget.All, ping, _hpPercentage);
+                rttSendTimer = 0;
+            }
+            //InGameConsole.LogFancy(string.Format("ViewID <color={1}>{0}</color> hpPercentage is: {2}", pv.ViewID, (pv.IsMine ? "green" : "#eb9534"), hpPercentage.ToString()));
         }
         else
         {
@@ -1907,11 +1939,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
     void Update()
     {
         float dt = UberManager.DeltaTime();
-        SyncRTTAndHitPointsPercentage(dt);
         
         
         if(pv.IsMine)
         {
+            SyncRTTAndHitPointsPercentage(dt);
             damageImmuneTimer -= dt;
             if(damageImmuneTimer < 0)
             {

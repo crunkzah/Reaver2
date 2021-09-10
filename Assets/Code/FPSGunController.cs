@@ -71,7 +71,7 @@ public class FPSGunController : MonoBehaviour
     const float revolverFireRate = 0.325F * 2;
     const float revolverParryRate = 0.9f;
     
-    const int shotgunDmgPellet = 60;
+    const int shotgunDmgPellet = 46;
     const int shotgunDmgPellet_Alt = 44;
     const float shotgunFireRate = 1.15F;
     const float shotgunAngle = 10F;
@@ -95,7 +95,7 @@ public class FPSGunController : MonoBehaviour
     const float mp5FireRate = 0.095F;
     const int mp5_alt_dmg = 700;
     const float mp5_alt_force = 14f;
-    const float mp5FireRate_alt = 1.0f;
+    const float mp5FireRate_alt = 0.7f;
     public float mp5_grenade_upMult = 0.5f;
     
     public ArmType currentArm = ArmType.Arm1;
@@ -372,6 +372,7 @@ public class FPSGunController : MonoBehaviour
     bool SwapAltWeaponKey()
     {
         return Inputs.GetInteractKeyDown();
+        //return Inputs.GetInteractKey();
     }
     
     int KeyboardSwitchWeapon()
@@ -406,12 +407,14 @@ public class FPSGunController : MonoBehaviour
     public float gunTimer = 0;
     float fireRateMultiplier = 1f;
     float gunAltTimer = 0;
+    float mp5AltFireTimer = 0;
+    const float mp5AltFireTimerCooldown = 2;
     //public float meleeCharge = 0;
     //float meleeChargeRate = 2;
     
     bool hasARGhost = false;
     float ARGhostCooldownTimer = 0;
-    const float ARGhostCooldown = 4;//= ARGhostDuration + 12f;
+    const float ARGhostCooldown = 10;//= ARGhostDuration + 12f;
     
     bool ARGhostFireQueued = false;
     int ARGhostFires_queued_num = 0;
@@ -589,6 +592,12 @@ public class FPSGunController : MonoBehaviour
         }
     }
     
+    void PetWithLeftArm()
+    {
+        if(arm_animator)
+            arm_animator.Play("Base.Pet", 0, 0);
+    }
+    
    
     
     void OnPunch(Vector3 point, Vector3 damageDirection, Vector3 normal, int damage, Collider col = null, NetworkObject targetNetworkObject = null)
@@ -749,27 +758,40 @@ public class FPSGunController : MonoBehaviour
                         
                     if(Arm_timer == 0f)
                     {
+                        //ArmLeft_Pet   
+                        Ray ray = pController.GetFPSRay();
                         
-                        
-                        // int rand = Random.Range(0, 2);
-                        
-                        // if(rand == 0)
-                        //     arm_animator.Play("Base.Punch1_impact", 0, 0);
-                        // else
-                        //     arm_animator.Play("Base.Hook_impact", 0, 0);
-
-                        
-                            
-                        byte fpsCommand = (byte)FPS_Func.Punch1;
-                        FPSCommand(fpsCommand);
-                        pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand);
+                        RaycastHit hit;
+                        if(Physics.Raycast(ray, out hit, punchDistance, groundCeilingMask))
+                        {
+                            SecretLady lady = hit.collider.GetComponent<SecretLady>();
+                            if(lady != null)
+                            {
+                                lady.OnTouch();
+                                Arm_timer = 0.25f;
+                                byte fpsCommand = (byte)FPS_Func.ArmLeft_Pet;
+                                FPSCommand(fpsCommand);
+                                pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand);
+                            }
+                            else
+                            {
+                                byte fpsCommand = (byte)FPS_Func.Punch1;
+                                FPSCommand(fpsCommand);
+                                pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand);
+                            }
+                        }
+                        else
+                        {
+                            byte fpsCommand = (byte)FPS_Func.Punch1;
+                            FPSCommand(fpsCommand);
+                            pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand);
+                        }
                         
                         Ray punchQtsRay = pController.GetFPSRay();
                         RaycastHit qts_hit;
                         
                         if(Physics.Raycast(punchQtsRay, out qts_hit, punchDistance, QTSLayer))
                         {
-                        //    InGameConsole.LogFancy("Calling QTS from PUNCH");
                             QuickTimeSphere qts = qts_hit.collider.GetComponent<QuickTimeSphere>();
                             if(qts)
                             {
@@ -777,27 +799,7 @@ public class FPSGunController : MonoBehaviour
                                 pController.MakeImmuneForDamageForXTime(0.150F);
                             }
                         }
-                        
-                        // if(arm1_overcharged)
-                        // {
-                        //     arm1_overcharged = false;
-                        //     byte fpsCommand = (byte)FPS_Func.Punch1_ult;
-                        //     FPSCommand(fpsCommand);
-                        //     pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand);
-                        //     arm_animator.Play("Base.Punch1", 0, 0);
-                        // }
-                        // else
-                        // {
-                        //     byte fpsCommand = (byte)FPS_Func.Punch1;
-                        //     FPSCommand(fpsCommand);
-                        //     pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand);
-                        //     arm_animator.Play("Base.Hook", 0, 0);
-                        // }
-                        
-//                        pv.RPC("Punch", RpcTarget.Others);
                     }
-                    
-                    
                 }
                 break;
             }
@@ -1437,27 +1439,9 @@ public class FPSGunController : MonoBehaviour
                                 if(altFire)
                                 {
                                     revolverState = RevolverState.Charging;
-                                    //revolver_alt_fired_count = 0;
-                                    
-                                    //R_Alt();
-                                    //Invoke("R_Alt", 0.125F);
-                                    //Invoke("R_Alt", 0.25F);
-                                   // Invoke("R_Alt", 0.375F);
                                 }
                             }
                         }
-                        // else
-                        // {
-                        //     //Ult:
-                        //     // if(!pController.isSliding && currentArm != ArmType.None)
-                        //     // {
-                        //     //     if(Arm_FKeyDown())
-                        //     //     {
-                        //     //         OnRevolverUltStarted();
-                        //     //         revolverState = RevolverState.Ult;
-                        //     //     }
-                        //     // }
-                        // }
                         break;
                     }
                     case(RevolverState.Charging):
@@ -1505,9 +1489,6 @@ public class FPSGunController : MonoBehaviour
                                 }
                                 else
                                     revolver_charge += dt * revolver_chargeRate * fireRateMultiplier;
-                                    
-                                    
-                                    
                                 //InGameConsole.LogFancy(string.Format("Charging <color=yellow>{0}</color>", revolver_charge.ToString("f")));
                                 if(revolver_charge >= 1)
                                 {
@@ -1640,24 +1621,24 @@ public class FPSGunController : MonoBehaviour
                         }
                         else
                         {
-                            if(altFire && Inputs.Arm_FKeyDown() && !pController.isSliding && currentArm != ArmType.None)
-                            {
-                                revolver_charge = 0;
-                                revolver_blue_fps.StopShaking();
-                                revolver_blue_fps.shaking_mult = revolver_charge;
-                                revolver_blue_fps.shaking_mult_smoothed = 0;
-                                //OnRevolverUltStarted();
-                                revolver_blue_State = RevolverState.Ult;
-                            }
-                            else
-                            {
+                            // if(altFire && Inputs.Arm_FKeyDown() && !pController.isSliding && currentArm != ArmType.None)
+                            // {
+                            //     revolver_charge = 0;
+                            //     revolver_blue_fps.StopShaking();
+                            //     revolver_blue_fps.shaking_mult = revolver_charge;
+                            //     revolver_blue_fps.shaking_mult_smoothed = 0;
+                            //     //OnRevolverUltStarted();
+                            //     revolver_blue_State = RevolverState.Ult;
+                            // }
+                            // else
+                            // {
                                 //InGameConsole.LogFancy(string.Format("Charging <color=yellow>{0}</color>", revolver_charge.ToString("f")));
                                 revolver_charge += dt * revolver_chargeRate * fireRateMultiplier;
                                 if(revolver_charge >= 1)
                                 {
                                     revolver_charge = 1f;
                                 }
-                            }
+                            // }
                         }
                         
                         break;
@@ -1741,13 +1722,6 @@ public class FPSGunController : MonoBehaviour
                             
                             S_Blue();
                             Invoke(nameof(S_Blue), 0.18f);
-                            //Ray shotgunRay = pController.GetFPSRay();
-                            //byte seed = (byte)Random.Range(0, 64);
-                            
-                            //byte fpsCommand = (byte)FPS_Func.Shoot_shotgun_blue;
-                                    
-                            //FPSCommand2(fpsCommand, shotgunRay.origin, shotgunRay.direction, seed);
-                            //pv.RPC("FPSCommand2", RpcTarget.Others, fpsCommand, shotgunRay.origin, shotgunRay.direction, seed);
                         }
                         else
                         {
@@ -1763,8 +1737,6 @@ public class FPSGunController : MonoBehaviour
                             }
                         }
                     }
-                    
-                   
                 
                 break;
             }
@@ -1787,12 +1759,6 @@ public class FPSGunController : MonoBehaviour
                         
                         gunTimer += fireRateMultiplier * rocketLauncherFireRate;
                         
-                        //Vector3 _shotPos = rocketLauncherRay.origin;
-                        //Vector3 _shotDir = rocketLauncherRay.direction;
-                        
-                        //ShootRocketLauncher(_shotPos, rocketLauncherRay.direction);
-                        //pv.RPC("ShootRocketLauncher", RpcTarget.Others, _shotPos, rocketLauncherRay.direction);
-                        
                         byte fpsCommand = (byte)FPS_Func.Shoot_rocketLauncher;
                                     
                         FPSCommand(fpsCommand, _shotPos, _shotDir);
@@ -1812,12 +1778,6 @@ public class FPSGunController : MonoBehaviour
                         }
                         
                         gunTimer += fireRateMultiplier * rocketLauncherFireRate;
-                        
-                        //Vector3 _shotPos = rocketLauncherRay.origin;
-                        //Vector3 _shotDir = rocketLauncherRay.direction;
-                        
-                        //ShootRocketLauncher(_shotPos, rocketLauncherRay.direction);
-                        //pv.RPC("ShootRocketLauncher", RpcTarget.Others, _shotPos, rocketLauncherRay.direction);
                         
                         Vector3 upDir = pController.GetFPSCameraTransform().up;
                         
@@ -1859,7 +1819,7 @@ public class FPSGunController : MonoBehaviour
                         
                         byte fpsCommand = (byte)FPS_Func.Shoot_AR;
                         FPSCommand(fpsCommand, AR_Ray.origin, AR_Ray.direction);    
-                        pv.RPC("FPSCommand", RpcTarget.Others, AR_Ray.origin, AR_Ray.direction);
+                        pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand, AR_Ray.origin, AR_Ray.direction);
                         
                         currentARFireRate -= ARFireRateAcceleration * dt;
                         currentARFireRate = Mathf.Clamp(currentARFireRate, ARFireRateFastest, ARFireRateSlowest);
@@ -1916,7 +1876,6 @@ public class FPSGunController : MonoBehaviour
             {
                 if(gunTimer == 0)
                 {
-                    
                     if(primaryFire)
                     {
                         Ray mp5Ray = pController.GetFPSRay();
@@ -1943,7 +1902,7 @@ public class FPSGunController : MonoBehaviour
                     }
                     else
                     {
-                        if(altFire)
+                        if(altFire && (mp5AltFireTimer == 0))
                         {
                             Vector3 _shotPos = gunPoint_mp5_grenade_fps.position;
                             Vector3 _shotDir = gunPoint_mp5_grenade_fps.forward;
@@ -1957,15 +1916,15 @@ public class FPSGunController : MonoBehaviour
                             }
                             else
                             {
-                                float dot = Vector3.Dot(Vector3.up, _shotDir);
-                                if(dot < 0.5f)
-                                {
-                                    _shotDir += Vector3.up * mp5_grenade_upMult;
-                                    _shotDir.Normalize();
-                                    InGameConsole.LogFancy(string.Format("Shooting grenade, dot: {0}, _ShotDir: {1}", dot, _shotDir));
-                                }
+                                // float dot = Vector3.Dot(Vector3.up, _shotDir);
+                                // if(dot < 0.5f)
+                                // {
+                                //     _shotDir += Vector3.up * mp5_grenade_upMult;
+                                //     _shotDir.Normalize();
+                                //     InGameConsole.LogFancy(string.Format("Shooting grenade, dot: {0}, _ShotDir: {1}", dot, _shotDir));
+                                // }
                             }
-                            
+                            mp5AltFireTimer = mp5AltFireTimerCooldown;
                             gunTimer += fireRateMultiplier * mp5FireRate_alt;
                             
                             byte fpsCommand = (byte)FPS_Func.Shoot_mp5_grenade;
@@ -2023,6 +1982,12 @@ public class FPSGunController : MonoBehaviour
         if(ARCurrentSpread <= 0)
         {
             ARCurrentSpread = 0;
+        }
+        
+        mp5AltFireTimer -= dt;
+        if(mp5AltFireTimer <= 0)
+        {
+            mp5AltFireTimer = 0;
         }
     }
     
@@ -2418,6 +2383,15 @@ public class FPSGunController : MonoBehaviour
                     pController.debugAvatarAnim.SetTrigger("DoAttack");
                 }
                 Punch();
+                break;
+            }
+            case(FPS_Func.ArmLeft_Pet):
+            {
+                if(!pv.IsMine)
+                {
+                    pController.debugAvatarAnim.SetTrigger("DoAttack");
+                }
+                PetWithLeftArm();
                 break;
             }
             default:

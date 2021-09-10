@@ -92,18 +92,14 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         SceneManager.sceneLoaded += OnSceneLoaded;
         
         char c = (char)('A' + Random.Range (0,26));
-        PhotonNetwork.NickName = "Player_" + c.ToString();
+        string nickName = PlayerPrefs.GetString("Nickname", "Player");
+        PhotonNetwork.NickName = nickName;
         
         //SetupMyNickName();
     }
+   
     
-    void OnActiveSceneChanged(Scene current, Scene next)
-    {
-        if(current.buildIndex != next.buildIndex)
-        {
-            AudioManager.StopMusic();
-        }
-    }
+    
     
     public void ConnectToPhotonNetwork()
     {
@@ -341,7 +337,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
             
             
             PlayerManager.Singleton().SetLocalPlayer(local_player_gameObject);
-            local_player_gameObject.name = "Local_Player";
+            local_player_gameObject.name = "Player " + local_player_gameObject.GetComponent<PhotonView>().Owner.NickName;
             
             //FollowingCamera.Singleton().transform.position = playerSpawnPosition;
             StartUpScreen.Singleton().FadeIn(1.5f);
@@ -387,7 +383,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
             
             
             PlayerManager.Singleton().SetLocalPlayer(local_player_gameObject);
-            local_player_gameObject.name = "Local_Player";
+            local_player_gameObject.name = "Player (local) " + local_player_gameObject.GetComponent<PhotonView>().Owner.NickName;
             
             //FollowingCamera.Singleton().transform.position = playerSpawnPosition;
             StartUpScreen.Singleton().FadeIn(1.5f);
@@ -404,8 +400,33 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
     
     public static bool wasFirstPlayerSpawned = false;
     
+     
+    void OnActiveSceneChanged(Scene current, Scene next)
+    {
+        // if(current.buildIndex != next.buildIndex)
+        // {
+        //     AudioManager.StopMusic();
+        //     InGameConsole.LogFancy(string.Format("PhotonManager(): StopMusicFromActiveSceneChanged() {0} -> {1}", current.name, next.name));
+        // }
+        // else
+        // {
+        //     if(usingSavePoints)
+        //     {
+        //         if(UberManager.Singleton().currentSavePointPriorityLevel == -1)
+        //         {
+        //             AudioManager.StopMusic();
+        //         }
+        //     }
+        // }
+    }
+    
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        if(prevSceneIndex != scene.buildIndex)
+        {
+            AudioManager.StopMusic();
+            //InGameConsole.LogFancy(string.Format("PhotonManager(): StopMusicFromActiveSceneChanged() {0} -> {1}", current.name, next.name));
+        }
         if(scene.buildIndex == 0 || scene.buildIndex == 1)
         {
             InGameMenu.Lock();
@@ -424,15 +445,19 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
             {
                 PhotonNetwork.CurrentRoom.IsOpen = false;
             }
+            if(usingSavePoints)
+            {
+                if(UberManager.Singleton().currentSavePointPriorityLevel == -1)
+                {
+                    //InGameConsole.LogFancy("ARARARARARARARARA");
+                    AudioManager.StopMusic();
+                }
+            }
         }
         switch(scene.buildIndex)
         {
             case(0):
             {
-                InGameConsole.LogFancy("<color=green>SetMusicMainMenu() from PhotonManager</color>");
-                InGameConsole.LogFancy("<color=green>SetMusicMainMenu() from PhotonManager</color>");
-                InGameConsole.LogFancy("<color=green>SetMusicMainMenu() from PhotonManager</color>");
-                InGameConsole.LogFancy("<color=green>SetMusicMainMenu() from PhotonManager</color>");
                 InGameConsole.LogFancy("<color=green>SetMusicMainMenu() from PhotonManager</color>");
                 
                 AudioManager.SetMusicMainMenu();
@@ -483,7 +508,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         
         spawnPlaceIndex = 0;
         
-        InGameConsole.Log(string.Format("Level '{0}' loaded!", scene.name));
+        InGameConsole.Log(string.Format("<color=yellow>Level '{0}' loaded!</color>", scene.name));
         AudioManager.PlayClip(SoundType.level_start1, 0.09f, 1);
         
         //sceneObjectsToSynchronize.Clear();

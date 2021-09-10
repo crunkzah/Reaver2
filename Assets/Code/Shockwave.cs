@@ -11,8 +11,8 @@ public class Shockwave : MonoBehaviour
     float lifeTimer;
     float currentScale;
     float currentSpeed = 10;
-    const float startSpeed = 15;
-    const float finalSpeed = 5;
+    const float startSpeed = 18;
+    const float finalSpeed = 8;
     
     bool didDamageToLocalPlayer = false;
     

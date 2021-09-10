@@ -14,7 +14,8 @@ public enum GlobalCommand : byte
     SetInfernoCircle,
     BounceHit_RevolverBlue,
     AddEnemiesAlive,
-    ShowRunStats
+    ShowRunStats,
+    SetSavePoint
 }
 
 [System.Serializable]
@@ -1252,6 +1253,13 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
             {
                 int enemiesToAdd = (int)args[0];
                 AudioManager.AddEnemiesAlive(enemiesToAdd);
+                break;
+            }
+            case(GlobalCommand.SetSavePoint):
+            {
+                int savePoint = (int)args[0];
+                UberManager.SetSavePointPriority(savePoint);
+                //AudioManager.AddEnemiesAlive(enemiesToAdd);
                 break;
             }
             default:

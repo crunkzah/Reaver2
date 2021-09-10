@@ -39,6 +39,8 @@ public class MP5ToPickUp : MonoBehaviour, INetworkObject
         net_comp = GetComponent<NetworkObject>();
     }
     
+    public GunType gunTypeToGive = GunType.AR;
+    
     void Update()
     {
         if(canSendCommands && PhotonNetwork.IsMasterClient)
@@ -60,7 +62,7 @@ public class MP5ToPickUp : MonoBehaviour, INetworkObject
                         //         NetworkObjectsManager.CallNetworkFunction(messages_on_pickup[j].net_comp.networkId, messages_on_pickup[j].command);
                         //     }
                         // }
-                        PlayerInventory.Singleton().RaiseEventGiveWeaponToAllPlayers(GunType.AR);
+                        PlayerInventory.Singleton().RaiseEventGiveWeaponToAllPlayers(gunTypeToGive);
                     }
                 }
             }

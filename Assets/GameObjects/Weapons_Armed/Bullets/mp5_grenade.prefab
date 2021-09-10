@@ -30,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1303921158164481607}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.53, y: 0, z: -7.09}
+  m_LocalPosition: {x: -0.53, y: 0, z: -7.342}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -53,6 +53,12 @@ MonoBehaviour:
   overrideParticleOnHit: 0
   particles_on_hit_override: 2
   on_die_behave: 2
+  explosionCanDamageNPCs: 1
+  explosionCanDamageLocalPlayer: 0
+  explosionDamage: 0
+  explosionPlayerDamage: 0
+  explosionRadius: 0
+  explosionForce: 0
   time_to_be_alive: 0
   ps: {fileID: 0}
   attached_particle_trail: {fileID: 0}
@@ -62,6 +68,8 @@ MonoBehaviour:
   max_reflects: 4
   useGravity: 1
   gravProjV: {x: 0, y: 0, z: 0}
+  gravityMultiplier: 1
+  uniqueID: 0
   isShotByPlayer: 0
 --- !u!33 &4037650985147757313
 MeshFilter:
@@ -88,7 +96,7 @@ MeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 20ab58425cca4094c8b5678fa1238c36, type: 2}
+  - {fileID: 2100000, guid: 9a493f0d1ba16254294c6b9eb2c23ead, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -206,7 +214,7 @@ ParticleSystem:
   startDelay:
     serializedVersion: 2
     minMaxState: 0
-    scalar: 0.05
+    scalar: 0.115
     minScalar: 0
     maxCurve:
       serializedVersion: 2
@@ -266,7 +274,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 3
+      scalar: 0.5
       minScalar: 0.7
       maxCurve:
         serializedVersion: 2
@@ -1011,12 +1019,12 @@ ParticleSystem:
           m_PostInfinity: 2
           m_RotationOrder: 4
   EmissionModule:
-    enabled: 0
+    enabled: 1
     serializedVersion: 4
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 50
+      scalar: 0
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -1069,7 +1077,7 @@ ParticleSystem:
     rateOverDistance:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: 2
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -2333,7 +2341,7 @@ ParticleSystem:
     y:
       serializedVersion: 2
       minMaxState: 0
-      scalar: -0.6
+      scalar: -0.5
       minScalar: 0
       maxCurve:
         serializedVersion: 2

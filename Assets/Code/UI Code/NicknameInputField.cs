@@ -13,14 +13,11 @@ public class NicknameInputField : MonoBehaviour
         
     }
     
-    void OnEnable()
+    void Start()
     {
-        if(!tmp_inputField)
-        {
-            tmp_inputField = GetComponent<TMP_InputField>();
-            string savedNickName = PlayerPrefs.GetString("Nickname", "Player");
-            tmp_inputField.SetTextWithoutNotify(savedNickName);
-        }
+        tmp_inputField = GetComponent<TMP_InputField>();
+        string savedNickName = PlayerPrefs.GetString("Nickname", "Player");
+        tmp_inputField.SetTextWithoutNotify(savedNickName);
     }
     
     void OnDisable()

@@ -130,6 +130,8 @@ public class InGameMenu : MonoBehaviour
     public void RestartCurrentLevelButton()
     {
         Hide();
+        if(PhotonNetwork.IsMasterClient)
+            NetworkObjectsManager.CallGlobalCommand(GlobalCommand.SetSavePoint, RpcTarget.All, -1);
         UberManager.SetSavePointPriority(-1);
         UberManager.Singleton().ReloadLevel();
     }

@@ -297,8 +297,8 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
         }
     }
     
-    const float footStepDistance = 1.25f;
-    float distanceTravelledRunningSqr;
+    //const float footStepDistance = 1.25f;
+    float distanceTravelledRunning;
     
     void SetTarget(PlayerController target)
     {
@@ -321,20 +321,20 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
         {
             case(SinclaireState.Chasing):
             {
-                distanceTravelledRunningSqr = 0;
+                distanceTravelledRunning = 0;
                 brainTimer = path_update_cd;
                 //anim.SetLayerWeight(1, 1);
                 break;
             }
             case(SinclaireState.Idle):
             {
-                distanceTravelledRunningSqr = 0;
+                distanceTravelledRunning = 0;
                 //anim.SetLayerWeight(1, 1);
                 break;
             }
             case(SinclaireState.SwordAttacking1):
             {
-                distanceTravelledRunningSqr = 0;
+                distanceTravelledRunning = 0;
                 canDoMeleeDamageToLocalPlayer = true;
                 break;
             }
@@ -592,7 +592,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     void DoSwordAttack1()
     {
         anim.Play("Base.Sword_Swing1", 0, 0);
-        audio_src.PlayOneShot(clipSwordSwing1, 0.6f);
+        audio_src.PlayOneShot(clipSwordSwing1, 1f);
         sword.OnSwing();
         dash_ps.Play();
     }
@@ -602,6 +602,9 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     public bool capsuleHit;
     public bool inRange2;
     public float inRange2_range;
+    
+    float changeTargetTimer;
+    const float changeTargetCooldown = 4.5f;
     
     
     void UpdateBrain(float dt)
@@ -638,6 +641,26 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                    
                     if(canSendCommands)
                     {
+                        changeTargetTimer += dt;
+                        if(changeTargetTimer > changeTargetCooldown)
+                        {
+                            changeTargetTimer = 0;
+                            if(canSendCommands)
+                            {
+                                Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
+                                if(potentialTarget && (potentialTarget.GetInstanceID() != target_pc.thisTransform.GetInstanceID()))
+                                {
+                                    PlayerController pc = potentialTarget.GetComponent<PlayerController>();
+                                    if(pc)
+                                    {
+                                        LockSendingCommands();
+                                        NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        
                         Vector3 sinclaireGroundPosition = thisTransform.localPosition;
                         
                         inRange1 = Math.SqrDistance(targetGroundPos, sinclaireGroundPosition) < dashDistanceCheck * dashDistanceCheck;
@@ -648,11 +671,29 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                             Vector3 punch_dir = (targetGroundPos - sinclaireGroundPosition).normalized;
                             
                             Vector3 dash_pos = sinclaireGroundPosition;
-                            if(NavMesh.SamplePosition(sinclaireGroundPosition + punch_dir * dashDistance, out navMeshHit, 1f, NavMesh.AllAreas))
+                            RaycastHit hit;
+                            Vector3 capsuleBottom = NPCTool.GetCapsuleBottomPoint(thisTransform, col);
+                            Vector3 capsuleTop = NPCTool.GetCapsuleTopPoint(thisTransform, col);
+                            
+                            if(Physics.SphereCast(capsuleBottom, col.radius, punch_dir, out hit, dashDistance, groundMask))
                             {
-                                dash_pos = navMeshHit.position;
-                                // InGameConsole.LogFancy("We DO <color=green>DASH ATTACK</color>");
+                             //   InGameConsole.LogFancy("Hit something");
+                                if(NavMesh.SamplePosition(sinclaireGroundPosition + punch_dir * dashDistance, out navMeshHit, 1f, NavMesh.AllAreas))
+                                {
+                                    dash_pos = navMeshHit.position;
+                                    // InGameConsole.LogFancy("We DO <color=green>DASH ATTACK</color>");
+                                }
                             }
+                            else
+                            {
+                                if(NavMesh.SamplePosition(sinclaireGroundPosition + punch_dir * dashDistance, out navMeshHit, 1f, NavMesh.AllAreas))
+                                {
+                                    dash_pos = navMeshHit.position;
+                                    // InGameConsole.LogFancy("We DO <color=green>DASH ATTACK</color>");
+                                }
+                            }
+                            
+                            
                             
                             LockSendingCommands();
                             NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Attack, dash_pos);
@@ -882,17 +923,15 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                 dPos.y = currentDestination.y - currentPos.y;
                 dPos.z = currentDestination.z - currentPos.z;
                 
-                distanceTravelledRunningSqr += Math.SqrMagnitude(dPos);
+                distanceTravelledRunning += Math.Magnitude(dPos);
                 
-                const float footStepDistanceSqr = footStepDistance * footStepDistance;
+                const float footStepDistance = 1.25f * 3;
                 
-                if(distanceTravelledRunningSqr > footStepDistanceSqr)
+                if(distanceTravelledRunning > footStepDistance)
                 {
-                    distanceTravelledRunningSqr -= footStepDistanceSqr;
-                    if(distanceTravelledRunningSqr  > footStepDistanceSqr)
-                        distanceTravelledRunningSqr = 0;
+                    distanceTravelledRunning = 0;
                     
-                    audio_src_feet.pitch = Random.Range(0.8f, 1.2f);
+                    audio_src_feet.pitch = Random.Range(0.9f, 1.1f);
                     audio_src_feet.PlayOneShot(clipStep, 0.5F);
                 }
                 
@@ -923,7 +962,8 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
                 {
                     //if(sword_attack_timer > sword_attack1_damageTimingStart && sword_attack_timer < sword_attack1_damageTimingEnd)
                     float sqrDistanceToDestination = Math.SqrDistance(currentDestination, currentPos);
-                    if(sword_attack_timer > sword_attack1_damageTimingStart && dV > 0 && sqrDistanceToDestination > 0f)
+                    //if(sword_attack_timer > sword_attack1_damageTimingStart && dV > 0 && sqrDistanceToDestination > 0f)
+                    if(sword_attack_timer > sword_attack1_damageTimingStart)
                     {
                         Vector3 dmgPos = thisTransform.localPosition;
                         dmgPos = dmgPos + thisTransform.up * localStrikeOffset.y + thisTransform.forward * localStrikeOffset.z;// + thisTransform.forward * localStrikeOffset.z;
@@ -1049,7 +1089,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
             
         
         
-        audio_src.PlayOneShot(clipDeath, 0.5f);
+        audio_src.PlayOneShot(clipDeath);
         HitPoints = 0;
         
         EnableSkeleton();  
@@ -1113,7 +1153,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
         if(remoteAgent)
             Destroy(remoteAgent.gameObject, 0.1f);
             
-        audio_src.PlayOneShot(clipDeath, 0.5f);
+        audio_src.PlayOneShot(clipDeath, 1f);
         HitPoints = 0;
         
         

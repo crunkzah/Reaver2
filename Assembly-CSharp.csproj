@@ -299,6 +299,7 @@
      <Compile Include="Assets\Code\ScaleAnimator.cs" />
      <Compile Include="Assets\Code\Scenario\DistanceTrigger.cs" />
      <Compile Include="Assets\Code\Scenario\DistanceTriggerNet.cs" />
+     <Compile Include="Assets\Code\SecretLady.cs" />
      <Compile Include="Assets\Code\Shockwave.cs" />
      <Compile Include="Assets\Code\ShootyThing1.cs" />
      <Compile Include="Assets\Code\ShotDirections.cs" />

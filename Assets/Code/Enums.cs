@@ -207,7 +207,8 @@ public enum FPS_Func : byte
      Shoot_revolver_blue_stronger,
      Shoot_revolver_blue_ult,
      Shoot_shotgun_blue,
-     Hook_shotgun_blue
+     Hook_shotgun_blue,
+     ArmLeft_Pet
      //Punch1_ult
 }
 
