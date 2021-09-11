@@ -428,6 +428,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
             AudioManager.StopMusic();
             //InGameConsole.LogFancy(string.Format("PhotonManager(): StopMusicFromActiveSceneChanged() {0} -> {1}", current.name, next.name));
         }
+        
+        isCallingLoadLevel = false;
         if(scene.buildIndex == 0 || scene.buildIndex == 1)
         {
             InGameMenu.Lock();
@@ -531,11 +533,10 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
     
     public Photon.Realtime.ClientState networkClientState;
     
-    static bool usingSavePoints = true;
+    static bool usingSavePoints = false;
     
     void OnLoadedOnSavePoint()
     {
-        
         int savePointPriority = UberManager.GetSavePointPriority();
         if(savePointPriority != -1)
         {
@@ -678,17 +679,25 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
                         {
                             UberManager.ResetInGameTimer();
                         }
-                        OnLoadedOnSavePoint();
+                        
+                        NetworkObjectsManager.CallGlobalCommand(GlobalCommand.SetSavePoint, RpcTarget.All, UberManager.GetSavePointPriority());
+                        if(!isCallingLoadLevel)
+                        {
+                            isCallingLoadLevel = true;
+                            InGameConsole.LogFancy("Invoking ReloadThisLevelToCheckPoint() !");
+                            Invoke(nameof(ReloadThisLevelToCheckPoint), 0.5f);
+                        }
+                        //OnLoadedOnSavePoint();
                     }
                 }
                 
             }
         }
-        
-        // if(Input.GetKeyDown(KeyCode.N) && PhotonNetwork.IsMasterClient)   
-        // {
-        //     photonView.RPC("SetTimeToSyncScene", RpcTarget.AllViaServer, PhotonNetwork.Time + 3d);
-        // }
+    }
+    bool isCallingLoadLevel = false;
+    void ReloadThisLevelToCheckPoint()
+    {
+        UberManager.ReloadLevelToSavepointWithCoroutine();
     }
     
     void RestartFromSavePoint()

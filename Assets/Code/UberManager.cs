@@ -332,6 +332,23 @@ public class UberManager : MonoBehaviour
         DialogueManager.HideShutter();
         OnFogsChanged(now.buildIndex);
         PartyHUD.RebuildPartyHUD();
+        if(currentSavePointPriorityLevel != -1)
+        {
+            
+        }
+        else
+        {
+             Checkpoint[] all_checkPoints = FindObjectsOfType<Checkpoint>();
+             int len = all_checkPoints.Length;
+             for(int i = 0; i < len; i++)
+             {
+                 if(all_checkPoints[i].checkPointPriority == currentSavePointPriorityLevel)
+                 {
+                     all_checkPoints[i].LoadToThisSavePoint();
+                     break;
+                 }
+             }
+        }
         //timeSinceLevelLoaded = TimeSinceStart();
     }
     
@@ -487,6 +504,36 @@ public class UberManager : MonoBehaviour
     // {
     //     int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
     // }
+    
+    
+    
+    public static void ReloadLevelToSavepointWithCoroutine()
+    {
+        // if(PhotonNetwork.IsMasterClient)
+        // {
+        //     NetworkObjectsManager.CallGlobalCommand(GlobalCommand.SetSavePoint, RpcTarget.Others, -1);
+        //     UberManager.SetSavePointPriority(-1);
+        // }
+        Singleton()._ReloadLevelToSavepointWithCoroutine();
+    }
+    
+    public void _ReloadLevelToSavepointWithCoroutine()
+    {
+        StartCoroutine(ReloadLevelSavepointCoroutine());
+    }
+    
+    IEnumerator ReloadLevelSavepointCoroutine()
+    {
+        //send RPC to other clients to load my scene
+        int currentLevelIndex = UberManager.GetCurrentLevelIndex();
+        NetworkObjectsManager.CallGlobalCommand(GlobalCommand.LoadLevel, RpcTarget.Others, currentLevelIndex);
+        //photonView.RPC("LoadLevel", RpcTarget.Others, UberManager.GetCurrentLevelIndex());
+        yield return null;
+        
+        PhotonNetwork.IsMessageQueueRunning = false;
+        UberManager.Load_Level(currentLevelIndex); //restart the game
+    }
+    
     
     public static void ReloadLevelWithCoroutine()
     {

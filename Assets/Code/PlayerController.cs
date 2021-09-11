@@ -499,7 +499,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     public Transform fpsWallJumpSensor;
     bool makeMouseSensitivityUniversal = false;
     public float fpsMouseSens = 1f;
-    const float baseMoveSpeed = 9.5F;
+    const float baseMoveSpeed = 9.0F;
     float fpsMaxMoveSpeedCurrent = 12.5f;
     
     float bunnyHopSpeedMult = bunnyHopMinMult;

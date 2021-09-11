@@ -110,7 +110,7 @@ public class Checkpoint : MonoBehaviour, INetworkObject
                 }
             }
         }
-        InGameConsole.LogFancy("LoadToThisSavePoint()");
+        InGameConsole.LogFancy("LoadToThisSavePoint(), checkPointPriority is " + this.checkPointPriority);
     }
     
     static int playersMask = -1;
