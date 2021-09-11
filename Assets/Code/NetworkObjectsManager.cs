@@ -15,7 +15,8 @@ public enum GlobalCommand : byte
     BounceHit_RevolverBlue,
     AddEnemiesAlive,
     ShowRunStats,
-    SetSavePoint
+    SetSavePoint,
+    LoadLevel
 }
 
 [System.Serializable]
@@ -1260,6 +1261,16 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
                 int savePoint = (int)args[0];
                 UberManager.SetSavePointPriority(savePoint);
                 //AudioManager.AddEnemiesAlive(enemiesToAdd);
+                break;
+            }
+            case(GlobalCommand.LoadLevel):
+            {
+                //PlayerController local_pc
+                int levelToLoad = (int)args[0];
+                //AudioManager.AddEnemiesAlive(enemiesToAdd);
+                
+                PhotonNetwork.LoadLevel(levelToLoad);
+                //UberManager.Load_Level_Locally(levelToLoad);
                 break;
             }
             default:

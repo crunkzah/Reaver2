@@ -645,6 +645,7 @@ MonoBehaviour:
   HitPoints: 600
   state: 0
   velocity: {x: 0, y: 0, z: 0}
+  clipAiming: {fileID: 8300000, guid: c2f8e71cacf0d5545baef625d84fb5f3, type: 3}
   clipStep: {fileID: 8300000, guid: 73ed0b4410af8684d848f5b90022da31, type: 3}
   clipHurt1: {fileID: 8300000, guid: f3d55798e8a7a41438f7a72e1b12af32, type: 3}
   clipDeath: {fileID: 8300000, guid: 99ab928719d5d6f4e9a9fca69ce7dec1, type: 3}
@@ -1854,7 +1855,7 @@ SkinnedMeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: f5eb318858846dc438ba7eea48d4300e, type: 2}
-  - {fileID: 2100000, guid: c80f470a2aff72f4ab92b068bac62f81, type: 2}
+  - {fileID: 2100000, guid: 44c281acfe3013348b52ccb1a0c0d5d1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -7390,7 +7391,7 @@ PrefabInstance:
     - target: {fileID: 2300000, guid: 7fdaa423803c67b40a4358e9c37b855c, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: c80f470a2aff72f4ab92b068bac62f81, type: 2}
+      objectReference: {fileID: 2100000, guid: 44c281acfe3013348b52ccb1a0c0d5d1, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7fdaa423803c67b40a4358e9c37b855c, type: 3}
 --- !u!4 &1261331112164371509 stripped
@@ -7544,7 +7545,7 @@ PrefabInstance:
     - target: {fileID: 2300000, guid: 7fdaa423803c67b40a4358e9c37b855c, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: c80f470a2aff72f4ab92b068bac62f81, type: 2}
+      objectReference: {fileID: 2100000, guid: 44c281acfe3013348b52ccb1a0c0d5d1, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7fdaa423803c67b40a4358e9c37b855c, type: 3}
 --- !u!4 &5836770766532614888 stripped

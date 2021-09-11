@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Photon.Pun;
+using System.Collections.Generic;
 
 public enum GateState : int
 {
@@ -91,6 +92,7 @@ public class GatesController : MonoBehaviour, INetworkObject
                 open_msgs_num--;
                 if(open_msgs_num <= 0)
                 {
+                    audioSource.PlayOneShot(unlock_clip);
                     Open();
                 }
                 break;
@@ -103,6 +105,7 @@ public class GatesController : MonoBehaviour, INetworkObject
             case(NetworkCommand.ForceOpenGates):
             {
                 open_msgs_num = 0;
+                audioSource.PlayOneShot(unlock_clip);
                 Open();
                 break;
             }
@@ -258,16 +261,19 @@ public class GatesController : MonoBehaviour, INetworkObject
     bool Detect()
     {
         bool Result = false;
+        if(!UberManager.Singleton())
+        {
+            return false;
+        }
+        ref List<PlayerController> pcs = ref UberManager.Singleton().players_controller;
+        int len = pcs.Count;
         switch(detectionMode)
         {
             case(GateDetectionMode.Old):
             {
-                //Result = Physics.CheckSphere(thisTransform.position, radius, detectorMask);
-                int len = NPCManager.AITargets().Count;
-                
                 for(int i = 0; i < len; i++)
                 {
-                    Vector3 playerPos = NPCManager.AITargets()[i].localPosition;
+                    Vector3 playerPos = pcs[i].thisTransform.localPosition;
                     if(Math.SqrDistance(playerPos, thisWorldPosition) < radius * radius)
                     {
                         Result = true;
@@ -279,11 +285,10 @@ public class GatesController : MonoBehaviour, INetworkObject
             case(GateDetectionMode.New):
             {
                 //Result = Physics.CheckSphere(detectionPosGlobal, radius, detectorMask);
-                int len = NPCManager.AITargets().Count;
                 
                 for(int i = 0; i < len; i++)
                 {
-                    Vector3 playerPos = NPCManager.AITargets()[i].localPosition;
+                    Vector3 playerPos = pcs[i].thisTransform.localPosition;
                     if(Math.SqrDistance(playerPos, thisWorldPosition) < radius * radius)
                     {
                         Result = true;
@@ -415,6 +420,8 @@ public class GatesController : MonoBehaviour, INetworkObject
         
         audioSource.pitch = 1;
         audioSource.PlayOneShot(openClip);
+        
+        
         
         Invoke("L_Open", 0.05F);
     }

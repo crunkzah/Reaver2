@@ -64,6 +64,7 @@ public struct InventoryPosition
 public class FPSGunController : MonoBehaviour
 {
     public AudioSource gunAudio;
+    public AudioSource gunAudio_pitched;
     
     const int revolverDmg = 300;
     const int revolverDmg_reflect = 150;
@@ -853,6 +854,20 @@ public class FPSGunController : MonoBehaviour
         revolver_fps.anim.Play("Base.Ult", 0, 0);
     }
     
+    void OnRevolverBlueUltStarted()
+    {
+        pController.moveSpeedMultiplier_RevolverUlt = 0.6f;
+        pController.canSlide = false;
+        pController.SetBerserkFov();
+        PostProcessingController2.SetState(PostProcessingState.Berserk);  
+        if(CurrentArmAnimator())
+        {
+            CurrentArmAnimator().Play("Base.Revolver_Ult", 0, 0);
+            arm_right_animator.Play("Base.Ult_Roll", 0, 0);
+        }
+        revolver_blue_fps.anim.Play("Base.Ult", 0, 0);
+    }
+    
     AnimatorStateInfo leftArmAnimatorStateInfo;
     
     void OnRevolverUltEnded()
@@ -1621,24 +1636,24 @@ public class FPSGunController : MonoBehaviour
                         }
                         else
                         {
-                            // if(altFire && Inputs.Arm_FKeyDown() && !pController.isSliding && currentArm != ArmType.None)
-                            // {
-                            //     revolver_charge = 0;
-                            //     revolver_blue_fps.StopShaking();
-                            //     revolver_blue_fps.shaking_mult = revolver_charge;
-                            //     revolver_blue_fps.shaking_mult_smoothed = 0;
-                            //     //OnRevolverUltStarted();
-                            //     revolver_blue_State = RevolverState.Ult;
-                            // }
-                            // else
-                            // {
+                            if(altFire && Inputs.Arm_FKeyDown() && !pController.isSliding && currentArm != ArmType.None)
+                            {
+                                revolver_charge = 0;
+                                revolver_blue_fps.StopShaking();
+                                revolver_blue_fps.shaking_mult = revolver_charge;
+                                revolver_blue_fps.shaking_mult_smoothed = 0;
+                                OnRevolverBlueUltStarted();
+                                revolver_blue_State = RevolverState.Ult;
+                            }
+                            else
+                            {
                                 //InGameConsole.LogFancy(string.Format("Charging <color=yellow>{0}</color>", revolver_charge.ToString("f")));
                                 revolver_charge += dt * revolver_chargeRate * fireRateMultiplier;
                                 if(revolver_charge >= 1)
                                 {
                                     revolver_charge = 1f;
                                 }
-                            // }
+                            }
                         }
                         
                         break;
@@ -1649,17 +1664,18 @@ public class FPSGunController : MonoBehaviour
                         {
                             if(gunTimer == 0)
                             {
-                                gunTimer += fireRateMultiplier * revolverFireRate * 2.25f;
+                                gunTimer += fireRateMultiplier * revolverFireRate;
                                 
                                 Ray revolverRay = pController.GetFPSRay();
                                     
                                 revolver_blue_fps.OnShotFPS();
                                 
                                 byte fpsCommand = (byte)FPS_Func.Shoot_revolver_blue_ult;
-                                FPSCommand(fpsCommand, revolverRay.origin, revolverRay.direction);
-                                pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand, revolverRay.origin, revolverRay.direction);
+                                Vector3 explosionPosition = revolverRay.origin + revolverRay.direction * 0.25f;
+                                FPSCommand(fpsCommand, explosionPosition, revolverRay.direction);
+                                pv.RPC("FPSCommand", RpcTarget.Others, fpsCommand, explosionPosition, revolverRay.direction);
                                 
-                                //SetPlayerControllerNormalState();
+                                SetPlayerControllerNormalState();
                                 revolver_blue_fps.shaking_mult = 0;
                                 
                                 revolver_blue_State = RevolverState.Normal;
@@ -1850,6 +1866,8 @@ public class FPSGunController : MonoBehaviour
                                 }
                             }
                         }
+                        float pitch_ar_t = Mathf.InverseLerp(ARFireRateSlowest, ARFireRateFastest, currentARFireRate);
+                        gunAudio_pitched.pitch = Mathf.Lerp(0.4f, 1, pitch_ar_t);
                         gunTimer += currentARFireRate;
                         
                     }
@@ -2581,7 +2599,7 @@ public class FPSGunController : MonoBehaviour
                     CrosshairController.MakeTrauma(crosshairTrauma);
                 }
                 
-                //ShootRevolver_Ult(pos, dir);
+                ShootRevolver_Ult_blue(pos, dir);
                 break;
             }
             
@@ -2755,7 +2773,6 @@ public class FPSGunController : MonoBehaviour
                 {
                     hits_scanned.Add(limb_net_id);
                     
-                    
                     OnHitScan(hits[i].point, hitScanDirection, hit.normal, ult_dmg, hits[i].collider, null, 2.6f, 1, 900);
                 }
             }
@@ -2764,6 +2781,31 @@ public class FPSGunController : MonoBehaviour
         ParticlesManager.PlayPooled(ParticleType.shot_star_ps, lineStart, ray.direction);
         GameObject bulletFX = ObjectPool.s().Get(ObjectPoolKey.Revolver_bullet_ult);
         bulletFX.GetComponent<BulletControllerHurtless>().Launch2(lineStart, lineEnd);
+    }
+    
+    void ShootRevolver_Ult_blue(Vector3 shotPos, Vector3 hitScanDirection)
+    {
+        if(pv.IsMine)
+        {
+            CameraShaker.MakeTrauma(0.9f);
+            revolver_blue_fps.anim.Play("Base.Fire_ult", 0, 0);
+            arm_right_animator.Play("Base.Fire_blue_ult", 0, 0);
+            if(CurrentArmAnimator())
+            {
+                CurrentArmAnimator().Play("Base.UltToEnd", 0, 0);
+            }
+            revolverFX_blue_stronger_ps.Play();
+            
+            //pController.BoostVelocity(-ray.direction * 24.0F);
+            //revolverFX_ps.Play();
+            
+            
+        }
+        
+        GameObject obj = ObjectPool.s().Get(ObjectPoolKey.Kaboom1, false);
+            
+        bool isMine = pv.IsMine;
+        obj.GetComponent<Kaboom1>().ExplodeDamageHostile(shotPos, 6, 38, 800, isMine, true, 10);
     }
     
     void ShootRevolver_Stronger(Vector3 shotPos, Vector3 hitScanDirection)
@@ -3490,6 +3532,7 @@ public class FPSGunController : MonoBehaviour
     
     public ParticleSystem mp5_alt_bulletShells_ps;
     
+    float arShoot_pitched_timeStamp;
     
     void ShootAR_HitScan(Vector3 shotPos, Vector3 hitScanDirection)
     {
@@ -3499,25 +3542,31 @@ public class FPSGunController : MonoBehaviour
         }
         if(gunAudio)
         {
-            gunAudio.PlayOneShot(arShotClip, 0.9f);
+            //gunAudio.PlayOneShot(arShotClip, 0.9f);
+            gunAudio_pitched.PlayOneShot(arShotClip, 1);
         }
         
         if(pv.IsMine)
         {
             CameraShaker.MakeTrauma(0.025f);
-            AR_animatorFPS.Play(BaseFire1_hash, 0, 0);
+            //if(Time.time - arShoot_pitched_timeStamp > 0.09f)
+            //{
+            //    arShoot_pitched_timeStamp = Time.time;
+                AR_animatorFPS.Play(BaseFire1_hash, 0, 0);
+            //}
             if(AR_bulletShells_ps)
             {
                 AR_bulletShells_ps.Emit(1);
             }
-        }
-        if(hasARGhost)
-        {
-            AR_stronger_ps.Play();
-        }
-        else
-        {
-            AR_ps.Play();
+            if(hasARGhost)
+            {
+                AR_stronger_ps.Play();
+            }
+            else
+            {
+                AR_ps.Play();
+            }
+        //revolverFX_ps.Play();
         }
         
         RaycastHit hit;
@@ -3533,7 +3582,6 @@ public class FPSGunController : MonoBehaviour
         bulletController.time_to_be_alive = ray_max_distance / bullet_speed;
         bulletController.on_die_behave = BulletOnDieBehaviour.Hurtless;
         
-        revolverFX_ps.Play();
         
         if(Physics.Raycast(ray, out hit, ray_max_distance, bulletMask))
         {
@@ -3565,8 +3613,9 @@ public class FPSGunController : MonoBehaviour
             {
                 ARGhost_bulletShells_ps.Emit(1);
             }
+            AR_ghost_ps.Play();
+            revolverFX_ps.Play();
         }
-        AR_ghost_ps.Play();
         
         RaycastHit hit;
         Ray ray = new Ray(shotPos, hitScanDirection);
@@ -3584,7 +3633,6 @@ public class FPSGunController : MonoBehaviour
         bulletController.LaunchAsSphere(AR_gunpoint_ghostFPS.position, ray.direction, 0.05f, bulletMask, bullet_speed, 0, false);
         bulletController.time_to_be_alive = ray_max_distance / bullet_speed;
         
-        revolverFX_ps.Play();
         
         if(Physics.Raycast(ray, out hit, ray_max_distance, bulletMask))
         {
@@ -3630,7 +3678,9 @@ public class FPSGunController : MonoBehaviour
         GameObject bullet = ObjectPool2.s().Get(ObjectPoolKey.mp5_bullet);    
         BulletController bulletController = bullet.GetComponent<BulletController>();
         
-        bulletController.LaunchAsSphere(mp5_alt_gunpointFPS.position, ray.direction, 0.05f, bulletMask, bullet_speed, 0, false);
+        //bulletController.LaunchAsSphere(mp5_alt_gunpointFPS.position, ray.direction, 0.05f, bulletMask, bullet_speed, 0, false);
+        
+        bulletController.LaunchAsSphere(AR_gunpointFPS.position, ray.direction, 0.05f, bulletMask, bullet_speed, 0, false);
         bulletController.time_to_be_alive = ray_max_distance / bullet_speed;
         bulletController.on_die_behave = BulletOnDieBehaviour.Hurtless;
         

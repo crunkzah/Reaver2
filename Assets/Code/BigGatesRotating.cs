@@ -55,11 +55,14 @@ public class BigGatesRotating : MonoBehaviour, Interactable, INetworkObject
         }
     }
     
+    
+    //public AudioSource audio_src;
+    
     public void Open()
     {
         occPortal.open = true;
         isOpen = true;
-        
+        audio_src.Play();
         timer = 0;
         angleSpeed = 90f / timeToWork;
         

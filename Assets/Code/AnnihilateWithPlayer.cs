@@ -55,7 +55,7 @@ public class AnnihilateWithPlayer : MonoBehaviour
                                 
                                 if(pc.pv.IsMine)
                                 {
-                                    pc.TakeDamageOnline(50);                            
+                                    //pc.TakeDamageOnline(50);                            
                                 }
                             }
                         }

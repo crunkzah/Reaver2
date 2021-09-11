@@ -144,9 +144,11 @@ public class BossHPBar : MonoBehaviour
             float scale_x = hpPercentage / 100f;
             float current_scale_x = bossHPBar_diff.transform.localScale.x;
             current_scale_x = Mathf.SmoothDamp(current_scale_x, scale_x, ref vel, smoothTime);
-            
-            bossHPBar_diff.transform.localScale = new Vector3(current_scale_x, 1, 1);      
-            bossHPBar.transform.localScale = new Vector3(scale_x, 1, 1);      
+            if(!float.IsInfinity(current_scale_x) && !float.IsNaN(current_scale_x))
+            {
+                bossHPBar_diff.transform.localScale = new Vector3(current_scale_x, 1, 1);      
+                bossHPBar.transform.localScale = new Vector3(scale_x, 1, 1);      
+            }
         }
         else
         {

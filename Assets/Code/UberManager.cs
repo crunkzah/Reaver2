@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.AI;
 using Photon.Pun;
+using System.Collections;
 
 public enum Level : int
 {
@@ -487,6 +488,33 @@ public class UberManager : MonoBehaviour
     //     int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
     // }
     
+    public static void ReloadLevelWithCoroutine()
+    {
+        if(PhotonNetwork.IsMasterClient)
+        {
+            NetworkObjectsManager.CallGlobalCommand(GlobalCommand.SetSavePoint, RpcTarget.Others, -1);
+            UberManager.SetSavePointPriority(-1);
+        }
+        Singleton()._ReloadLevelWithCoroutine();
+    }
+    
+    public void _ReloadLevelWithCoroutine()
+    {
+        StartCoroutine(ReloadLevelCoroutine());
+    }
+    
+    IEnumerator ReloadLevelCoroutine()
+    {
+        //send RPC to other clients to load my scene
+        int currentLevelIndex = UberManager.GetCurrentLevelIndex();
+        NetworkObjectsManager.CallGlobalCommand(GlobalCommand.LoadLevel, RpcTarget.Others, currentLevelIndex);
+        //photonView.RPC("LoadLevel", RpcTarget.Others, UberManager.GetCurrentLevelIndex());
+        yield return null;
+        
+        PhotonNetwork.IsMessageQueueRunning = false;
+        UberManager.Load_Level(currentLevelIndex); //restart the game
+    }  
+    
     public static void Load_Level(int level_index)
     {
         Singleton().LoadLevel(level_index);
@@ -521,6 +549,8 @@ public class UberManager : MonoBehaviour
         {
             return;
         }
+        
+        //PhotonManager.Singleton().DestroyMyPlayer();
         
         if(readyToSwitchLevel)
         {
@@ -660,37 +690,35 @@ public class UberManager : MonoBehaviour
     void ChangeLevel()
     {
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        Level currentLevel = (Level)currentSceneIndex;
-        InGameConsole.LogOrange(currentLevel.ToString());
         
-        // if(Input.GetKey(KeyCode.LeftShift))
-        // {
-        //     LoadLevel((int)currentLevel);
-        // }
-        // else
-        // {
-            
-            switch(currentLevel)
+        if(Input.GetKey(KeyCode.LeftShift))
+        {
+            if(currentSceneIndex > 1)
+                LoadLevel(currentSceneIndex);
+        }
+        else
+        {
+            switch(currentSceneIndex)
             {
-                case Level.Lobby:
-                    LoadLevel((int)Level.LabyrinthRadial);
+                case 0:
+                    //LoadLevel(2);
+                    break;
+                    
+                case 2:
+                    LoadLevel(3);
                     
                     break;
-                case Level.LabyrinthRadial:
-                    LoadLevel((int)Level.Level_1);
+                case 3:
+                    LoadLevel(4);
                     
                     break;
-                case Level.Level_1:
-                    LoadLevel((int)Level.LabyrinthRadial);
-                    
-                    break;
-                case Level.Level_Flat:
+                case 4:
                 {
-                    LoadLevel((int)Level.Level_Flat);
+                    LoadLevel(2);
                     break;
                 }
             }
-        // }
+        }
     }
     
     void HandlePlayerList()
@@ -797,13 +825,14 @@ public class UberManager : MonoBehaviour
             DebugSpawnOnClick();
         }
         
-        
-        
         // if(Inputs.GetKeyDown(KeyCode.T) && PhotonNetwork.IsMasterClient)
         // {
+        //     InGameConsole.LogFancy("ChangeLevel()");
         //     ChangeLevel();
             
         // }
+        
+        
         
         // if(Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButtonDown(1))
         // {

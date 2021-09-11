@@ -630,12 +630,22 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
     const float stomp_cooldown  = 2.25F;
     const float stomp_duration  = 2F;
     const float stomp_radius    = 5F;
-    const int   stomp_dmg       = 20;
+    const int   stomp_dmg       = 30;
           float stomp_timer     = 0F;
     float stomp_local_timer     = 0f;
     
     float clap_timer            = 0f;
     const float clap_cooldown   = 4f;
+    
+    bool IsTargetValid()
+    {
+        if(target_pc && target_pc.isAlive)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
     
     void UpdateBrain(float dt)
     {
@@ -665,7 +675,7 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
                 stomp_timer += dt;
                 clap_timer += dt;
                 
-                if(target_pc)
+                if(IsTargetValid())
                 {
                     Vector3 targetGroundPos = target_pc.GetGroundPosition();
                     
@@ -800,7 +810,7 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
             
             InGameConsole.LogOrange("Players count is <color=yellow>" + UberManager.Singleton().players_controller.Count.ToString() + "</color>");
             
-            if(target_pc)
+            if(IsTargetValid())
             {
                 Vector3 ground_pos = target_pc.GetGroundPosition();
                 NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability2, ground_pos);

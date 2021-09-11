@@ -32,7 +32,7 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
     static int groundMask = -1;
     static int projectileMask = -1;
     
-    
+    public Cloth coat;
     
     DamagableLimb[] limbs;
     
@@ -207,6 +207,8 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
                 
                 if((ScourgeCoolState)_state == ScourgeCoolState.Shooting)
                 {
+                    if(state != ScourgeCoolState.Shooting)
+                        audio_src.PlayOneShot(clipAiming);
                     Vector3 _shootingPos = (Vector3)args[1];
                     SetMovePos(_shootingPos);
                     WarpRemoteAgent(_shootingPos);
@@ -388,12 +390,23 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
     }
     
     float damage_taken_timeStamp;
+    float damage_taken_timeStamp2;
+    
+    void OnTakeDamageSFX()
+    {
+        if(Time.time - damage_taken_timeStamp2 > 0.2f)
+        {
+            audio_src.pitch = Random.Range(0.92f, 1f);
+            audio_src.PlayOneShot(clipHurt1, 1);
+            damage_taken_timeStamp2 = Time.time;
+        }
+    }
     
     void TakeDamage(int dmg, byte limb_id)
     {
         InGameConsole.LogOrange("TakeDamage()");
         HitPoints -= dmg;
-         
+        OnTakeDamageSFX();
         if(HitPoints <= 0)
         {
             Die(Vector3.zero, limb_id);
@@ -405,7 +418,8 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
     {
         //InGameConsole.LogOrange("TakeDamageForce()");
         HitPoints -= dmg;
-         
+        OnTakeDamageSFX();
+        
         if(HitPoints <= 0)
         {
             Die(force, limb_id);
@@ -447,7 +461,7 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
         if(remoteAgent)
             Destroy(remoteAgent.gameObject, 0.1f);
             
-        
+        Destroy(coat.gameObject);
         
         audio_src.PlayOneShot(clipDeath, 0.5f);
         HitPoints = 0;
@@ -496,6 +510,8 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
         {
             return;
         }
+        
+        Destroy(coat.gameObject);
         
         SetState(ScourgeCoolState.Dead);
         
@@ -730,6 +746,16 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
     
     float changeTargetTimer;
     const float changeTargetCooldown = 4;
+    
+    bool IsTargetValid()
+    {
+        if(target_pc && target_pc.isAlive)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
     
     void UpdateBrain(float dt)
     {
@@ -1318,4 +1344,6 @@ public class ScourgeCoolController : MonoBehaviour, INetworkObject, IDamagableLo
     public AudioClip clipDeath;
     public AudioClip clipLaunchedAirborne;
     public AudioClip clipShoot;
+    public AudioClip clipAiming;
+    
 }

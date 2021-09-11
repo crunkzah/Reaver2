@@ -159,8 +159,11 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     
     public bool canSendCommands = true;
     
+    float lockSendingCommandsTimeStamp;
+    
     void LockSendingCommands()
     {
+        lockSendingCommandsTimeStamp = Time.time;
         canSendCommands = false;
     }
     
@@ -606,9 +609,26 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
     float changeTargetTimer;
     const float changeTargetCooldown = 4.5f;
     
+    bool IsTargetValid()
+    {
+        if(target_pc && target_pc.isAlive)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
     
     void UpdateBrain(float dt)
     {
+        if(!canSendCommands)
+        {
+            if(Time.time - lockSendingCommandsTimeStamp > 1)
+            {
+                UnlockSendingCommands();
+            }
+        }
+        
         switch(state)
         {
             case(SinclaireState.Idle):
@@ -631,7 +651,7 @@ public class SinclaireController : MonoBehaviour, INetworkObject, IDamagableLoca
             }
             case(SinclaireState.Chasing):
             {
-                if(target_pc)
+                if(IsTargetValid())
                 {
                     brainTimer += dt;
                     firing_masterTimer += dt;

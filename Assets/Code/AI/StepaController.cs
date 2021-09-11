@@ -220,6 +220,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 
                 if(_state == (byte)StepaState.Aiming)
                 {
+                    audio_src.PlayOneShot(clipAiming);
                     aimingPos = (Vector3)args[1];
                 }
                 
@@ -882,6 +883,16 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     float changeTargetTimer;
     const float changeTargetCooldown = 6;
     
+    bool IsTargetValid()
+    {
+        if(target_pc && target_pc.isAlive)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+    
     void UpdateBrain(float dt)
     {
         switch(state)
@@ -909,7 +920,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 brainTimer += dt;
                 shootingChasingTimer += dt;
                 
-                if(target_pc)
+                if(IsTargetValid())
                 {
                     changeTargetTimer += dt;
                     if(changeTargetTimer > changeTargetCooldown)
@@ -1071,7 +1082,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                         // if(Math.SqrDistance(t))
                         bool foundNavPos = false;
                         
-                        if(target_pc)
+                        if(IsTargetValid())
                         {
                             if(Math.SqrDistance(target_pc.GetGroundPosition(), thisTransform.localPosition) > 6 * 6)
                             {
@@ -1378,7 +1389,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 
                 if(currentDestination == currentPos)
                 {
-                    if(target_pc)
+                    if(IsTargetValid())
                         RotateToLookAt(target_pc.GetGroundPosition(), rotateTimeAtTarget * speedMult, false);
                 }
                 else
@@ -1413,7 +1424,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 
                 if(currentDestination == currentPos)
                 {
-                    if(target_pc)
+                    if(IsTargetValid())
                         RotateToLookAt(target_pc.GetGroundPosition(), 0.1f * speedMult, false);
                 }
                 else
@@ -1478,7 +1489,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 
                 // if(currentPos == fleeingPos)
                 // {
-                //     if(target_pc)
+                //     if(IsTargetValid())
                 //         RotateToLookAt(target_pc.GetGroundPosition(), rotateTimeAtTarget * speedMult, false);
                 // }
                 // else
@@ -1594,6 +1605,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     
     
     [Header("Clips:")]
+    public AudioClip clipAiming;
     public AudioClip clipStep;
     public AudioClip clipHurt1;
     public AudioClip clipDeath;

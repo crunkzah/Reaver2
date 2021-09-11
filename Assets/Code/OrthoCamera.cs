@@ -64,7 +64,7 @@ public class OrthoCamera : MonoBehaviour
     ParticleSystem.MainModule currentHitPoints_ps_main;
     ParticleSystem.ShapeModule currentHitPoints_ps_shape;
     ParticleSystem.EmissionModule currentHitPoints_ps_emission;
-    const float hitpoints_full_emission = 330;
+    const float hitpoints_full_emission = 100;
     
     Vector3 hitPoints_full_pos = new Vector3(1f, 0.06f, 0);
     const float hitPointsFullRadius = 0.69f;
@@ -82,7 +82,7 @@ public class OrthoCamera : MonoBehaviour
     ParticleSystem.EmissionModule stamina_ps_emission;
     Vector3 stamina_full_pos = new Vector3(1f, 0.06f, 0);
     const float staminaFullRadius = 0.69f;
-    const float stamina_full_emission = 250;
+    const float stamina_full_emission = 100;
     
     public ParticleSystem onHeal_ps;
     public ParticleSystem onTakeDamage_ps;

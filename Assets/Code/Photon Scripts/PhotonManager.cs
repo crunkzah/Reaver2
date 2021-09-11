@@ -205,7 +205,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
     
     public void CreateRoom()
     {
-        roomNameToCreateOrJoin = CreateRandomName();
+        //roomNameToCreateOrJoin = CreateRandomName();
+        roomNameToCreateOrJoin = "1234";
         
         // print("Creating room");
         InGameConsole.LogFancy("CreateRoom() " + roomNameToCreateOrJoin);
@@ -528,11 +529,6 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         
     }
     
-    void SyncSceneOnAllClients()
-    {
-        photonView.RPC("SetTimeToSyncScene", RpcTarget.AllViaServer, PhotonNetwork.Time + 3d);
-    }
-    
     public Photon.Realtime.ClientState networkClientState;
     
     static bool usingSavePoints = true;
@@ -593,16 +589,6 @@ public class PhotonManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
         
         
         isConnected = PhotonNetwork.IsConnectedAndReady;
-        
-        if(shouldSync)
-        {
-            if(PhotonNetwork.Time > timeWhenToSync)
-            {
-                shouldSync = false;
-                
-                OnSceneSync();
-            }
-        }
         
         if(Input.GetKeyDown(KeyCode.V))
         {

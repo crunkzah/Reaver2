@@ -213,6 +213,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                 
                 if((ScourgeState)_state == ScourgeState.Shooting)
                 {
+                    audio_src.PlayOneShot(clipAiming);
                     Vector3 _shootingPos = (Vector3)args[1];
                     SetMovePos(_shootingPos);
                     WarpRemoteAgent(_shootingPos);
@@ -474,10 +475,24 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
     
     float damage_taken_timeStamp;
     
+    float damage_taken_timeStamp2;
+    
+    void OnTakeDamageSFX()
+    {
+        if(Time.time - damage_taken_timeStamp2 > 0.2f)
+        {
+            audio_src.pitch = Random.Range(0.92f, 1f);
+            audio_src.PlayOneShot(clipHurt1, 1);
+            damage_taken_timeStamp2 = Time.time;
+        }
+    }
+    
     void TakeDamage(int dmg, byte limb_id)
     {
         InGameConsole.LogOrange("TakeDamage()");
         HitPoints -= dmg;
+        
+        OnTakeDamageSFX();
          
         if(HitPoints <= 0)
         {
@@ -490,6 +505,8 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
     {
         //InGameConsole.LogOrange("TakeDamageForce()");
         HitPoints -= dmg;
+        
+        OnTakeDamageSFX();
          
         if(HitPoints <= 0)
         {
@@ -558,7 +575,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                 break;
             }
         }
-        
+        Destroy(coat.gameObject);
         
         // if(limb_to_destroy != 0)
         // {
@@ -593,6 +610,8 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
         {
             return;
         }
+        
+        Destroy(coat.gameObject);
         
         AudioManager.RemoveEnemiesAlive();
         
@@ -850,6 +869,16 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
     
     public GameObject coat;
     
+    bool IsTargetValid()
+    {
+        if(target_pc && target_pc.isAlive)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+    
     void UpdateBrain(float dt)
     {
         switch(state)
@@ -877,7 +906,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                 brainTimer += dt;
                 shootingChasingTimer += dt;
                 
-                if(target_pc)
+                if(IsTargetValid())
                 {
                     changeTargetTimer += dt;
                     if(changeTargetTimer > changeTargetCooldown)
@@ -990,7 +1019,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                 brainTimer += dt;
                 if(canSendCommands)
                 {
-                    if(target_pc)
+                    if(IsTargetValid())
                     {
                         bool shouldShoot = false;
                         switch(shotsPerformed)
@@ -1374,7 +1403,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                 
                 if(currentDestination == currentPos)
                 {
-                    if(target_pc)
+                    if(IsTargetValid())
                         RotateToLookAt(target_pc.GetGroundPosition(), rotateTimeAtTarget * speedMult, false);
                 }
                 else
@@ -1407,7 +1436,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                 
                 //RotateToLookAt(currentDestination, rotateTime * speedMult, false);
                 Vector3 shootingDirectionXZ = Math.GetXZ(shootingDirection);
-                if(target_pc)
+                if(IsTargetValid())
                 {
                     shootingDirectionXZ = Math.GetXZ(target_pc.GetGroundPosition() - thisTransform.localPosition);
                 }
@@ -1443,7 +1472,7 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
                 
                 // if(currentPos == fleeingPos)
                 // {
-                //     if(target_pc)
+                //     if(IsTargetValid())
                 //         RotateToLookAt(target_pc.GetGroundPosition(), rotateTimeAtTarget * speedMult, false);
                 // }
                 // else
@@ -1565,4 +1594,5 @@ public class ScourgeController : MonoBehaviour, INetworkObject, IDamagableLocal,
     public AudioClip clipDeath;
     public AudioClip clipLaunchedAirborne;
     public AudioClip clipShoot;
+    public AudioClip clipAiming;
 }

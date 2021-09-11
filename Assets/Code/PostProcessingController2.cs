@@ -61,16 +61,14 @@ public class PostProcessingController2 : MonoBehaviour
     
     void ApplyColorGradingSettings()
     {
-        colorGradingSettings_active.basic.temperature = ppc_active.temperature;
+        //colorGradingSettings_active.basic.temperature = ppc_active.temperature;
         colorGradingSettings_active.basic.contrast = ppc_active.contrast;
         colorGradingSettings_active.basic.saturation = ppc_active.saturation;
-        colorGradingSettings_active.basic.postExposure = ppc_active.postExposure;
-        //colorGradingSettings_active.channelMixer.red = ppc_active.redChannel;
+        //colorGradingSettings_active.basic.postExposure = ppc_active.postExposure;
         
         profile_active.colorGrading.settings = colorGradingSettings_active;
         
         //InGameConsole.LogFancy("ApplyColorGradingSettings()");
-        //colorGradingSettings_active.tonemapping = colorGradingTonemappingSettings_active;
     }
     
     void ApplyChromaticAberration()
@@ -132,8 +130,8 @@ public class PostProcessingController2 : MonoBehaviour
             }
         }
         
-        ApplyColorGradingSettings();
-        ApplyChromaticAberration();
+        //ApplyColorGradingSettings();
+        //ApplyChromaticAberration();
     }
     
     void DebugInput()
@@ -181,7 +179,7 @@ public class PostProcessingController2 : MonoBehaviour
             case(PostProcessingState.Berserk):
             {
                 _blendTime = blendTimeBerserk;
-               ppc_target = ppc_berserk;
+                ppc_target = ppc_berserk;
                 
                 break;
             }
@@ -194,11 +192,11 @@ public class PostProcessingController2 : MonoBehaviour
             }
         }
         
-        if(!Mathf.Approximately(ppc_active.temperature, ppc_target.temperature))
-        {
-            ppc_active.temperature = Mathf.SmoothDamp(ppc_active.temperature, ppc_target.temperature, ref vel1, blendTimeNormal);
-            needChange = true;
-        }
+        // if(!Mathf.Approximately(ppc_active.temperature, ppc_target.temperature))
+        // {
+        //     ppc_active.temperature = Mathf.SmoothDamp(ppc_active.temperature, ppc_target.temperature, ref vel1, blendTimeNormal);
+        //     needChange = true;
+        // }
         
         if(!Mathf.Approximately(ppc_active.contrast, ppc_target.contrast))
         {
@@ -206,10 +204,18 @@ public class PostProcessingController2 : MonoBehaviour
             needChange = true;
         }
         
-        if(!Mathf.Approximately(ppc_active.postExposure, ppc_target.postExposure))
+        // if(!Mathf.Approximately(ppc_active.postExposure, ppc_target.postExposure))
+        // {
+        //     ppc_active.postExposure = Mathf.SmoothDamp(ppc_active.postExposure, ppc_target.postExposure, ref vel3, blendTimeNormal);
+        //     needChange = true;
+        // }
+        if(state == PostProcessingState.PlayerDead)
         {
-            ppc_active.postExposure = Mathf.SmoothDamp(ppc_active.postExposure, ppc_target.postExposure, ref vel3, blendTimeNormal);
-            needChange = true;
+            profile_active.colorGrading.enabled = true;
+        }
+        else
+        {
+            profile_active.colorGrading.enabled = false;
         }
         
         if(!Mathf.Approximately(ppc_active.saturation, ppc_target.saturation))

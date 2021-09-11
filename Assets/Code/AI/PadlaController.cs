@@ -153,8 +153,11 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     
     public bool canSendCommands = true;
     
+    float lockSendingCommandsTimeStamp;
+    
     void LockSendingCommands()
     {
+        lockSendingCommandsTimeStamp = Time.time;
         canSendCommands = false;
     }
     
@@ -791,8 +794,27 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     float changeTargetTimer;
     const float changeTargetCooldown = 4;
     
+    
+    bool IsTargetValid()
+    {
+        if(target_pc && target_pc.isAlive)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+    
     void UpdateBrain(float dt)
     {
+        if(!canSendCommands)
+        {
+            if(Time.time - lockSendingCommandsTimeStamp > 1)
+            {
+                UnlockSendingCommands();
+            }
+        }
+        
         switch(state)
         {
             case(PadlaState.Idle):
@@ -817,7 +839,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             {
                 brainTimer += dt;
                 
-                if(target_pc)
+                if(IsTargetValid())
                 {
                     Vector3 targetGroundPos = target_pc.GetGroundPosition();
                     

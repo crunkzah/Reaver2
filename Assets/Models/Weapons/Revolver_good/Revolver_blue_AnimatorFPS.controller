@@ -428,7 +428,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Fire_ult
-  m_Speed: 1.5
+  m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 1101495012393760372}
@@ -441,7 +441,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400028, guid: 707fd78bc21bcfb46b20852f80e67782, type: 3}
+  m_Motion: {fileID: 7400006, guid: d8ddd7253c8a5d841b11b0d7821cc07a, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 

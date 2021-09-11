@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
+using System.Collections;
 
 public enum InGameMenuState : byte
 {
@@ -129,12 +130,18 @@ public class InGameMenu : MonoBehaviour
     
     public void RestartCurrentLevelButton()
     {
-        Hide();
         if(PhotonNetwork.IsMasterClient)
-            NetworkObjectsManager.CallGlobalCommand(GlobalCommand.SetSavePoint, RpcTarget.All, -1);
-        UberManager.SetSavePointPriority(-1);
-        UberManager.Singleton().ReloadLevel();
+        {
+            Hide();
+            
+            //UberManager.Singleton().ReloadLevel();
+            UberManager.ReloadLevelWithCoroutine();
+        }
     }
+    
+ 
+    
+    
     
     
     void SaveSettingsFromInGameMenu()

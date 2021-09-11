@@ -148,7 +148,8 @@ public class Kaboom1 : MonoBehaviour
         PlayerController local_pc = PhotonManager.GetLocalPlayer();
         if(local_pc)
         {
-            float distance = Vector3.Distance(local_pc.GetCenterPosition(), pos);
+            Vector3 localPlayerPos = local_pc.GetFPSPosition();
+            float distance = Vector3.Distance(localPlayerPos, pos);
             if(distance < radius)
             {
                 Vector3 dir = local_pc.GetFPSPosition() - pos;

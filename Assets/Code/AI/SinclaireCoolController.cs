@@ -206,16 +206,12 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
     
     void Start()
     {
+        CalculatedMaxHealth = MaxHealth * PhotonNetwork.CurrentRoom.PlayerCount;
+        HitPoints = CalculatedMaxHealth;
+        
         if(PhotonNetwork.IsMasterClient)
         {
             InitAsMaster();    
-        }
-        
-        HitPoints = MaxHealth;
-        if(PhotonNetwork.CurrentRoom.PlayerCount > 1)
-        {
-            HitPoints *= PhotonNetwork.CurrentRoom.PlayerCount;
-            CalculatedMaxHealth = HitPoints;
         }
         
         NPCManager.RegisterKillable(this);
@@ -249,8 +245,11 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
     
     public bool canSendCommands = true;
     
+    float lockSendingCommandsTimeStamp;
+    
     void LockSendingCommands()
     {
+        lockSendingCommandsTimeStamp = Time.time;
         canSendCommands = false;
     }
     
@@ -769,8 +768,26 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
     float changeTargetTimer;
     const float changeTargetCooldown = 6.0f;
     
+    bool IsTargetValid()
+    {
+        if(target_pc && target_pc.isAlive)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+    
     void UpdateBrain(float dt)
     {
+        if(!canSendCommands)
+        {
+            if(Time.time - lockSendingCommandsTimeStamp > 1)
+            {
+                UnlockSendingCommands();
+            }
+        }
+        
         switch(state)
         {
             case(SinclaireCoolState.Idle):
@@ -793,7 +810,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
             }
             case(SinclaireCoolState.Chasing):
             {
-                if(target_pc)
+                if(IsTargetValid())
                 {
                     changeTargetTimer += dt;
                     if(changeTargetTimer > changeTargetCooldown)

@@ -211,14 +211,20 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     public AudioClip onHealedClip;
     
+    float healed_timeStamp;
+    
     void OnHealed()
     {
         if(pv.IsMine)
         {
-            //InGameConsole.LogFancy("Healed!");
-            playerAudioSource.PlayOneShot(onHealedClip, 0.75f);
-            HurtGUI.ShowHeal();
-            OrthoCamera.OnHeal();
+            if(Time.time - healed_timeStamp > 0.15f)
+            {
+                healed_timeStamp = Time.time;
+                //InGameConsole.LogFancy("Healed!");
+                playerAudioSource.PlayOneShot(onHealedClip, 1f);
+                HurtGUI.ShowHeal();
+                OrthoCamera.OnHeal();
+            }
         }
     }
             
@@ -253,7 +259,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
         
         if(pv.IsMine)
         {
-            SetFPSCameraToPlayer();
+            Invoke(nameof(SetFPSCameraToPlayer), 0.05f);
+            //SetFPSCameraToPlayer();
             PostProcessingController2.SetState(PostProcessingState.Normal);  
             OrthoCamera.Hide();
             DeadGUI.Hide();
@@ -601,10 +608,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     void InterpolateFov(float dt)
     {
-        float currentFov = fpsCam_camera.fieldOfView;
-        fpsCam_camera.fieldOfView = Mathf.MoveTowards(currentFov, targetFov, dt * fovSpeed);
-        
-        
+        if(fpsCam_camera)
+        {
+            float currentFov = fpsCam_camera.fieldOfView;
+            fpsCam_camera.fieldOfView = Mathf.MoveTowards(currentFov, targetFov, dt * fovSpeed);
+        }
     }
     
     float slideControllerHeight = 0.5f;//1f;
@@ -1180,10 +1188,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
     void OnBecomeGrounded()
     {
         if(pv.IsMine)
-        {
+        { 
             onBecomeGrounded_timeStamp = Time.time;
             //InGameConsole.LogFancy("onBecomeGrounded_timeStamp: " + onBecomeGrounded_timeStamp);
-            CameraShaker.ShakeY(2.5f);
+            CameraShaker.ShakeY(6f);
             
             velocityBeforeGrounded = fpsVelocity;
             //InGameConsole.LogOrange(string.Format("<b>VelocityBeforeGrounded:</b> <color=yellow>{0}</color>", velocityBeforeGrounded));
@@ -1191,9 +1199,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
             if(tryingToSlam)
                 groundSlammed_timeStamp = Time.time;
             
-            if(Math.SqrMagnitude(velocityBeforeGrounded) > 8f * 8f)
+            if(Math.SqrMagnitude(velocityBeforeGrounded) > 16f * 16f)
             {
-                playerAudioSource.PlayOneShot(OnBecomeGroundedClip, 0.2f);
+                playerAudioSource.PlayOneShot(OnBecomeGroundedClip, 1f);
             }
         }
     }
@@ -1657,7 +1665,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             //         // }
             //     // }
             // }
-            playerAudioSource.PlayOneShot(jumpLocalClip, 0.275f);
+            playerAudioSource.PlayOneShot(jumpLocalClip, 1f);
         }
         
         
@@ -1679,7 +1687,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
         
         // InGameConsole.LogFancy("SecondJumpFPS()");
-        playerAudioSource.PlayOneShot(jumpSecondLocalClip, 0.8f);
+        playerAudioSource.PlayOneShot(jumpSecondLocalClip, 1f);
     }
     
     public Vector3 GetFPSDirection()
@@ -2169,10 +2177,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
     }
     
-    public void TakeDamageOnline(int dmg)
-    {
-        pv.RPC("TakeDamage", RpcTarget.All, dmg);
-    }
+    // public void TakeDamageOnline(int dmg)
+    // {
+    //     pv.RPC("TakeDamage", RpcTarget.All, dmg);
+    // }
     
     
     float TimeWhenTookDamage = 0;
@@ -2195,6 +2203,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     public void TakeDamageNonLethal(int dmg)
     {
+        if(!pv.IsMine)
+        {
+            return;
+        }
         HitPoints -= dmg;
         if(HitPoints <= 1)
         {
@@ -2237,6 +2249,12 @@ public class PlayerController : MonoBehaviour, IPunObservable
     [PunRPC]
     public void TakeDamage(int dmg)
     {
+        if(!pv.IsMine)
+        {
+            return;
+        }
+        
+        
         if(Math.Abs(Time.time - TimeWhenTookDamage) < takeDamageImmunityDuration)
         {
             //InGameConsole.LogFancy("DAMAGE WAS IGNORED");
@@ -2288,7 +2306,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         {
             //PostProcessingController.AddSaturation(-0.15f);
             CameraShaker.MakeTrauma(0.45f * Mathf.InverseLerp(1, 100, dmg));
-            playerAudioSource.PlayOneShot(hurtLocalClip, 0.4f);
+            playerAudioSource.PlayOneShot(hurtLocalClip, 1f);
             HurtGUI.ShowHurt();
             OrthoCamera.OnTakeDamage();
         }
@@ -2347,6 +2365,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
         {
             NPCManager.Singleton().aiTargets.Remove(this.transform);
         }
+        
+        // if(UnityEngine.SceneManagement.SceneManager. pv.IsMine)
+        // {
+        //PhotonManager.Singleton().DestroyMyPlayer();
+        //}
         
         if(UberManager.Singleton())
         {
@@ -2499,11 +2522,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
             _camTr.SetParent(null);
             
             Camera _cam = FollowingCamera.Singleton().GetComponent<Camera>();
+            isAlive = false;
         }
         
         
         
-        isAlive = false;
         InGameConsole.LogFancy(string.Format("Player {0} has <color=red>died</color>", this.gameObject.name));
         //GlobalShooter.MakeGibs(thisTransform.localPosition, 32);
     }

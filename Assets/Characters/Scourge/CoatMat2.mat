@@ -107,7 +107,7 @@ Material:
     - _Color: {r: 0, g: 0.71126604, b: 1, a: 1}
     - _ColorAddSubDiff: {r: 0, g: 0, b: 0, a: 0}
     - _Emission: {r: 0, g: 0, b: 0, a: 1}
-    - _EmissionColor: {r: 0, g: 0.26228365, b: 0.33962262, a: 1}
+    - _EmissionColor: {r: 0.6603774, g: 0.04566431, b: 0, a: 1}
     - _RimColor: {r: 0, g: 0, b: 0, a: 1}
     - _SoftParticleFadeParams: {r: 0, g: 0, b: 0, a: 0}
     - _SpecularColor: {r: 0, g: 0, b: 0, a: 1}

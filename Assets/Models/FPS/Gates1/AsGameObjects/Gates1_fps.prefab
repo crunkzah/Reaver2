@@ -14544,9 +14544,14 @@ MonoBehaviour:
   locked_mat: {fileID: 2100000, guid: 9a493f0d1ba16254294c6b9eb2c23ead, type: 2}
   locked_ps1: {fileID: 2528181281799943336}
   locked_ps2: {fileID: 5437986007236786991}
-  unlock_clip: {fileID: 8300000, guid: b4b6981870dd33a428cad649380c4bea, type: 3}
-  lock_clip: {fileID: 8300000, guid: 3baac09071cdc9b41ad7a3d25d09d16c, type: 3}
+  open_msgs_num: 1
+  checkPointPriority: 0
+  messages_on_load: []
+  stopWatch: 0
+  unlock_clip: {fileID: 8300000, guid: 6258124f92b4b8741b9f005f4d2a9bab, type: 3}
+  lock_clip: {fileID: 8300000, guid: 882a7c74ca9497347a766b756076fc2f, type: 3}
   radius: 9
+  music_on_open: 0
 --- !u!82 &4229721592834452291
 AudioSource:
   m_ObjectHideFlags: 0
@@ -19455,10 +19460,6 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 2300000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 8c1e53ef826cb7d40a67594e952e386f, type: 2}
     - target: {fileID: 400000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -19503,6 +19504,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8c1e53ef826cb7d40a67594e952e386f, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
 --- !u!23 &3963606378038033333 stripped
@@ -19532,10 +19537,6 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 2300000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 8c1e53ef826cb7d40a67594e952e386f, type: 2}
     - target: {fileID: 400000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -19580,6 +19581,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8c1e53ef826cb7d40a67594e952e386f, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5e1d44322de39264fa6c2c41e540a741, type: 3}
 --- !u!23 &5723363244360743732 stripped

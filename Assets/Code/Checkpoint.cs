@@ -113,7 +113,7 @@ public class Checkpoint : MonoBehaviour, INetworkObject
         InGameConsole.LogFancy("LoadToThisSavePoint()");
     }
     
-    int playersMask = -1;
+    static int playersMask = -1;
     
     bool canSendCommands = true;
     
@@ -129,8 +129,16 @@ public class Checkpoint : MonoBehaviour, INetworkObject
     
     // CheckPointSpawnPlace;
     
+    [Header("On load position:")]
+    public Transform onLoadPosition;
+    
     public Vector3 GetSavePointSpawnPlace()
     {
+        if(onLoadPosition)
+        {
+            return onLoadPosition.position;
+        }
+        
         return transform.position;
     }
     
@@ -213,7 +221,8 @@ public class Checkpoint : MonoBehaviour, INetworkObject
     {
         net_comp = GetComponent<NetworkObject>();
         audio_src = GetComponent<AudioSource>();
-        playersMask = LayerMask.GetMask("Player");
+        if(playersMask == -1)
+            playersMask = LayerMask.GetMask("Player");
         thisTransform = transform;
         thisPosition = thisTransform.position;
         

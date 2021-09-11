@@ -102,7 +102,7 @@ Cloth:
   m_BendingStiffness: 0.5
   m_UseTethers: 1
   m_UseGravity: 1
-  m_Damping: 0.5
+  m_Damping: 0.8
   m_ExternalAcceleration: {x: 0, y: 0, z: 0}
   m_RandomAcceleration: {x: 0, y: 0, z: 0}
   m_WorldVelocityScale: 0.5
@@ -150,35 +150,35 @@ Cloth:
     collisionSphereDistance: 3.4028235e+38
   - maxDistance: 3.4028235e+38
     collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 0.5
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 0.5
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 0.9
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 0.9
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 3.4028235e+38
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 3.4028235e+38
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 3.4028235e+38
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 3.4028235e+38
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 3.4028235e+38
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 3.4028235e+38
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 3.4028235e+38
+    collisionSphereDistance: 3.4028235e+38
   - maxDistance: 3.4028235e+38
     collisionSphereDistance: 3.4028235e+38
   - maxDistance: 3.4028235e+38
     collisionSphereDistance: 3.4028235e+38
   - maxDistance: 0.5
     collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 0.5
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 3.4028235e+38
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 3.4028235e+38
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 3.4028235e+38
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 3.4028235e+38
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 3.4028235e+38
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 3.4028235e+38
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 3.4028235e+38
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 3.4028235e+38
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 3.4028235e+38
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 3.4028235e+38
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 0.5
+  - maxDistance: 0.9
     collisionSphereDistance: 3.4028235e+38
   - maxDistance: 0
     collisionSphereDistance: 3.4028235e+38
@@ -186,25 +186,23 @@ Cloth:
     collisionSphereDistance: 3.4028235e+38
   - maxDistance: 0
     collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 0.5
+  - maxDistance: 0.9
     collisionSphereDistance: 3.4028235e+38
   - maxDistance: 0
     collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 0.5
+  - maxDistance: 0.9
     collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 0.5
+  - maxDistance: 0.9
     collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 0.5
+  - maxDistance: 0.9
     collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 0.5
+  - maxDistance: 0.9
     collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 0.5
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 0
+  - maxDistance: 0.9
     collisionSphereDistance: 3.4028235e+38
   - maxDistance: 0
     collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 3.4028235e+38
+  - maxDistance: 0
     collisionSphereDistance: 3.4028235e+38
   - maxDistance: 3.4028235e+38
     collisionSphereDistance: 3.4028235e+38
@@ -242,7 +240,9 @@ Cloth:
     collisionSphereDistance: 3.4028235e+38
   - maxDistance: 3.4028235e+38
     collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 3.4028235e+38
+  - maxDistance: 0.5
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 0.5
     collisionSphereDistance: 3.4028235e+38
   - maxDistance: 0
     collisionSphereDistance: 3.4028235e+38
@@ -493,7 +493,7 @@ MonoBehaviour:
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
-  limb_HitPoints: 200
+  limb_HitPoints: 50
 --- !u!1 &5182788866066698118
 GameObject:
   m_ObjectHideFlags: 0
@@ -627,7 +627,7 @@ MonoBehaviour:
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
-  limb_HitPoints: 200
+  limb_HitPoints: 50
 --- !u!1 &5182788866066698120
 GameObject:
   m_ObjectHideFlags: 0
@@ -853,7 +853,7 @@ MonoBehaviour:
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
-  limb_HitPoints: 200
+  limb_HitPoints: 50
 --- !u!1 &5182788866066698126
 GameObject:
   m_ObjectHideFlags: 0
@@ -987,7 +987,7 @@ MonoBehaviour:
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
-  limb_HitPoints: 200
+  limb_HitPoints: 50
 --- !u!1 &5182788866066698128
 GameObject:
   m_ObjectHideFlags: 0
@@ -1187,7 +1187,7 @@ MonoBehaviour:
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
-  limb_HitPoints: 200
+  limb_HitPoints: 50
 --- !u!1 &5182788866066698134
 GameObject:
   m_ObjectHideFlags: 0
@@ -1380,7 +1380,7 @@ MonoBehaviour:
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
-  limb_HitPoints: 200
+  limb_HitPoints: 50
 --- !u!1 &5182788866066698140
 GameObject:
   m_ObjectHideFlags: 0
@@ -1576,7 +1576,7 @@ MonoBehaviour:
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
-  limb_HitPoints: 200
+  limb_HitPoints: 50
 --- !u!1 &5182788866066698210
 GameObject:
   m_ObjectHideFlags: 0
@@ -1710,7 +1710,7 @@ MonoBehaviour:
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
-  limb_HitPoints: 200
+  limb_HitPoints: 50
 --- !u!1 &5182788866066698212
 GameObject:
   m_ObjectHideFlags: 0
@@ -1844,7 +1844,7 @@ MonoBehaviour:
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
-  limb_HitPoints: 200
+  limb_HitPoints: 50
 --- !u!1 &5182788866066698214
 GameObject:
   m_ObjectHideFlags: 0
@@ -1978,7 +1978,7 @@ MonoBehaviour:
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
-  limb_HitPoints: 200
+  limb_HitPoints: 50
 --- !u!1 &5182788866066698216
 GameObject:
   m_ObjectHideFlags: 0
@@ -2200,7 +2200,7 @@ MonoBehaviour:
   deadLimb_ps: {fileID: 0}
   limb_id: 0
   adjacentLimbs: []
-  limb_HitPoints: 200
+  limb_HitPoints: 50
 --- !u!1 &5182788866066698222
 GameObject:
   m_ObjectHideFlags: 0
@@ -2302,6 +2302,7 @@ MonoBehaviour:
     type: 3}
   eye_ps: {fileID: 0}
   audio_src: {fileID: 1192030775169879288}
+  coat: {fileID: 4961918178491512154}
   head: {fileID: 5182788866067059642}
   canSendCommands: 1
   HitPoints: 2500
@@ -2309,10 +2310,11 @@ MonoBehaviour:
   velocity: {x: 0, y: 0, z: 0}
   slide_ps: {fileID: 3885840506802587599}
   clipStep: {fileID: 0}
-  clipHurt1: {fileID: 0}
-  clipDeath: {fileID: 0}
+  clipHurt1: {fileID: 8300000, guid: b12f1313d65ce834f965ce02f2c7ee59, type: 3}
+  clipDeath: {fileID: 8300000, guid: 66151a7163df24d48bc338f7df93fe51, type: 3}
   clipLaunchedAirborne: {fileID: 0}
   clipShoot: {fileID: 0}
+  clipAiming: {fileID: 8300000, guid: e180dbc8532581247a7657518b8fdee3, type: 3}
 --- !u!136 &4904263683275137878
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2340,6 +2342,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   limbs: []
+  canBeAffected: 1
 --- !u!82 &1192030775169879288
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2349,7 +2352,8 @@ AudioSource:
   m_GameObject: {fileID: 5182788866066698222}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 243086065624918228, guid: 90796b012c318744db1bee2b209366c9,
+    type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
