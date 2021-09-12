@@ -36,17 +36,17 @@ public class SurveillanceOwl : MonoBehaviour
             
             target = null;
             
-            for(int i = 0; i < NPCManager.Singleton().aiTargets.Count; i++)
-            {
-                Transform possibleTarget = NPCManager.Singleton().aiTargets[i];
-                float sqrDistance = Math.SqrDistance(thisTransform.position, NPCManager.Singleton().aiTargets[i].position);
+            // for(int i = 0; i < NPCManager.Singleton().aiTargets.Count; i++)
+            // {
+            //     Transform possibleTarget = NPCManager.Singleton().aiTargets[i];
+            //     float sqrDistance = Math.SqrDistance(thisTransform.position, NPCManager.Singleton().aiTargets[i].position);
                 
-                if(sqrDistance < sqrViewRadius && sqrDistance < minSqrDistance)                        
-                {
-                    target = possibleTarget;
-                    minSqrDistance = sqrDistance;
-                }
-            }
+            //     if(sqrDistance < sqrViewRadius && sqrDistance < minSqrDistance)                        
+            //     {
+            //         target = possibleTarget;
+            //         minSqrDistance = sqrDistance;
+            //     }
+            // }
             
             
             

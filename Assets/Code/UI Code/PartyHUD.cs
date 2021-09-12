@@ -48,7 +48,7 @@ public class PartyHUD : MonoBehaviour
     
     public static void RebuildPartyHUD()
     {
-        ref List<PlayerController> pcs = ref UberManager.Singleton().players_controller;
+        ref List<PlayerController> pcs = ref UberManager.Singleton().playerControllers;
         int otherPlayersCount = 0;
         for(int i = 0; i < pcs.Count; i++)
         {
@@ -75,7 +75,7 @@ public class PartyHUD : MonoBehaviour
         InGameConsole.LogFancy("_SetPlayersInScene " + otherPlayerInSceneCount);
         party.Clear();
         
-        ref List<PlayerController> pcs = ref UberManager.Singleton().players_controller;
+        ref List<PlayerController> pcs = ref UberManager.Singleton().playerControllers;
         int j = 0;
         
         for(int i = 0; i < pcs.Count; i++)

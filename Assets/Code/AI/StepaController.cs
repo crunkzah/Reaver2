@@ -899,7 +899,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
         {
             case(StepaState.Idle):
             {
-                if(canSendCommands)
+                if(canSendCommands && UberManager.readyToSwitchLevel)
                 {
                     Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
                     if(potentialTarget)
@@ -926,7 +926,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                     if(changeTargetTimer > changeTargetCooldown)
                     {
                         changeTargetTimer = 0;
-                        if(canSendCommands)
+                        if(canSendCommands && UberManager.readyToSwitchLevel)
                         {
                             Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
                             Vector3 _shootingCheckPosOffsetted = currentDestination;
@@ -979,7 +979,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                     //     UpdateRemoteAgentDestination(currentDestination);
                     // }
                     
-                    if(canSendCommands)
+                    if(canSendCommands && UberManager.readyToSwitchLevel)
                     {
                         if(canShootFromDestination)
                         {
@@ -1015,7 +1015,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 }
                 else
                 {
-                    if(canSendCommands)
+                    if(canSendCommands && UberManager.readyToSwitchLevel)
                     {
                         Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
                         if(potentialTarget)
@@ -1045,7 +1045,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 
                 if(brainTimer > aimingDurationBeforeShooting)
                 {
-                    if(canSendCommands)
+                    if(canSendCommands && UberManager.readyToSwitchLevel)
                     {
                         Vector3 targetGroundPos = target_pc.GetGroundPosition();
                     
@@ -1072,7 +1072,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 
                 if(brainTimer >= shootingDuration)
                 {
-                    if(canSendCommands)
+                    if(canSendCommands && UberManager.readyToSwitchLevel)
                     {
                         brainTimer = 0;
                         NavMeshHit navMeshHit;
@@ -1160,7 +1160,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             {
                 UpdateRemoteAgentDestination(fleeingPos);
                 
-                if(canSendCommands)
+                if(canSendCommands && UberManager.readyToSwitchLevel)
                 {
                     brainTimer += dt;
                     fleeingTimer += dt;
@@ -1251,7 +1251,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                                 Vector3 samplePos = thisTransform.localPosition;
                                 if(NavMesh.SamplePosition(samplePos, out _navMeshHit, 1f, NavMesh.AllAreas))
                                 {
-                                    if(canSendCommands)
+                                    if(canSendCommands && UberManager.readyToSwitchLevel)
                                     {
                                         LockSendingCommands();
                                       //  InGameConsole.LogOrange("<color=green>Sending LandOnGround() </color>");
@@ -1271,7 +1271,7 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                             //if(NavMesh.SamplePosition(hit.point, out navMeshHit, 0.33f, NavMesh.AllAreas))
                             if(NavMesh.SamplePosition(thisTransform.localPosition, out navMeshHit, 0.33f, NavMesh.AllAreas))
                             {
-                                if(canSendCommands)
+                                if(canSendCommands && UberManager.readyToSwitchLevel)
                                 {
                                     LockSendingCommands();
                                     InGameConsole.LogOrange("<color=green>Sending LandOnGround() </color>");
@@ -1584,19 +1584,23 @@ public class StepaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
     {
         Transform result = null;
         
-        int len = NPCManager.Singleton().aiTargets.Count;
+        ref List<PlayerController> pcs = ref UberManager.Singleton().playerControllers;
+        int len = pcs.Count;
         
         float minDistanceSqr = float.MaxValue;
         
         for(int i = 0; i < len; i++)
         {
-            Transform potentialTarget = NPCManager.Singleton().aiTargets[i];
-            float distSqr = Math.SqrDistance(seekerPos, potentialTarget.position);
-            
-            if(distSqr <  minDistanceSqr)
+            PlayerController potentialTarget = pcs[i];
+            if(pcs[i].isAlive)
             {
-                minDistanceSqr = distSqr;
-                result = potentialTarget;
+                float distSqr = Math.SqrDistance(seekerPos, potentialTarget.GetGroundPosition());
+                
+                if(distSqr <  minDistanceSqr)
+                {
+                    minDistanceSqr = distSqr;
+                    result = potentialTarget.thisTransform;
+                }
             }
         }
         

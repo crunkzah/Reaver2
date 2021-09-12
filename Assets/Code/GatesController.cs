@@ -265,7 +265,7 @@ public class GatesController : MonoBehaviour, INetworkObject
         {
             return false;
         }
-        ref List<PlayerController> pcs = ref UberManager.Singleton().players_controller;
+        ref List<PlayerController> pcs = ref UberManager.Singleton().playerControllers;
         int len = pcs.Count;
         switch(detectionMode)
         {

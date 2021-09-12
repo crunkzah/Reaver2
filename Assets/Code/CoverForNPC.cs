@@ -78,10 +78,6 @@ public class CoverForNPC : MonoBehaviour
             return;
         }
         
-        if(NPCManager.Singleton())
-        {
-            NPCManager.Singleton().AddCover(this);
-        }
     }
     
 #if UNITY_EDITOR

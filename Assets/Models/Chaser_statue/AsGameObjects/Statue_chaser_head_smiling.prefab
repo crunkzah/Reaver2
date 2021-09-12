@@ -104,6 +104,7 @@ GameObject:
   - component: {fileID: 616875673643095685}
   - component: {fileID: 7670813146484316261}
   - component: {fileID: 5353350915834768441}
+  - component: {fileID: 7853397781160294929}
   m_Layer: 0
   m_Name: Eye_local_ps
   m_TagString: Untagged
@@ -4791,6 +4792,23 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!114 &7853397781160294929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1853990077316359775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33de94052ad962b4395f8535a4b508e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mult: 1
+  burstThreshold: 50
+  burstNum: 32
+  minSimulationSpeed: 0.1
+  vol: 0
 --- !u!1 &4285010918734173825
 GameObject:
   m_ObjectHideFlags: 0
@@ -4802,6 +4820,7 @@ GameObject:
   - component: {fileID: 6370203976660323285}
   - component: {fileID: 1710260816656165710}
   - component: {fileID: 2781712096003966796}
+  - component: {fileID: 1648112087837871701}
   m_Layer: 0
   m_Name: Eye_local_ps (1)
   m_TagString: Untagged
@@ -9489,3 +9508,20 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!114 &1648112087837871701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4285010918734173825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33de94052ad962b4395f8535a4b508e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mult: 1
+  burstThreshold: 50
+  burstNum: 32
+  minSimulationSpeed: 0.1
+  vol: 0

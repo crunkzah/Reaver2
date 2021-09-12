@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 using Photon.Pun;
 
 public class CarolineKneeling : MonoBehaviour, INetworkObject
@@ -61,9 +62,11 @@ public class CarolineKneeling : MonoBehaviour, INetworkObject
     {
         if(canSendCommands && PhotonNetwork.IsMasterClient)
         {
-            for(int i = 0; i < NPCManager.AITargets().Count; i++)
+            ref List<PlayerController> pcs = ref UberManager.Singleton().playerControllers;
+            int len = pcs.Count;
+            for(int i = 0; i < len; i++)
             {
-                PlayerController playerTarget = NPCManager.AITargets()[i].GetComponent<PlayerController>();
+                PlayerController playerTarget = pcs[i];
                 if(playerTarget)
                 {
                     float distance_to_revolver = Math.SqrDistance(shotgun_transform.position, playerTarget.GetHeadPosition());

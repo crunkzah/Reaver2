@@ -325,6 +325,7 @@
      <Compile Include="Assets\Code\TriggerReceiverParticles.cs" />
      <Compile Include="Assets\Code\TriggerTrackable.cs" />
      <Compile Include="Assets\Code\UberManager.cs" />
+     <Compile Include="Assets\Code\UI Code\AnimateScaleSin.cs" />
      <Compile Include="Assets\Code\UI Code\ButtonText.cs" />
      <Compile Include="Assets\Code\UI Code\DisconnectButtonGUI.cs" />
      <Compile Include="Assets\Code\UI Code\HurtGUI.cs" />

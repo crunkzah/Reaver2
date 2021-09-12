@@ -81,10 +81,11 @@ public class Civ2Controller : MonoBehaviour, INetworkObject
                 if(canSendCommands)
                 {
                     //PlayerController masterPlayer = PhotonManager.GetLocalPlayer();
-                    
-                    for(int i = 0; i < NPCManager.AITargets().Count; i++)
+                    ref List<PlayerController> pcs = ref UberManager.Singleton().playerControllers;
+                    int len = pcs.Count;                    
+                    for(int i = 0; i < len; i++)
                     {
-                        PlayerController playerTarget = NPCManager.AITargets()[i].GetComponent<PlayerController>();
+                        PlayerController playerTarget = pcs[i];
                         if(playerTarget)
                         {
                             float distance_to_revolver = Vector3.Distance(revolver_holding.position, playerTarget.GetHeadPosition());

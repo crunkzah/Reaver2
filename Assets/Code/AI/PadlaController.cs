@@ -819,7 +819,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
         {
             case(PadlaState.Idle):
             {
-                if(canSendCommands)
+                if(canSendCommands && UberManager.readyToSwitchLevel)
                 {
                     Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
                     if(potentialTarget)
@@ -847,7 +847,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                     if(changeTargetTimer > changeTargetCooldown)
                     {
                         changeTargetTimer = 0;
-                        if(canSendCommands)
+                        if(canSendCommands && UberManager.readyToSwitchLevel)
                         {
                             Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
                             if(potentialTarget && (potentialTarget.GetInstanceID() != target_pc.thisTransform.GetInstanceID()))
@@ -869,7 +869,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                     
                     Vector3 padlaPosition = thisTransform.localPosition;
                     
-                    if(canSendCommands)
+                    if(canSendCommands && UberManager.readyToSwitchLevel)
                     {
                         if(Math.SqrDistance(targetGroundPos, padlaPosition) < punch1_distance  * punch1_distance)
                         {
@@ -914,7 +914,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                 }
                 else
                 {
-                    if(canSendCommands)
+                    if(canSendCommands && UberManager.readyToSwitchLevel)
                     {
                         Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
                         if(potentialTarget)
@@ -940,7 +940,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
             {
                 brainTimer += dt;
                 
-                if(canSendCommands)
+                if(canSendCommands && UberManager.readyToSwitchLevel)
                 {
                     if(brainTimer > punch1_duration)
                     {
@@ -1018,7 +1018,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                                 Vector3 samplePos = thisTransform.localPosition;
                                 if(NavMesh.SamplePosition(samplePos, out _navMeshHit, 1.25f, NavMesh.AllAreas))
                                 {
-                                    if(canSendCommands)
+                                    if(canSendCommands && UberManager.readyToSwitchLevel)
                                     {
                                         LockSendingCommands();
                                       //  InGameConsole.LogOrange("<color=green>Sending LandOnGround() </color>");
@@ -1037,7 +1037,7 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
                             NavMeshHit navMeshHit;
                             if(NavMesh.SamplePosition(thisTransform.localPosition, out navMeshHit, 0.33f, NavMesh.AllAreas))
                             {
-                                if(canSendCommands)
+                                if(canSendCommands && UberManager.readyToSwitchLevel)
                                 {
                                     LockSendingCommands();
                                     InGameConsole.LogOrange("<color=green>Sending LandOnGround() </color>");
@@ -1341,23 +1341,27 @@ public class PadlaController : MonoBehaviour, INetworkObject, IDamagableLocal, I
         UpdateBrainLocally(dt);
     }
     
-    Transform ChooseTargetClosest(Vector3 seekerPos)
+   Transform ChooseTargetClosest(Vector3 seekerPos)
     {
         Transform result = null;
         
-        int len = NPCManager.Singleton().aiTargets.Count;
+        ref List<PlayerController> pcs = ref UberManager.Singleton().playerControllers;
+        int len = pcs.Count;
         
         float minDistanceSqr = float.MaxValue;
         
         for(int i = 0; i < len; i++)
         {
-            Transform potentialTarget = NPCManager.Singleton().aiTargets[i];
-            float distSqr = Math.SqrDistance(seekerPos, potentialTarget.position);
-            
-            if(distSqr <  minDistanceSqr)
+            PlayerController potentialTarget = pcs[i];
+            if(pcs[i].isAlive)
             {
-                minDistanceSqr = distSqr;
-                result = potentialTarget;
+                float distSqr = Math.SqrDistance(seekerPos, potentialTarget.GetGroundPosition());
+                
+                if(distSqr <  minDistanceSqr)
+                {
+                    minDistanceSqr = distSqr;
+                    result = potentialTarget.thisTransform;
+                }
             }
         }
         

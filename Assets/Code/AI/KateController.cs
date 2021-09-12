@@ -58,7 +58,7 @@ public class KateController : MonoBehaviour,  INetworkObject
         {
             case(KateState.Sitting):
             {
-                ref List<PlayerController> pcs = ref UberManager.Singleton().players_controller;
+                ref List<PlayerController> pcs = ref UberManager.Singleton().playerControllers;
                 
                 float closestDistanceSqr = float.MaxValue;
                 

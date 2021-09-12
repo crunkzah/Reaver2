@@ -26,7 +26,7 @@ public class PlatformPassiveAnimator01 : MonoBehaviour, ISceneSyncable
     
     void Start()
     {
-        PhotonManager.Singleton().SubscribeToOnSceneSync(this.gameObject);
+        //PhotonManager.Singleton().SubscribeToOnSceneSync(this.gameObject);
         
         InitialInit();        
         

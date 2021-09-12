@@ -653,7 +653,7 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
         {
             case(PadlaLongState.Idle):
             {
-                if(canSendCommands)
+                if(canSendCommands && UberManager.readyToSwitchLevel)
                 {
                     Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
                     if(potentialTarget)
@@ -683,7 +683,7 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
                     
                     Vector3 padlaLongPosition = thisTransform.localPosition;
                     
-                    if(canSendCommands)
+                    if(canSendCommands && UberManager.readyToSwitchLevel)
                     {
                         if(stomp_timer > stomp_cooldown &&  Math.SqrDistance(targetGroundPos, padlaLongPosition) < stomp_distance  * stomp_distance)
                         {
@@ -716,7 +716,7 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
                 }
                 else
                 {
-                    if(canSendCommands)
+                    if(canSendCommands && UberManager.readyToSwitchLevel)
                     {
                         Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
                         if(potentialTarget)
@@ -742,7 +742,7 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
             {
                 brainTimer += dt;
                 
-                if(canSendCommands)
+                if(canSendCommands && UberManager.readyToSwitchLevel)
                 {
                     if(brainTimer > stomp_duration)
                     {
@@ -808,7 +808,7 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
         {
             //Vector3 clap_pos = thisTransform.localPosition + new Vector3(Random.Range(-1f, 1f), 0.0f, Random.Range(-1f, 1f)) * 5;
             
-            InGameConsole.LogOrange("Players count is <color=yellow>" + UberManager.Singleton().players_controller.Count.ToString() + "</color>");
+            InGameConsole.LogOrange("Players count is <color=yellow>" + UberManager.Singleton().playerControllers.Count.ToString() + "</color>");
             
             if(IsTargetValid())
             {
@@ -971,19 +971,23 @@ public class PadlaLongController : MonoBehaviour, INetworkObject, IDamagableLoca
     {
         Transform result = null;
         
-        int len = NPCManager.Singleton().aiTargets.Count;
+        ref List<PlayerController> pcs = ref UberManager.Singleton().playerControllers;
+        int len = pcs.Count;
         
         float minDistanceSqr = float.MaxValue;
         
         for(int i = 0; i < len; i++)
         {
-            Transform potentialTarget = NPCManager.Singleton().aiTargets[i];
-            float distSqr = Math.SqrDistance(seekerPos, potentialTarget.position);
-            
-            if(distSqr <  minDistanceSqr)
+            PlayerController potentialTarget = pcs[i];
+            if(pcs[i].isAlive)
             {
-                minDistanceSqr = distSqr;
-                result = potentialTarget;
+                float distSqr = Math.SqrDistance(seekerPos, potentialTarget.GetGroundPosition());
+                
+                if(distSqr <  minDistanceSqr)
+                {
+                    minDistanceSqr = distSqr;
+                    result = potentialTarget.thisTransform;
+                }
             }
         }
         

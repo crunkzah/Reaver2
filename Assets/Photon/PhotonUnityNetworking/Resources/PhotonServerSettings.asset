@@ -73,4 +73,6 @@ MonoBehaviour:
   - OnSlideEnded
   - OnSlideStarted
   - DieRPC
+  - ReviveWithPenalty
+  - MakeAlive
   DisableAutoOpenWizard: 1

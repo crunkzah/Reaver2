@@ -529,15 +529,14 @@ MonoBehaviour:
   swingingDampTime: 0
   rtt: 0
   rttInSeconds: 0
-  noStaminaClip: {fileID: 8300000, guid: dec7b82ffdd7225459b8e803b25d1949, type: 3}
-  slamDirectDamageClip: {fileID: 8300000, guid: 4802fb1cb21a055488148c0267841059,
-    type: 3}
+  noStaminaClip: {fileID: 0}
+  slamDirectDamageClip: {fileID: 0}
   wind_player_ps: {fileID: 3108872136011371129}
-  dashAudioClip: {fileID: 8300000, guid: 05cdc2c328fb05149abf0b60581081a3, type: 3}
+  dashAudioClip: {fileID: 8300000, guid: 86ba6ff01090e5b41bf6723a8a2d06d8, type: 3}
   tryingToSlam: 0
   fpsWeaponPlaceMover: {fileID: 7057098966988756362}
   secondJumpHappened: 0
-  OnBecomeGroundedClip: {fileID: 8300000, guid: 431299604e6f4dd439308dc0e1f4db47,
+  OnBecomeGroundedClip: {fileID: 8300000, guid: bf24870d2f2ed50429cf30fdd78f50f9,
     type: 3}
   fpsCam_anim_recoil: {fileID: 0}
   slamLaunch_ps: {fileID: 6230563382331038198}
@@ -561,12 +560,11 @@ MonoBehaviour:
   Stamina: 0
   hpPercentage: 1
   hurtLocalClip: {fileID: 8300000, guid: 10f4bf71eaff3d84eb346ad351043443, type: 3}
-  launchClip: {fileID: 8300000, guid: c7ab22651f174f74d9231be18119f9d7, type: 3}
-  jumpLocalClip: {fileID: 8300000, guid: 8bcabea979b1bef4ca0f98c77140f275, type: 3}
-  jumpSlideLocalClip: {fileID: 8300000, guid: 51fdd1dc1c319e141b43b94a5fe845f0, type: 3}
-  jumpSecondLocalClip: {fileID: 8300000, guid: 1eaeaf53070131d44b151a83c1b5f29b, type: 3}
-  jumpWallLocalClip: {fileID: 8300000, guid: ccf8921bbd47fca4e8fbfc195d435096, type: 3}
-  dash: {fileID: 0}
+  launchClip: {fileID: 8300000, guid: a4fb0e3d75e43a041974da9f5eb7ff6e, type: 3}
+  jumpLocalClip: {fileID: 8300000, guid: 50a15e1f150c09a49ba4520b36ab7e9c, type: 3}
+  jumpSlideLocalClip: {fileID: 8300000, guid: a4fb0e3d75e43a041974da9f5eb7ff6e, type: 3}
+  jumpSecondLocalClip: {fileID: 8300000, guid: a4ffff33da49aeb44af010cc16ed0c0f, type: 3}
+  jumpWallLocalClip: {fileID: 8300000, guid: 93a6ee0bd8cb40e46bae55997d8d2ff2, type: 3}
 --- !u!114 &3721719949410401715
 MonoBehaviour:
   m_ObjectHideFlags: 0

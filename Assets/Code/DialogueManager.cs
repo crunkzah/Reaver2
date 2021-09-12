@@ -262,7 +262,7 @@ public class DialogueManager : MonoBehaviour
     
     void SetState(DialogueState _state)
     {
-        InGameConsole.LogOrange("SetState: " + _state.ToString());
+        //InGameConsole.LogOrange("SetState: " + _state.ToString());
         switch(_state)
         {
             case(DialogueState.Hidden):

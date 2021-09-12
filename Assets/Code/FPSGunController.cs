@@ -2029,7 +2029,7 @@ public class FPSGunController : MonoBehaviour
     {
         //GunType gun = inventory[currentSlotPositionInInventory];
         GunType gun = GetCurrentWeaponInHands();
-        InGameConsole.LogOrange(string.Format("WieldGunFPS(): gun to wield is <color=yellow>{0}</color>", gun.ToString()));
+        //InGameConsole.LogOrange(string.Format("WieldGunFPS(): gun to wield is <color=yellow>{0}</color>", gun.ToString()));
         
         if(pv.IsMine)
         {
@@ -2805,7 +2805,7 @@ public class FPSGunController : MonoBehaviour
         GameObject obj = ObjectPool.s().Get(ObjectPoolKey.Kaboom1, false);
             
         bool isMine = pv.IsMine;
-        obj.GetComponent<Kaboom1>().ExplodeDamageHostile(shotPos, 6, 38, 800, isMine, true, 10);
+        obj.GetComponent<Kaboom1>().ExplodeDamageHostile(shotPos, 6, 38, 800, isMine, true, 15);
     }
     
     void ShootRevolver_Stronger(Vector3 shotPos, Vector3 hitScanDirection)
@@ -3420,13 +3420,7 @@ public class FPSGunController : MonoBehaviour
     void ShootRocketLauncher(Vector3 shotPos, Vector3 direction)
     {
         GameObject bullet = ObjectPool.s().Get(ObjectPoolKey.RocketLauncher_rocket);
-                
         BulletController bulletController = bullet.GetComponent<BulletController>();
-        
-        // if(playerGunLight)
-        // {
-        //     playerGunLight.ShootRocketLauncher();
-        // }
         
         if(pv.IsMine)
         {
@@ -3435,8 +3429,6 @@ public class FPSGunController : MonoBehaviour
             
             rocketLauncher.OnShoot();
         }
-        
-        //rocketLauncher_animatorFPS.SetTrigger("Fire1");
         
         if(gunAudio)
         {
@@ -3450,7 +3442,8 @@ public class FPSGunController : MonoBehaviour
         bulletController.explosionRadius = 4.5f;
         bulletController.explosionForce = 36;
         bulletController.explosionDamage = 400;
-        bulletController.explosionCanDamageLocalPlayer = false;
+        bulletController.explosionPlayerDamage = 10;
+        bulletController.explosionCanDamageLocalPlayer = true;
         bulletController.explosionCanDamageNPCs = true;
     }
     
@@ -3506,23 +3499,6 @@ public class FPSGunController : MonoBehaviour
             
             angle += angleStep;
         }
-        
-        // for(int i = 0; i < shotgunPelletCount_Alt - 1; i++)
-        // {
-        //     Vector3 rotatedOrtho = Quaternion.AngleAxis(20 * (i+1), shotDir) * ortho;
-        //     Vector3 offsettedOrigin = shotPos + rotatedOrtho * shotgunSpread_Alt;
-            
-        //     bullet = ObjectPool.s().Get(ObjectPoolKey.Shotgun_bullet_alt);    
-        //     bulletController = bullet.GetComponent<BulletController>();
-            
-        //     Vector3 offset_direction = (offsettedOrigin - shotPos).normalized;
-        //     Vector3 altered_direction = ray.direction + offset_direction * 0.033F;
-        //     altered_direction.Normalize();
-            
-        //     bulletController.LaunchAsSphere(shotPos, altered_direction, 0.1f, bulletMask, pellet_speed, shotgunDmgPellet_Alt, isMine);
-        //     bulletController.time_to_be_alive = 2F;
-        //     bulletController.on_die_behave = BulletOnDieBehaviour.Default;
-        // }
     }
     
     int BaseFire1_hash;
@@ -3593,9 +3569,6 @@ public class FPSGunController : MonoBehaviour
             OnHitScan(shotPos + hitScanDirection * ray_max_distance, hitScanDirection, -hitScanDirection, revolverDmg, null);
         }
     }
-    
-    
-    
     
     void ShootARGhost_HitScan(Vector3 shotPos, Vector3 hitScanDirection)
     {

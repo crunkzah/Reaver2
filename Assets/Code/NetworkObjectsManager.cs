@@ -16,7 +16,8 @@ public enum GlobalCommand : byte
     AddEnemiesAlive,
     ShowRunStats,
     SetSavePoint,
-    LoadLevel
+    LoadLevel,
+    SavePointActivated
 }
 
 [System.Serializable]
@@ -1142,12 +1143,12 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
         commands_to_exclude_from_log.Add(NetworkCommand.LaunchAirborne);
         commands_to_exclude_from_log.Add(NetworkCommand.LaunchAirborneUp);
         
-        commands_to_exclude_from_log.Add(NetworkCommand.Ability1);
-        commands_to_exclude_from_log.Add(NetworkCommand.Ability2);
-        commands_to_exclude_from_log.Add(NetworkCommand.Ability3);
+        //commands_to_exclude_from_log.Add(NetworkCommand.Ability1);
+       // commands_to_exclude_from_log.Add(NetworkCommand.Ability2);
+        //commands_to_exclude_from_log.Add(NetworkCommand.Ability3);
         
-        commands_to_exclude_from_log.Add(NetworkCommand.OpenGates);
-        commands_to_exclude_from_log.Add(NetworkCommand.LockGates);
+        //commands_to_exclude_from_log.Add(NetworkCommand.OpenGates);
+        //commands_to_exclude_from_log.Add(NetworkCommand.LockGates);
     }
 
     [PunRPC]
@@ -1265,12 +1266,35 @@ public class NetworkObjectsManager : MonoBehaviour, IOnEventCallback//MonoBehavi
             }
             case(GlobalCommand.LoadLevel):
             {
-                //PlayerController local_pc
                 int levelToLoad = (int)args[0];
-                //AudioManager.AddEnemiesAlive(enemiesToAdd);
                 
                 PhotonNetwork.LoadLevel(levelToLoad);
-                //UberManager.Load_Level_Locally(levelToLoad);
+                break;
+            }
+            case(GlobalCommand.SavePointActivated):
+            {
+                // if(PhotonNetwork.IsMasterClient)
+                // {
+                //     ref List<PlayerController> players = ref UberManager.Singleton().playerControllers;
+                    
+                //     for(int i = 0; i < players.Count; i++)
+                //     {
+                //         if(players[i] && !players[i].isAlive)
+                //         {
+                //             players[i].pv.RPC("ReviveWithPenalty", RpcTarget.)
+                //         }
+                //     }
+                // }
+                
+                PlayerController myPlayer = PhotonManager.GetLocalPlayer();
+                if(myPlayer)
+                {
+                    if(!myPlayer.isAlive)
+                    {
+                        myPlayer.ReviveWithPenalty(0.25f);
+                    }
+                }
+                
                 break;
             }
             default:

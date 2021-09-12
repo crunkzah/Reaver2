@@ -348,7 +348,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
         {
             case(OliosState.Idle):
             {
-                if(canSendCommands)
+                if(canSendCommands && UberManager.readyToSwitchLevel)
                 {
                     Transform potentialTarget = ChooseTargetClosest(parentTransform.localPosition);
                     if(potentialTarget)
@@ -374,7 +374,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
                     if(changeTargetTimer > changeTargetCooldown)
                     {
                         changeTargetTimer = 0;
-                        if(canSendCommands)
+                        if(canSendCommands && UberManager.readyToSwitchLevel)
                         {
                             Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
                             if(potentialTarget.GetInstanceID() != target_pc.thisTransform.GetInstanceID())
@@ -392,7 +392,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
                     
                     if(moveTimer > moveCooldown)
                     {
-                        if(canSendCommands)
+                        if(canSendCommands && UberManager.readyToSwitchLevel)
                         {
                             moveTimer = 0;
                             
@@ -429,7 +429,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
                     
                     if(brainTimer > strikeCooldown_major)
                     {
-                        if(canSendCommands)
+                        if(canSendCommands && UberManager.readyToSwitchLevel)
                         {
                             OliosState _state = OliosState.Striking_direct;
                             //Vector3 _strike_pos = parentTransform.localPosition;
@@ -509,7 +509,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
                 }
                 else
                 {
-                    if(canSendCommands)
+                    if(canSendCommands && UberManager.readyToSwitchLevel)
                     {
                         Transform potentialTarget = ChooseTargetClosest(parentTransform.localPosition);
                         if(potentialTarget)
@@ -530,7 +530,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
                 brainTimer += dt;
                 if(brainTimer > strikeDirect_attackTime)
                 {
-                    if(canSendCommands)
+                    if(canSendCommands && UberManager.readyToSwitchLevel)
                     {
                         LockSendingCommands();
                         NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Attack);
@@ -543,7 +543,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
                 brainTimer += dt;
                 if(brainTimer > strikeHor_attackTime)
                 {
-                    if(canSendCommands)
+                    if(canSendCommands && UberManager.readyToSwitchLevel)
                     {
                         LockSendingCommands();
                         NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability1);
@@ -556,7 +556,7 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
                 brainTimer += dt;
                 if(brainTimer > strikeVert_attackTime)
                 {
-                    if(canSendCommands)
+                    if(canSendCommands && UberManager.readyToSwitchLevel)
                     {
                         LockSendingCommands();
                         NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability2);
@@ -1136,19 +1136,23 @@ public class OliosController : MonoBehaviour, IDamagableLocal, INetworkObject, I
     {
         Transform result = null;
         
-        int len = NPCManager.Singleton().aiTargets.Count;
+        ref List<PlayerController> pcs = ref UberManager.Singleton().playerControllers;
+        int len = pcs.Count;
         
         float minDistanceSqr = float.MaxValue;
         
         for(int i = 0; i < len; i++)
         {
-            Transform potentialTarget = NPCManager.Singleton().aiTargets[i];
-            float distSqr = Math.SqrDistance(seekerPos, potentialTarget.position);
-            
-            if(distSqr <  minDistanceSqr)
+            PlayerController potentialTarget = pcs[i];
+            if(pcs[i].isAlive)
             {
-                minDistanceSqr = distSqr;
-                result = potentialTarget;
+                float distSqr = Math.SqrDistance(seekerPos, potentialTarget.GetGroundPosition());
+                
+                if(distSqr <  minDistanceSqr)
+                {
+                    minDistanceSqr = distSqr;
+                    result = potentialTarget.thisTransform;
+                }
             }
         }
         

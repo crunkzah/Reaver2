@@ -101,16 +101,21 @@ public class Checkpoint : MonoBehaviour, INetworkObject
         
         if(PhotonNetwork.IsMasterClient)
         {
-            if(messages_on_load != null)
-            {
-                for(int i = 0; i < messages_on_load.Length; i++)
-                {
-                    if(messages_on_load[i].net_comp)
-                        NetworkObjectsManager.CallNetworkFunction(messages_on_load[i].net_comp.networkId, messages_on_load[i].command);
-                }
-            }
+            Invoke(nameof(OnLoadedToThisSavePointMasterSide), 0.15f);
         }
         InGameConsole.LogFancy("LoadToThisSavePoint(), checkPointPriority is " + this.checkPointPriority);
+    }
+    
+    void OnLoadedToThisSavePointMasterSide()
+    {
+        if(messages_on_load != null)
+        {
+            for(int i = 0; i < messages_on_load.Length; i++)
+            {
+                if(messages_on_load[i].net_comp)
+                    NetworkObjectsManager.CallNetworkFunction(messages_on_load[i].net_comp.networkId, messages_on_load[i].command);
+            }
+        }
     }
     
     static int playersMask = -1;
@@ -246,7 +251,7 @@ public class Checkpoint : MonoBehaviour, INetworkObject
     {
         bool Result = false;
         
-        ref List<PlayerController> pcs = ref UberManager.Singleton().players_controller;
+        ref List<PlayerController> pcs = ref UberManager.Singleton().playerControllers;
         int playersCount = pcs.Count;
         //int playersCount = NPCManager.AITargets().Count;
         
@@ -458,6 +463,7 @@ public class Checkpoint : MonoBehaviour, INetworkObject
                     if(CheckIfPlayersInArea())
                     {
                         LockSendingCommands();
+                        NetworkObjectsManager.CallGlobalCommand(GlobalCommand.SavePointActivated, RpcTarget.All, this.checkPointPriority);
                         NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability1);
                     }
                 }

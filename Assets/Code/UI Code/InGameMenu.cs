@@ -85,7 +85,7 @@ public class InGameMenu : MonoBehaviour
     
     void _ShowInGameMenu()
     {
-        InGameConsole.LogFancy("ShowInGameMenu");
+        //InGameConsole.LogFancy("ShowInGameMenu");
         UberManager.PauseGame();
         
         if(PlayerPrefs.GetInt("Fogs", 1) == 1)
@@ -139,30 +139,36 @@ public class InGameMenu : MonoBehaviour
         }
     }
     
- 
-    
-    
-    
+    public void RestartFromCheckPointButton()
+    {
+        if(PhotonNetwork.IsMasterClient)
+        {
+            Hide();
+            
+            //UberManager.Singleton().ReloadLevel();
+            UberManager.ReloadLevelToSavepointWithCoroutine();
+        }
+    }
     
     void SaveSettingsFromInGameMenu()
     {
-        InGameConsole.LogOrange("Saving settings form HideInGameMenu()");
+        //InGameConsole.LogOrange("Saving settings form HideInGameMenu()");
             
-            if(fogs_toggle.isOn)
-            {
-                PlayerPrefs.SetInt("Fogs", 1);
-            }
-            else
-            {
-                PlayerPrefs.SetInt("Fogs", 0);
-            }
-            currentMusicVolumeOnSlider = musicScrollbar.value;
-            currentMusicVolumeOnSlider = Mathf.Clamp(currentMusicVolumeOnSlider, 0.0001f, 1f);
-            PlayerPrefs.SetFloat("MV", currentMusicVolumeOnSlider);
-            
-            currentEffectsVolumeOnSlider = effectsScrollbar.value;
-            currentEffectsVolumeOnSlider = Mathf.Clamp(currentEffectsVolumeOnSlider, 0.0001f, 1f);
-            PlayerPrefs.SetFloat("EV", currentEffectsVolumeOnSlider);
+        if(fogs_toggle.isOn)
+        {
+            PlayerPrefs.SetInt("Fogs", 1);
+        }
+        else
+        {
+            PlayerPrefs.SetInt("Fogs", 0);
+        }
+        currentMusicVolumeOnSlider = musicScrollbar.value;
+        currentMusicVolumeOnSlider = Mathf.Clamp(currentMusicVolumeOnSlider, 0.0001f, 1f);
+        PlayerPrefs.SetFloat("MV", currentMusicVolumeOnSlider);
+        
+        currentEffectsVolumeOnSlider = effectsScrollbar.value;
+        currentEffectsVolumeOnSlider = Mathf.Clamp(currentEffectsVolumeOnSlider, 0.0001f, 1f);
+        PlayerPrefs.SetFloat("EV", currentEffectsVolumeOnSlider);
     }
     
     void _HideInGameMenu()
@@ -189,12 +195,10 @@ public class InGameMenu : MonoBehaviour
     
     public void GoToMainMenu()
     {
-        
         if(PhotonNetwork.InRoom)
         {
             PhotonNetwork.LeaveRoom();
         }
-        
         
         UberManager.Load_Level_Locally(0);
     }

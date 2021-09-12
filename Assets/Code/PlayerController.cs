@@ -253,36 +253,32 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
     }
     
-    void Revive()
+    [PunRPC]
+    void MakeAlive(bool _isAlive)
     {
-        PhotonManager.wasFirstPlayerSpawned = true;
-        
+        isAlive = _isAlive;
+    }
+    
+    
+    public void ReviveWithPenalty(float penaltyPercent)
+    {
         if(pv.IsMine)
         {
             Invoke(nameof(SetFPSCameraToPlayer), 0.05f);
-            //SetFPSCameraToPlayer();
             PostProcessingController2.SetState(PostProcessingState.Normal);  
             OrthoCamera.Hide();
             DeadGUI.Hide();
-               
-            //playerCamera.GetComponent<FollowingCamera>().SetTarget(this.transform);
+            Stamina = MaxStamina;
+            HitPoints = (int)((float)MaxHealth * penaltyPercent);
+            pv.RPC(nameof(MakeAlive), RpcTarget.Others, true);
         }
         
-        HitPoints = MaxHealth;
         isAlive = true;
         
-        Stamina = MaxStamina;
-        
-        NPCManager.Singleton().RegisterAiTarget(this.transform);
-        
-        
         Ray ray = new Ray(transform.position, Vector3.down);
-        
         Vector3 particlesPos = transform.position;
         RaycastHit hit;
-        
-        int groundMask = LayerMask.GetMask("Ground");
-        
+                
         if(Physics.Raycast(ray, out hit, 10f, groundMask))
         {
             particlesPos = hit.point;
@@ -291,7 +287,32 @@ public class PlayerController : MonoBehaviour, IPunObservable
         ParticlesManager.PlayPooled(ParticleType.player_spawn_ps, particlesPos, Vector3.forward);
     }
     
-    
+    void Revive()
+    {
+        if(pv.IsMine)
+        {
+            Invoke(nameof(SetFPSCameraToPlayer), 0.05f);
+            PostProcessingController2.SetState(PostProcessingState.Normal);  
+            OrthoCamera.Hide();
+            DeadGUI.Hide();
+            Stamina = MaxStamina;
+            HitPoints = MaxHealth;
+            pv.RPC(nameof(MakeAlive), RpcTarget.Others, true);
+        }
+        
+        isAlive = true;
+        Ray ray = new Ray(transform.position, Vector3.down);
+        
+        Vector3 particlesPos = transform.position;
+        RaycastHit hit;
+        
+        if(Physics.Raycast(ray, out hit, 10f, groundMask))
+        {
+            particlesPos = hit.point;
+        }
+        
+        ParticlesManager.PlayPooled(ParticleType.player_spawn_ps, particlesPos, Vector3.forward);
+    }
 
     bool isGrounded = false;
     
@@ -499,7 +520,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     public Transform fpsWallJumpSensor;
     bool makeMouseSensitivityUniversal = false;
     public float fpsMouseSens = 1f;
-    const float baseMoveSpeed = 9.0F;
+    const float baseMoveSpeed = 10.0F;
     float fpsMaxMoveSpeedCurrent = 12.5f;
     
     float bunnyHopSpeedMult = bunnyHopMinMult;
@@ -979,7 +1000,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     void FPSDashFX()
     {
-        playerAudioSource.PlayOneShot(dashAudioClip, 0.5f);
+        playerAudioSource.PlayOneShot(dashAudioClip, 0.75f);
     }
     
     Vector3 GetTopCapsuleP()
@@ -1114,7 +1135,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
         if(pv.IsMine)
         {
             //tryingToSlam = false;
-            CameraShaker.ShakeY(6.2f);
+            //CameraShaker.ShakeY(6.2f);
+            CameraShaker.ShakeY(3.2f);
             CameraShaker.MakeTrauma(1f);
         }
     }
@@ -1191,7 +1213,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
         { 
             onBecomeGrounded_timeStamp = Time.time;
             //InGameConsole.LogFancy("onBecomeGrounded_timeStamp: " + onBecomeGrounded_timeStamp);
-            CameraShaker.ShakeY(6f);
             
             velocityBeforeGrounded = fpsVelocity;
             //InGameConsole.LogOrange(string.Format("<b>VelocityBeforeGrounded:</b> <color=yellow>{0}</color>", velocityBeforeGrounded));
@@ -1201,7 +1222,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
             
             if(Math.SqrMagnitude(velocityBeforeGrounded) > 16f * 16f)
             {
-                playerAudioSource.PlayOneShot(OnBecomeGroundedClip, 1f);
+                CameraShaker.ShakeY(3.2f);
+                playerAudioSource.PlayOneShot(OnBecomeGroundedClip, 0.9f);
             }
         }
     }
@@ -1665,7 +1687,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             //         // }
             //     // }
             // }
-            playerAudioSource.PlayOneShot(jumpLocalClip, 1f);
+            playerAudioSource.PlayOneShot(jumpLocalClip, 0.7f);
         }
         
         
@@ -1728,8 +1750,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         return new Ray(GunMiddlePoint_FPS.position, GunLowerPoint_FPS.forward);
     }
-    
-    
     
     public bool CheckIfFPSRayObscure()
     {
@@ -1893,10 +1913,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
                 rttSendTimer = 0;
             }
             //InGameConsole.LogFancy(string.Format("ViewID <color={1}>{0}</color> hpPercentage is: {2}", pv.ViewID, (pv.IsMine ? "green" : "#eb9534"), hpPercentage.ToString()));
-        }
-        else
-        {
-            rttSendTimer += dt;
         }
     }
     
@@ -2254,7 +2270,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
             return;
         }
         
-        
         if(Math.Abs(Time.time - TimeWhenTookDamage) < takeDamageImmunityDuration)
         {
             //InGameConsole.LogFancy("DAMAGE WAS IGNORED");
@@ -2304,7 +2319,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         if(pv.IsMine)
         {
-            //PostProcessingController.AddSaturation(-0.15f);
             CameraShaker.MakeTrauma(0.45f * Mathf.InverseLerp(1, 100, dmg));
             playerAudioSource.PlayOneShot(hurtLocalClip, 1f);
             HurtGUI.ShowHurt();
@@ -2316,16 +2330,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
     
     public void OnDestroyCustom()
     {
-        // if(NPCManager.Singleton() != null)
-        // {
-        //     if(this.transform != null)
-        //     {
-        //         NPCManager.Singleton().UnregisterAiTarget(this.transform);
-        //     }
-        // }
        if(pv.IsMine && FollowingCamera.Singleton() && fpsCameraPlace.childCount > 0)
        {
-            
             Transform _camTr = FollowingCamera.Singleton().transform;
             _camTr.SetParent(null);
             _camTr.localPosition  = new Vector3(0, 8, 0);
@@ -2341,7 +2347,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
                 if(_camCol)
                     Destroy(_camCol);
             }
-            // fpsCam_transform = null;
             fpsCam_camera = null;
             fpsCam_weaponView_cam = null;
             GameStats.Hide();
@@ -2351,29 +2356,13 @@ public class PlayerController : MonoBehaviour, IPunObservable
        {
             Destroy(playerLight.gameObject);
        } 
-       
-       if(dash)
-       {
-           Destroy(dash.gameObject);
-       }
-       
     }
     
     void OnDestroy()
     {
-        if(NPCManager.Singleton())
-        {
-            NPCManager.Singleton().aiTargets.Remove(this.transform);
-        }
-        
-        // if(UnityEngine.SceneManagement.SceneManager. pv.IsMine)
-        // {
-        //PhotonManager.Singleton().DestroyMyPlayer();
-        //}
-        
         if(UberManager.Singleton())
         {
-            if((UberManager.Singleton().players != null) && (UberManager.Singleton().players_controller != null))
+            if((UberManager.Singleton().players != null) && (UberManager.Singleton().playerControllers != null))
                 UberManager.Singleton().RemovePlayerFromList(this.gameObject);
         }
         
@@ -2383,92 +2372,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             {
                 Destroy(playerLight.gameObject);
             } 
-            
-            if(dash)
-            {
-                Destroy(dash.gameObject);
-            }
-            
         }
-    }
-    
-    [PunRPC]
-    void DashFXStart()
-    {
-        if(!pv.IsMine)
-            player_renderer.enabled = false;
-        dash.Play();
-    }
-    
-    [PunRPC]
-    void DashFXEnd()
-    {
-        if(!pv.IsMine)
-            player_renderer.enabled = true;
-        dash.Stop();
-    }
-    
-    
-    
-    public PlayerDash dash;
-    //const float dash_cooldown = 0.55f;
-    const float dash_duration = 0.25f;
-    float dash_timer = 0f;
-    float dash_speed = 36f;
-    
-    Vector3 dash_dir;
-    
-    void Dashing_Update()
-    {
-        if(isAlive)
-        {
-            float dt = UberManager.DeltaTime();
-            
-            Vector3 _dash_dir = new Vector3(0, 0, 1);
-            GetDirectionFromMouse2(Input.mousePosition, ref _dash_dir);
-            
-            if(aliveState == PlayerAliveState.Dashing)
-            {
-                dash_timer += dt;
-                if(dash_timer > dash_duration)
-                {
-                    aliveState = PlayerAliveState.Normal;
-                    pv.RPC("DashFXEnd", RpcTarget.All);
-                    //DashFXEnd();
-                }
-                else
-                {
-                    Vector3 dash_vel = dash_dir * dash_speed;
-                    controller.Move(dash_vel * dt);
-                }
-            }
-            else
-            {
-                if(Input.GetMouseButtonDown(1))    
-                {
-                    Vector3 mouse_pos = Input.mousePosition;
-                    
-                    Dash(_dash_dir);
-                }
-            }
-        }
-    }
-    
-   
-    
-    void Dash(Vector3 _dir)
-    {
-        // InGameConsole.LogFancy(string.Format("Dashing! {0}", _dir));
-        dash_dir = _dir;
-        //externalVelocity = velocity = Vector3.zero;
-        
-        velocity.y = MIN_GRAVITY;
-        velocity.x = velocity.z = 0;
-        
-        aliveState = PlayerAliveState.Dashing;
-        dash_timer = 0f;
-        
-        pv.RPC("DashFXStart", RpcTarget.All);
     }
     
     void OnDieDestroyFPSGUNS()
@@ -2496,11 +2400,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         if(!isAlive)
             return;
-        
-        if(NPCManager.Singleton() != null)
-        {
-            NPCManager.Singleton().UnregisterAiTarget(this.transform);
-        }
         
         if(pv.IsMine)
         {

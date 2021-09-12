@@ -102,7 +102,7 @@ public class PostProcessingController2 : MonoBehaviour
     void _SetState(PostProcessingState _state)
     {
         state = _state;
-        InGameConsole.LogFancy("PostProcessingController2: state is <color=yellow>" + _state + "</color>");
+        //InGameConsole.LogFancy("PostProcessingController2: state is <color=yellow>" + _state + "</color>");
     }
     
     void _SetState_Immediately(PostProcessingState _state)

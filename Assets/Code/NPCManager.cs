@@ -16,11 +16,6 @@ public class NPCManager : MonoBehaviour {
     }
     #endregion
 
-    //public Transform[] aiTargets;
-    public List<Transform> aiTargets = new List<Transform>();
-    
-    
-    public List<CoverForNPC> covers = new List<CoverForNPC>(16);
     
     public const int killablesMaxNum = 128;
     //static bool wasKillablesInit = false;
@@ -52,80 +47,6 @@ public class NPCManager : MonoBehaviour {
     {
         killables.Remove(_killable);
     }
-    
-    public void AddCover(CoverForNPC _cover)
-    {
-        covers.Add(_cover);
-    }
-    
-    
-    public static ref List<Transform> AITargets()
-    {
-        return ref Singleton().aiTargets;
-    }
-    
-    public bool GetClosestCover(Vector3 hiderPos, Transform target, ref Cover coverSpot, float maxDistance)
-    {
-        if(target == null)
-        {
-            return false;
-        }
-        
-        CoverForNPC closestCover = null;
-        int len = covers.Count;
-        
-        float closestDistanceSqr = maxDistance * maxDistance;
-        
-        for(int i = 0; i < len; i++)
-        {
-            float distanceSqr = Math.SqrMagnitude(covers[i].worldPos - hiderPos);
-            
-            if(distanceSqr < closestDistanceSqr && covers[i].HasFreeSpots())
-            {
-                closestDistanceSqr = distanceSqr;
-                closestCover = covers[i];
-            }
-        }
-        
-        if(closestCover != null)
-        {
-            len = closestCover.spots.Length;
-            
-            float dot = -1;
-            
-            Vector3 targetToCoverDir = (closestCover.worldPos - target.position);
-            
-            for(int i = 0; i < len; i++)
-            {
-                if(closestCover.spots[i].isOccupied)
-                    continue;
-                
-                dot = Vector3.Dot(targetToCoverDir, closestCover.spots[i].spot.transform.forward);
-                if(dot > 0)
-                {
-                    coverSpot = closestCover.spots[i];
-                    // InGameConsole.LogFancy("Found <color=yellow>spot</color>!");
-                    return true;
-                }
-            }
-        }
-        
-        // InGameConsole.LogFancy("<color=yellow>Spot</color> was <color=red>not</color> found.");
-        return false;
-    }
-    
-    void Update()
-    {
-        int len = aiTargets.Count;
-        for(int i = 0; i < len; i++)
-        {
-            if(aiTargets[i] == null)
-            {
-                aiTargets.RemoveAt(i);
-                InGameConsole.LogFancy("Removed PlayerController from AI targets list");
-            }
-        }
-    }
         
     void Awake()
     {
@@ -139,50 +60,6 @@ public class NPCManager : MonoBehaviour {
             Destroy(this.gameObject);
         }
     }
-    
-    public void UnregisterAiTarget(Transform targetToRemove)
-    {
-        if(targetToRemove == null)
-        {
-            return;
-        }
-        //InGameConsole.LogOrange(string.Format("UnregisterAiTarget({0})", targetToRemove.gameObject.name));
-        if(aiTargets != null)
-        {
-            if(aiTargets.Contains(targetToRemove))
-            {
-                InGameConsole.LogOrange(string.Format("Removed <color=blue>{0}</color> from AI targets", targetToRemove.gameObject.name));
-                aiTargets.Remove(targetToRemove);
-            }
-            else
-            {
-                InGameConsole.Log(string.Format("<color=red>NPCManager does not contain <color=blue>{0}</color> in AI targets</color>", targetToRemove.gameObject.name));
-            }
-        }
-    }
-    
-    public void RegisterAiTarget(Transform targetToAdd)
-    {
-        InGameConsole.LogOrange("TryingToRegister" + targetToAdd.gameObject.name);
-        if(!aiTargets.Contains(targetToAdd))
-        {
-            aiTargets.Add(targetToAdd);
-        }
-    }
-
-   
-
-    // void FindAiTargets(out Transform[] targets)
-    // {
-    //     GameObject[] targetsObj = GameObject.FindGameObjectsWithTag("Player");
-    //     targets = new Transform[targetsObj.Length];
-    //     for(int i = 0; i < targets.Length; i++)
-    //     {
-    //         targets[i] = targetsObj[i].transform;
-    //         Debug.Log("Found " + targets[i].name + " as target for AI");
-    //     }
-        
-    // }
     
     static Vector3 targetOffsetPos = new Vector3(0f, 0.65f, 0f);
     

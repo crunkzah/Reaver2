@@ -169,24 +169,24 @@ public class Boss01Controller : MonoBehaviour, INetworkObject
         {
             case(Boss01State.Idle):
             {
-                for(int i = 0; i < NPCManager.Singleton().aiTargets.Count; i++)
-                {
-                    Transform potentialTarget = NPCManager.Singleton().aiTargets[i];
+                // for(int i = 0; i < NPCManager.Singleton().aiTargets.Count; i++)
+                // {
+                //     Transform potentialTarget = NPCManager.Singleton().aiTargets[i];
                     
-                     if(NPCManager.CheckTargetVisibility(thisTransform, potentialTarget,
-                                                     sqrFatalVisionRadius, idleVisionRadiusSqr,
-                                                     idleVisionFovCos,
-                                                     eyesOffsetY, Globals.playerEyesOffset.y))
-                    {
-                        int photonViewId = potentialTarget.GetComponent<PhotonView>().ViewID;
-                        double timeToExecute = setTargetDelay + PhotonNetwork.Time;
-                        NetworkObjectsManager.ScheduleCommand(netComponent.networkId,  timeToExecute, NetworkCommand.SetTarget, photonViewId);
+                //      if(NPCManager.CheckTargetVisibility(thisTransform, potentialTarget,
+                //                                      sqrFatalVisionRadius, idleVisionRadiusSqr,
+                //                                      idleVisionFovCos,
+                //                                      eyesOffsetY, Globals.playerEyesOffset.y))
+                //     {
+                //         int photonViewId = potentialTarget.GetComponent<PhotonView>().ViewID;
+                //         double timeToExecute = setTargetDelay + PhotonNetwork.Time;
+                //         NetworkObjectsManager.ScheduleCommand(netComponent.networkId,  timeToExecute, NetworkCommand.SetTarget, photonViewId);
                         
-                        LockSendingCommands();
-                        break;
-                    }
+                //         LockSendingCommands();
+                //         break;
+                //     }
                     
-                }
+                // }
                 
                 
                 break;
@@ -375,15 +375,15 @@ public class Boss01Controller : MonoBehaviour, INetworkObject
         FollowingCamera.ShakeY(15);
         
         
-        for(int i = 0; i < NPCManager.Singleton().aiTargets.Count; i++)
-        {
-            Transform t = NPCManager.Singleton().aiTargets[i];
-            if(Math.SqrDistance(t.position, thisTransform.position) < stompRadiusSqr)
-            {
-                t.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.AllViaServer, stompDamage);
-                // _target.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.AllViaServer, slamDamage);
-            }
-        }
+        // for(int i = 0; i < NPCManager.Singleton().aiTargets.Count; i++)
+        // {
+        //     Transform t = NPCManager.Singleton().aiTargets[i];
+        //     if(Math.SqrDistance(t.position, thisTransform.position) < stompRadiusSqr)
+        //     {
+        //         t.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.AllViaServer, stompDamage);
+        //         // _target.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.AllViaServer, slamDamage);
+        //     }
+        // }
         
         
         Vector3 pos = thisTransform.position;

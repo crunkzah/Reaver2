@@ -68,7 +68,7 @@ public class UberManager : MonoBehaviour
     public Material blueDemon;
     
     public List<GameObject> players = new List<GameObject>(4);
-    public List<PlayerController> players_controller = new List<PlayerController>(4);
+    public List<PlayerController> playerControllers = new List<PlayerController>(4);
     
     public static int GetCurrentLevelIndex()
     {
@@ -88,7 +88,7 @@ public class UberManager : MonoBehaviour
         if(!players.Contains(player))
         {
             players.Add(player);
-            players_controller.Add(player.GetComponent<PlayerController>());
+            playerControllers.Add(player.GetComponent<PlayerController>());
             
             InGameConsole.LogFancy("Added player !");
         }
@@ -100,9 +100,9 @@ public class UberManager : MonoBehaviour
         {
             players.Remove(player);
             PlayerController pc = player.GetComponent<PlayerController>();
-            if(players_controller.Contains(pc))
+            if(playerControllers.Contains(pc))
             {
-                players_controller.Remove(pc);
+                playerControllers.Remove(pc);
             }
         }
     }
@@ -214,8 +214,37 @@ public class UberManager : MonoBehaviour
         }
         
         SceneManager.activeSceneChanged += OnActiveSceneChanged;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
     
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        readyToSwitchLevel = true;
+        
+        InGameConsole.LogFancy("<color=yellow>UberManager, OnSceneLoaded()</color>");
+        
+        if(scene.buildIndex > 1)
+        {
+            if(currentSavePointPriorityLevel != -1)
+            {
+                InGameConsole.LogFancy("<color=green>UberManager, OnSceneLoaded(): trying to unfuck checkpoints!</color>");
+                Checkpoint[] all_checkPoints = FindObjectsOfType<Checkpoint>();
+                int len = all_checkPoints.Length;
+                for(int i = 0; i < len; i++)
+                {
+                    if(all_checkPoints[i].checkPointPriority == currentSavePointPriorityLevel)
+                    {
+                        all_checkPoints[i].LoadToThisSavePoint();
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                InGameConsole.LogFancy("<color=red>UberManager, OnSceneLoaded(): currentSavePointPriorityLevel is -1</color>");
+            }
+        }
+    }
 
     LocalSettings local_settings;
 
@@ -332,23 +361,7 @@ public class UberManager : MonoBehaviour
         DialogueManager.HideShutter();
         OnFogsChanged(now.buildIndex);
         PartyHUD.RebuildPartyHUD();
-        if(currentSavePointPriorityLevel != -1)
-        {
-            
-        }
-        else
-        {
-             Checkpoint[] all_checkPoints = FindObjectsOfType<Checkpoint>();
-             int len = all_checkPoints.Length;
-             for(int i = 0; i < len; i++)
-             {
-                 if(all_checkPoints[i].checkPointPriority == currentSavePointPriorityLevel)
-                 {
-                     all_checkPoints[i].LoadToThisSavePoint();
-                     break;
-                 }
-             }
-        }
+        
         //timeSinceLevelLoaded = TimeSinceStart();
     }
     
@@ -471,7 +484,7 @@ public class UberManager : MonoBehaviour
     
     int screenshots = 0;
     
-    public bool readyToSwitchLevel = true;
+    public static bool readyToSwitchLevel = true;
     
     int[] targetFps = {-1, 30, 60, 120};
     int fpsIndex = 0;
@@ -494,26 +507,16 @@ public class UberManager : MonoBehaviour
         SceneManager.LoadScene(level_index);    
     }
     
-    
-    // public static void ReloadLevel()
-    // {
-    //     Singleton().ReloadLevel();
-    // }
-    
-    // void ReloadLevel()
-    // {
-    //     int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-    // }
-    
-    
-    
     public static void ReloadLevelToSavepointWithCoroutine()
     {
-        // if(PhotonNetwork.IsMasterClient)
-        // {
-        //     NetworkObjectsManager.CallGlobalCommand(GlobalCommand.SetSavePoint, RpcTarget.Others, -1);
-        //     UberManager.SetSavePointPriority(-1);
-        // }
+        if(!readyToSwitchLevel)
+        {
+            return;
+        }
+        if(PhotonNetwork.IsMasterClient)
+        {
+            NetworkObjectsManager.CallGlobalCommand(GlobalCommand.SetSavePoint, RpcTarget.Others, Singleton().currentSavePointPriorityLevel);
+        }
         Singleton()._ReloadLevelToSavepointWithCoroutine();
     }
     
@@ -524,19 +527,22 @@ public class UberManager : MonoBehaviour
     
     IEnumerator ReloadLevelSavepointCoroutine()
     {
-        //send RPC to other clients to load my scene
+        readyToSwitchLevel = false;
         int currentLevelIndex = UberManager.GetCurrentLevelIndex();
         NetworkObjectsManager.CallGlobalCommand(GlobalCommand.LoadLevel, RpcTarget.Others, currentLevelIndex);
-        //photonView.RPC("LoadLevel", RpcTarget.Others, UberManager.GetCurrentLevelIndex());
         yield return null;
-        
         PhotonNetwork.IsMessageQueueRunning = false;
         UberManager.Load_Level(currentLevelIndex); //restart the game
     }
     
+    //static bool isLoadingLevel = false;
     
     public static void ReloadLevelWithCoroutine()
     {
+        if(!readyToSwitchLevel)
+        {
+            return;
+        }
         if(PhotonNetwork.IsMasterClient)
         {
             NetworkObjectsManager.CallGlobalCommand(GlobalCommand.SetSavePoint, RpcTarget.Others, -1);
@@ -552,6 +558,7 @@ public class UberManager : MonoBehaviour
     
     IEnumerator ReloadLevelCoroutine()
     {
+        readyToSwitchLevel = false;
         //send RPC to other clients to load my scene
         int currentLevelIndex = UberManager.GetCurrentLevelIndex();
         NetworkObjectsManager.CallGlobalCommand(GlobalCommand.LoadLevel, RpcTarget.Others, currentLevelIndex);
@@ -599,9 +606,9 @@ public class UberManager : MonoBehaviour
         
         //PhotonManager.Singleton().DestroyMyPlayer();
         
-        if(readyToSwitchLevel)
-        {
-            readyToSwitchLevel = false;
+        // if(readyToSwitchLevel)
+        // {
+            //readyToSwitchLevel = false;
             
             LoadingScreen.SetOn(level_index);
             //System.GC.Collect();
@@ -611,11 +618,11 @@ public class UberManager : MonoBehaviour
                 //This means we are reloading current level
             }
             PhotonNetwork.LoadLevel(level_index);
-        }
-        else
-        {
-            InGameConsole.LogFancy("<color=yellow>Can't switch level</color>, we are <color=red>not</color> done with previous <color=green>LoadLevel()</color> command.");
-        }
+        // }
+        // else
+        // {
+        //     InGameConsole.LogFancy("<color=yellow>Can't switch level</color>, we are <color=red>not</color> done with previous <color=green>LoadLevel()</color> command.");
+        // }
     }
     
     
@@ -776,7 +783,7 @@ public class UberManager : MonoBehaviour
             if(players[i] == null)
             {
                 players.RemoveAt(i);
-                players_controller.RemoveAt(i);
+                playerControllers.RemoveAt(i);
             }
         }
     }

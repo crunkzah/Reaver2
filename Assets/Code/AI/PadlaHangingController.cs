@@ -141,87 +141,29 @@ public class PadlaHangingController : MonoBehaviour, INetworkObject, IDamagableL
         {
             case(NetworkCommand.SetTarget):
             {
-                UnlockSendingCommands();
-                int viewID = (int)args[0];
-                
-                PhotonView _pv = PhotonNetwork.GetPhotonView(viewID);
-                if(_pv)
-                {
-                    PlayerController _pc = _pv.GetComponent<PlayerController>();
-                    if(_pc)
-                    {
-                        SetTarget(_pc);
-                        SetState(PadlaState.Chasing);
-                    }
-                }
+               
                 break;
             }
             case(NetworkCommand.Move):
             {
-                UnlockSendingCommands();
-                Vector3 pos = (Vector3)args[0];
-                
-                SetMovePos(pos);                
+                        
                 break;
             }
             case(NetworkCommand.Attack):
             {
-                UnlockSendingCommands();
-                
-                if(state == PadlaState.Dead || state == PadlaState.Airbourne)
-                    return;
-                
-                Vector3 attackDashPos = (Vector3)args[0];
-                attackDashDir = (Vector3)args[1];
-                
-                brainTimer = 0;
-                attack_timer = 0;
-                
-                SetDashPos(attackDashPos);
-                
-                SetMovePos(currentDestination);
-                Punch1_L();
-                SetState(PadlaState.Attacking1);
-                
-                
+              
                 break;
             }
             case(NetworkCommand.Ability1):
             {
-                UnlockSendingCommands();
-                
-                if(state == PadlaState.Dead || state == PadlaState.Airbourne)
-                    return;
-                
-                Vector3 attackDashPos = (Vector3)args[0];
-                attackDashDir = (Vector3)args[1];
-                
-                brainTimer = 0;
-                attack_timer = 0;
-                
-                SetDashPos(attackDashPos);
-                
-                SetMovePos(currentDestination);
-                Punch1_R();
-                SetState(PadlaState.Attacking1);
-                
+              
                 
                 break;
             }
             
             case(NetworkCommand.SetState):
             {
-                UnlockSendingCommands();
-                
-                if(state == PadlaState.Dead)
-                {
-                    return;
-                }
-                
-                byte _state = (byte)args[0];
-                
-                SetState((PadlaState)_state);
-                
+              
                 break;
             }
             case(NetworkCommand.TakeDamageExplosive):
@@ -287,8 +229,6 @@ public class PadlaHangingController : MonoBehaviour, INetworkObject, IDamagableL
             case(PadlaState.Airbourne):
             {
                
-                
-                anim.Play("Base.Airbourne", 0, 0);
                 break;
             }
             case(PadlaState.Chasing):
@@ -610,123 +550,18 @@ public class PadlaHangingController : MonoBehaviour, INetworkObject, IDamagableL
         {
             case(PadlaState.Idle):
             {
-                if(canSendCommands)
-                {
-                    Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
-                    if(potentialTarget)
-                    {
-                        PlayerController pc = potentialTarget.GetComponent<PlayerController>();
-                        if(pc)
-                        {
-                            LockSendingCommands();
-                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
-                        }
-                    }
-                }
+               
                 
                 break;
             }
             case(PadlaState.Chasing):
             {
-                brainTimer += dt;
-                
-                if(target_pc)
-                {
-                    Vector3 targetGroundPos = target_pc.GetGroundPosition();
-                    
-               
-                    
-                    Vector3 padlaPosition = thisTransform.localPosition;
-                    
-                    if(canSendCommands)
-                    {
-                        if(Math.SqrDistance(targetGroundPos, padlaPosition) < punch1_distance  * punch1_distance)
-                        {
-                            NavMeshHit navMeshHit;
-                            //Vector3 punch_dir = (Math.GetXZ(targetGroundPos - padlaPosition)).normalized;
-                            Vector3 punch_dir = (targetGroundPos - padlaPosition).normalized;
-                            
-                            Vector3 dash_pos = padlaPosition;
-                            if(NavMesh.SamplePosition(padlaPosition + punch_dir * punch1_dashDistance, out navMeshHit, 0.125f, NavMesh.AllAreas))
-                            {
-                                dash_pos = navMeshHit.position;
-                                InGameConsole.LogFancy("We DO <color=green>DASH ATTACK</color>");
-                            }
-                            else
-                                InGameConsole.LogFancy("We DO <color=orange>NOT DASH ATTACK</color>");
-                            
-                            LockSendingCommands();
-                            if(numberOfPunchesPerformed % 2 == 0)
-                            {
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Attack, dash_pos, punch_dir);
-                            }
-                            else
-                            {
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.Ability1, dash_pos, punch_dir);
-                            }
-                        }
-                        else if(brainTimer > path_update_cd)
-                        {
-                            brainTimer = 0;
-                            
-                          
-                        }
-                    }
-                
-                }
-                else
-                {
-                    if(canSendCommands)
-                    {
-                        Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
-                        if(potentialTarget)
-                        {
-                            PlayerController pc = potentialTarget.GetComponent<PlayerController>();
-                            if(pc)
-                            {
-                                LockSendingCommands();
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
-                            }
-                        }
-                        else
-                        {
-                            LockSendingCommands();
-                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetState, (byte)PadlaState.Idle);                        
-                        }
-                    }
-                }
                 
                 break;
             }
             case(PadlaState.Attacking1):
             {
-                brainTimer += dt;
-                
-                if(canSendCommands)
-                {
-                    if(brainTimer > punch1_duration)
-                    {
-                        brainTimer = 0;
-                        Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
-                       
-                        
-                        if(potentialTarget)
-                        {
-                            PlayerController pc = potentialTarget.GetComponent<PlayerController>();
-                            if(pc)
-                            {
-                                LockSendingCommands();
-                                NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetTarget, pc.pv.ViewID);
-                            }
-                        }
-                        else
-                        {
-                            LockSendingCommands();
-                            NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.SetState, (byte)PadlaState.Idle);
-                        }
-                        
-                    }
-                }
+               
                 break;
             }
             case(PadlaState.Attacking2):
@@ -735,67 +570,7 @@ public class PadlaHangingController : MonoBehaviour, INetworkObject, IDamagableL
             }
             case(PadlaState.Airbourne):
             {
-                Vector3 currentPos = thisTransform.localPosition;
-                
-                velocity.y += GRAVITY_Y * dt;
-                velocity.y = Math.Clamp(-GRAVITY_MAX, GRAVITY_MAX, velocity.y);
-                
-                if(airbourneTimeStamp > airbourneTimeStamp + 15f)
-                {
-                    LockSendingCommands();
-                    //NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.DieWithForce, new Vector3(0, 0, 0));
-                }
-                
-                RaycastHit hit;
-                
-                float velMag = Math.Magnitude(velocity);
-                Vector3 velDir = velocity.normalized;
-                
-                Vector3 capsulePBottom = GetCapsulePointBottom();
-                Vector3 capsulePTop = GetCapsulePointTop();
-                
-                gizmoP1 = capsulePBottom;
-                gizmoP2 = capsulePTop;
-                
-                float capsuleRadius = col.radius;
-                
-                if(velMag > 0)
-                {
-                    if(Physics.CapsuleCast(capsulePBottom, capsulePTop, capsuleRadius, velDir, out hit, velMag * dt, groundMask))
-                    {
-                        float dot = Vector3.Dot(hit.normal, velDir);
-                        velocity = velocity + hit.normal * velMag * Math.Abs(dot);
-                        
-                        velMag = Math.Magnitude(velocity);
-                        
-                        if(velMag > 0.1f)
-                        {
-                            if(Physics.CapsuleCast(capsulePBottom, capsulePTop, capsuleRadius, velDir, velMag * dt, groundMask))
-                            {
-                                velocity.x = velocity.y = velocity.z = 0;
-                                InGameConsole.LogFancy(string.Format("{0}: Double capsule cast hit!", this.gameObject.name));
-                            }
-                        }
-                        else
-                        {
-                            //InGameConsole.LogOrange("Magnitude of vel is " + velMag.ToString());
-                            NavMeshHit navMeshHit;
-                            if(NavMesh.SamplePosition(thisTransform.localPosition, out navMeshHit, 0.33f, NavMesh.AllAreas))
-                            {
-                                if(canSendCommands)
-                                {
-                                    LockSendingCommands();
-                                    InGameConsole.LogOrange("<color=green>Sending LandOnGround() </color>");
-                                    NetworkObjectsManager.CallNetworkFunction(net_comp.networkId, NetworkCommand.LandOnGround, navMeshHit.position);
-                                }
-                            }
-                        }
-                    }
-                    
-                }
-                
-                Vector3 updatedPos = currentPos + velocity * dt;                
-                thisTransform.localPosition = updatedPos;
+               
                 
                 
                 break;
@@ -1084,28 +859,7 @@ public class PadlaHangingController : MonoBehaviour, INetworkObject, IDamagableL
         UpdateBrainLocally(dt);
     }
     
-    Transform ChooseTargetClosest(Vector3 seekerPos)
-    {
-        Transform result = null;
-        
-        int len = NPCManager.Singleton().aiTargets.Count;
-        
-        float minDistanceSqr = float.MaxValue;
-        
-        for(int i = 0; i < len; i++)
-        {
-            Transform potentialTarget = NPCManager.Singleton().aiTargets[i];
-            float distSqr = Math.SqrDistance(seekerPos, potentialTarget.position);
-            
-            if(distSqr <  minDistanceSqr)
-            {
-                minDistanceSqr = distSqr;
-                result = potentialTarget;
-            }
-        }
-        
-        return result;
-    }
+    
     
     bool TryDoMeleeDamageToLocalPlayer(Vector3 pos, float radius)
     {

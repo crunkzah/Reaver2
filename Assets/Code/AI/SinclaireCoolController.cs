@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 using Photon.Pun;
+using System.Collections.Generic;
 
 public enum SinclaireCoolState : byte
 {
@@ -477,7 +478,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
             
             firing_masterTimer = 0.5f;
             slam_cooldown_timer = 0;
-            if(canSendCommands)
+            if(canSendCommands && UberManager.readyToSwitchLevel)
             {
                 Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
                 if(potentialTarget)
@@ -560,19 +561,23 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
     {
         Transform result = null;
         
-        int len = NPCManager.Singleton().aiTargets.Count;
+        ref List<PlayerController> pcs = ref UberManager.Singleton().playerControllers;
+        int len = pcs.Count;
         
         float minDistanceSqr = float.MaxValue;
         
         for(int i = 0; i < len; i++)
         {
-            Transform potentialTarget = NPCManager.Singleton().aiTargets[i];
-            float distSqr = Math.SqrDistance(seekerPos, potentialTarget.position);
-            
-            if(distSqr <  minDistanceSqr)
+            PlayerController potentialTarget = pcs[i];
+            if(pcs[i].isAlive)
             {
-                minDistanceSqr = distSqr;
-                result = potentialTarget;
+                float distSqr = Math.SqrDistance(seekerPos, potentialTarget.GetGroundPosition());
+                
+                if(distSqr <  minDistanceSqr)
+                {
+                    minDistanceSqr = distSqr;
+                    result = potentialTarget.thisTransform;
+                }
             }
         }
         
@@ -792,7 +797,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
         {
             case(SinclaireCoolState.Idle):
             {
-                if(canSendCommands)
+                if(canSendCommands && UberManager.readyToSwitchLevel)
                 {
                     Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
                     if(potentialTarget)
@@ -816,7 +821,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                     if(changeTargetTimer > changeTargetCooldown)
                     {
                         changeTargetTimer = 0;
-                        if(canSendCommands)
+                        if(canSendCommands && UberManager.readyToSwitchLevel)
                         {
                             Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
                             if(potentialTarget.GetInstanceID() != target_pc.thisTransform.GetInstanceID())
@@ -841,7 +846,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                     
                     UpdateRemoteAgentDestination(targetGroundPos);
                    
-                    if(canSendCommands)
+                    if(canSendCommands && UberManager.readyToSwitchLevel)
                     {
                         if(slam_cooldown_timer > slam_cooldown)
                         {
@@ -942,7 +947,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                 }
                 else
                 {
-                    if(canSendCommands)
+                    if(canSendCommands && UberManager.readyToSwitchLevel)
                     {
                         Transform potentialTarget = ChooseTargetClosest(thisTransform.localPosition);
                         if(potentialTarget)
@@ -975,7 +980,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
             {
                 brainTimer += dt;
                 
-                if(canSendCommands)
+                if(canSendCommands && UberManager.readyToSwitchLevel)
                 {
                     if(brainTimer > sword_attack1_duration)
                     {
@@ -1003,7 +1008,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
             {
                 brainTimer += dt;
                 
-                if(canSendCommands)
+                if(canSendCommands && UberManager.readyToSwitchLevel)
                 {
                     if(brainTimer > firing_duration)
                     {
@@ -1032,11 +1037,12 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                 brainTimer += dt;
                 if(brainTimer > vanishDuration)
                 {
-                    int playerCount = NPCManager.AITargets().Count;
+                    ref List<PlayerController> pcs = ref UberManager.Singleton().playerControllers;
+                    int playerCount = pcs.Count;
                     int playersAlive = 0;
                     for(int i = 0; i < playerCount; i++)
                     {
-                        if(NPCManager.AITargets()[i].GetComponent<PlayerController>().isAlive)
+                        if(pcs[i].isAlive)
                             playersAlive++;
                     }
                     
@@ -1046,7 +1052,7 @@ public class SinclaireCoolController : MonoBehaviour, INetworkObject, IDamagable
                     if(playersAlive > 0)
                     {
                         int rand = Random.Range(0, playersAlive);
-                        PlayerController slam_target = NPCManager.AITargets()[rand].GetComponent<PlayerController>(); 
+                        PlayerController slam_target = pcs[rand].GetComponent<PlayerController>(); 
                         
                         if(slam_target && slam_target.isAlive)
                         {
